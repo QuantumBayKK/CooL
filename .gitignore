@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+app/vector.index
+app/vector_meta.pkl
+data/raw/
