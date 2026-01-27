@@ -1,4 +1,4 @@
-# FounderOS 🧠  
+FounderOS  
 Explainable Multi-Agent AI Cofounder System
 
 FounderOS is a local, explainable, multi-agent AI system designed to simulate
