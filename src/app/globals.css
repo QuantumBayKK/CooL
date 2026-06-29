@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+/*
+  CooL — Design Tokens (single source of truth, mirrors CREATIVE-DIRECTION-SYSTEM.md §3)
+  Color is a dramatic arc: warm-human -> cold-clinical -> verifiable-light -> resolved.
+  Values are the tuned starting points defined in the Creative Direction System.
+*/
+@theme {
+  /* ---- Foundation (constant across the film) ---- */
+  --color-void: #05060a;          /* primary canvas: the dark room */
+  --color-void-raised: #0b0e15;   /* elevated dark surfaces */
+  --color-ink: #0a0b0e;           /* text on light */
+  --color-paper: #f4f1ea;         /* light surfaces — never pure white */
+  --color-mist: #9aa3b4;          /* recessive text — lifted for legibility */
+
+  /* ---- Narrative temperature ---- */
+  --color-human: #d98b5f;         /* Act I/V — life, stakes, warmth */
+  --color-human-deep: #a8542f;
+  --color-doubt: #3a4452;         /* Act II/III — cold, clinical */
+  --color-doubt-deep: #1c232e;
+
+  /* The signature accent — born in Ch.4. Rationed. Means "proven".
+     Tuned cooler/calmer than neon — "clean light through water". */
+  --color-verify: #67d3e6;
+  --color-verify-deep: #2f9bb0;
+  --color-proof: #84e6b8;         /* calm "verified" confirmation */
+  --color-alarm: #e0644f;         /* used exactly once (Ch.6) */
+
+  /* ---- Typography families (set by next/font in layout.tsx) ---- */
+  --font-narrator: var(--font-display), Georgia, "Times New Roman", serif;
+  --font-witness: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-instrument: var(--font-mono), ui-monospace, "SFMono-Regular", "Cascadia Code", monospace;
+
+  /* ---- Fluid type scale (clamp-based, contrast-heavy) ---- */
+  --text-cinema: clamp(2.75rem, 7.5vw, 7rem);
+  --text-display: clamp(2.25rem, 5vw, 4.25rem);
+  --text-headline: clamp(1.6rem, 3vw, 2.75rem);
+  --text-body-lg: clamp(1.1rem, 1.5vw, 1.4rem);
+  --text-body: 1.0625rem;
+  --text-caption: 0.8125rem;
+
+  /* ---- Spacing scale (8px base) ---- */
+  --spacing-section: clamp(6rem, 14vh, 14rem);
+
+  /* ---- Motion (mirrors motion.tokens.ts; CSS-side use only) ---- */
+  --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);   /* decisive arrival (expo-out-ish) */
+  --ease-mass: cubic-bezier(0.65, 0, 0.35, 1);       /* weighted transform */
+  --duration-base: 400ms;
+  --duration-slow: 800ms;
+  --duration-cinematic: 1400ms;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-void);
+  color: var(--color-paper);
+  font-family: var(--font-witness);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Lenis smooth-scroll baseline (recommended setup) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* The film canvas should never show a horizontal scrollbar from full-bleed frames. */
+body {
+  overflow-x: clip;
+}
+
+/* Recessive, premium selection */
+::selection {
+  background: color-mix(in oklab, var(--color-verify) 35%, transparent);
+  color: var(--color-paper);
+}
+
+/* Honor reduced-motion globally as a hard safety net (engines also branch on it). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility: a single statement centered in the dark (the "museum object" layout). */
+.frame-cinema {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  position: relative;
+}

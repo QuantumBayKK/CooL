@@ -1,0 +1,9 @@
+# Vercel upload ignore — keep clips IN (they are static runtime assets).
+.next
+node_modules
+.git
+.DS_Store
+npm-debug.log*
+# Docs aren't needed at runtime.
+creative
+PRD.md
