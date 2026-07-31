@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import dynamic from "next/dynamic";
 import { ArrowDown } from "lucide-react";
@@ -18,7 +18,7 @@ function LightPool() {
   );
 }
 
-/* Claymorphic bloom — soft light pooled behind the object so it reads on dark */
+/* Claymorphic bloom â€” soft light pooled behind the object so it reads on dark */
 function ClayGlow() {
   return (
     <div
@@ -54,7 +54,7 @@ function HeroStage({ className }: { className: string }) {
  * The ask.
  *
  * Rebuilt because the old card broke at both ends. `whitespace-nowrap` on a
- * `15vw` display face set "₹1 Crore" wider than a 360px phone and shoved the
+ * `15vw` display face set "â‚¹1 Crore" wider than a 360px phone and shoved the
  * card sideways, and the rotating shimmer ring drew a hard seam over the border
  * on dark. It is now a plain figure that cannot overflow: the number sits on
  * its own line and the type scales off the container rather than the viewport.
@@ -66,10 +66,10 @@ function AskBox() {
         Pre-seed ask
       </p>
       <p className="display mt-2.5 text-[clamp(2.4rem,7vw,3.2rem)] leading-none text-ink">
-        ₹1 Cr
+        â‚¹1 Cr
       </p>
       <p className="mt-2.5 border-t border-line pt-2.5 font-mono text-[11px] leading-relaxed text-mist">
-        SAFE · ₹10 Cr cap · 12-month runway
+        SAFE Â· â‚¹10 Cr cap Â· 12-month runway
       </p>
     </div>
   );
@@ -78,7 +78,7 @@ function AskBox() {
 /**
  * One action.
  *
- * This used to be three buttons of near-equal weight — deck, demo, dashboard —
+ * This used to be three buttons of near-equal weight â€” deck, demo, dashboard â€”
  * which is three exits from the first screen and no path through it. A reader
  * who has to choose before they know anything usually chooses to leave.
  */
@@ -107,13 +107,20 @@ function Cta({ stack = false }: { stack?: boolean }) {
 /**
  * The promise, in one sentence.
  *
- * The previous version stacked four past-participles onto a dash — "documented,
- * approved, filed and provable. Automatically." — which reads as a feature list
+ * The previous version stacked four past-participles onto a dash â€” "documented,
+ * approved, filed and provable. Automatically." â€” which reads as a feature list
  * wearing a sentence's clothes, and asks a compliance officer to work out the
  * subject. This says who does what, in order, in the language a bank or a
  * hospital already uses for this work.
+ *
+ * NOT named `Promise`. It was, and that shadowed the global `Promise` for this
+ * whole module â€” so the `next/dynamic` loader generated for the two imports at
+ * the top of this file called `Promise.all(...)`, found a React component, and
+ * threw `b.all is not a function` on hydration. The page rendered on the server
+ * and then died in the browser. Module-scope identifiers must never collide
+ * with globals that bundler-generated code relies on.
  */
-function Promise({ className }: { className?: string }) {
+function HeroPromise({ className }: { className?: string }) {
   return (
     <p className={className}>
       Your teams change their AI every day. Every change has to be written up,
@@ -128,7 +135,7 @@ export default function S01Cover() {
     <section
       id="cover"
       data-slide="01"
-      data-layer="01 · COVER"
+      data-layer="01 Â· COVER"
       className="relative mx-auto flex min-h-[100svh] w-full max-w-6xl snap-start items-center px-5 pt-24 pb-14 lg:pt-24 lg:pb-16"
     >
       <SlideFrame mode="fall" className="w-full">
@@ -144,7 +151,7 @@ export default function S01Cover() {
               <HeroStage className="h-[188px] w-full" />
             </div>
 
-            <Promise className="mx-auto max-w-[34ch] text-[15px] leading-relaxed font-medium text-fog" />
+            <HeroPromise className="mx-auto max-w-[34ch] text-[15px] leading-relaxed font-medium text-fog" />
 
             <p className="mx-auto mt-3 max-w-[32ch] text-[13.5px] leading-relaxed text-mist">
               Weeks of manual work a year, gone. Audit costs down by up to 90%.
@@ -159,7 +166,7 @@ export default function S01Cover() {
             </div>
 
             <p className="mt-4 font-mono text-[10.5px] leading-relaxed text-mist">
-              Northwind Cipher Pvt Ltd · Pranauv Shrinaath S, CEO · Kailosh
+              Northwind Cipher Pvt Ltd Â· Pranauv Shrinaath S, CEO Â· Kailosh
               Kalimuthu, CTO
             </p>
           </Reveal>
@@ -173,7 +180,7 @@ export default function S01Cover() {
             </h1>
             <p className="kicker mt-2 text-[15px]">The black box for AI</p>
 
-            <Promise className="mt-6 max-w-lg text-[20px] leading-relaxed font-medium text-fog" />
+            <HeroPromise className="mt-6 max-w-lg text-[20px] leading-relaxed font-medium text-fog" />
 
             <p className="mt-4 max-w-md text-[15px] leading-relaxed text-mist">
               Weeks of manual work a year, gone. Audit costs down by up to 90%.
@@ -185,7 +192,7 @@ export default function S01Cover() {
             </div>
 
             <p className="mt-6 font-mono text-[11.5px] leading-relaxed text-mist">
-              Northwind Cipher Pvt Ltd · Pranauv Shrinaath S, CEO · Kailosh
+              Northwind Cipher Pvt Ltd Â· Pranauv Shrinaath S, CEO Â· Kailosh
               Kalimuthu, CTO
             </p>
           </Reveal>
