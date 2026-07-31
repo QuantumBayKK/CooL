@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { Play, ArrowRight } from "lucide-react";
 import { Slide } from "@/components/Slide";
 import { Reveal, GithubMark } from "@/components/ui";
 
@@ -43,18 +41,9 @@ export default function S05Proof() {
             Then try to cheat: alter the record and watch the same verifier reject
             it, and tell you exactly which domain broke.
           </p>
-          {/* One action. The console is in the nav for anyone who wants it —
-              here, the only thing worth asking for is that they run it. */}
-          <div className="mt-3.5">
-            <Link
-              href="/demo"
-              prefetch
-              className="inline-flex items-center gap-2 rounded-full bg-verify-deep px-5 py-3 font-mono text-[12.5px] text-white shadow-[0_0_22px_rgba(9,105,218,0.45)] transition-shadow hover:shadow-[0_0_34px_rgba(9,105,218,0.75)]"
-            >
-              <Play className="size-3.5" strokeWidth={2.4} /> Run it yourself
-              <ArrowRight className="size-3.5" />
-            </Link>
-          </div>
+          {/* No button here. The invitation to go and run it belongs at the end
+              of the deck, not halfway through — a link at this point is an exit
+              that costs the reader the market, the model and the ask. */}
         </div>
       </Reveal>
 

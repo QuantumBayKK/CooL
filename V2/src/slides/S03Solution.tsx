@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { Slide } from "@/components/Slide";
 import { Reveal, Mark } from "@/components/ui";
 
@@ -101,59 +99,60 @@ export default function S03Solution() {
         </div>
       </Reveal>
 
+      {/* Two full-width rows rather than a 2-column split. The split stacked the
+          three gain cards vertically in the right column, which made this the
+          tallest slide in the deck — 1239px against a 900px laptop, needing
+          0.68x to fit and so falling through the readability floor. Side by
+          side they cost a third of the height. */}
       <Reveal delay={0.12}>
-        <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_1fr]">
-          <div className="frost rounded-2xl border border-line px-4 py-4">
+        <div className="mt-4 frost rounded-2xl border border-line px-4 py-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
             <p className="font-mono text-[11px] tracking-[0.16em] text-verify uppercase">
               It fits what you already run
             </p>
-            <p className="mt-2 text-[13.5px] leading-relaxed text-fog">
-              CooL reads your existing setup — your code system, your AI
-              providers, your ticketing — and connects to them. No migration, no
+            <p className="max-w-xl text-[13.5px] leading-relaxed text-fog">
+              CooL reads your existing setup and connects to it. No migration, no
               new platform, no retraining anyone.
             </p>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {FITS.map((f) => (
-                <span
-                  key={f}
-                  className="rounded-full border border-line bg-panel/60 px-2.5 py-1 font-mono text-[10.5px] text-fog"
-                >
-                  {f}
-                </span>
-              ))}
-            </div>
           </div>
-
-          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            {GAINS.map(([big, small]) => (
-              <div
-                key={big}
-                className="frost rounded-2xl border border-live/30 px-4 py-3.5"
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {FITS.map((f) => (
+              <span
+                key={f}
+                className="rounded-full border border-line bg-panel/60 px-2.5 py-1 font-mono text-[10.5px] text-fog"
               >
-                <p className="display text-[clamp(1.3rem,4vw,1.7rem)] leading-none text-live">
-                  {big}
-                </p>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-fog">{small}</p>
-              </div>
+                {f}
+              </span>
             ))}
           </div>
         </div>
       </Reveal>
 
-      <Reveal delay={0.2}>
-        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-verify/30 bg-verify/[0.07] px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[14.5px] leading-relaxed text-fog">
-            Audits stop being fire drills, because the evidence was already
-            sealed and waiting — and it holds up whichever AI provider you use.
-          </p>
-          <Link
-            href="/dashboard"
-            prefetch
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-verify/45 bg-verify/15 px-4 py-2.5 font-mono text-[12px] text-ink transition-colors hover:bg-verify/25"
-          >
-            See it <ArrowRight className="size-3.5" />
-          </Link>
+      <Reveal delay={0.16}>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          {GAINS.map(([big, small]) => (
+            <div
+              key={big}
+              className="frost rounded-2xl border border-live/30 px-4 py-3.5"
+            >
+              <p className="display text-[clamp(1.3rem,4vw,1.7rem)] leading-none text-live">
+                {big}
+              </p>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-fog">{small}</p>
+            </div>
+          ))}
         </div>
+      </Reveal>
+
+      {/* The "see the dashboard" link that used to sit here is gone. It was a
+          mid-deck exit — the same reason the demo button came off slide 5 — and
+          removing it also brought this slide under the height where it can be
+          scaled to a single screen instead of being scrolled. */}
+      <Reveal delay={0.2}>
+        <p className="mt-3 text-[14px] leading-relaxed text-mist">
+          Audits stop being fire drills, because the evidence was already sealed
+          and waiting — and it holds up whichever AI provider you use.
+        </p>
       </Reveal>
     </Slide>
   );

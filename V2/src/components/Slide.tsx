@@ -102,6 +102,89 @@ export function SlideFrame({
 export const frameModeFor = (no: string): FrameMode =>
   (["fall", "left", "right"] as const)[(parseInt(no, 10) - 1) % 3]!;
 
+/**
+ * Below this scale, shrinking stops and the slide is allowed to scroll.
+ *
+ * Auto-fit is what lets a prose-heavy slide still be "one screen, one scroll".
+ * But it has a floor, because the alternative is worse than not fitting: slide
+ * 3 measures ~1780px against a 667px phone, which would need 0.37× — turning
+ * 14px body text into roughly 5px. A slide nobody can read is not a slide that
+ * fits. Past this point the slide keeps its size, loses its snap point (see
+ * `.is-tall`) and is simply scrolled, which is the honest outcome on a small
+ * screen carrying an essay.
+ */
+const MIN_FIT_SCALE = 0.72;
+
+/**
+ * Measure the slide's content and shrink it to the viewport when it is close
+ * enough to fit. Returns the scale to apply and whether the section should be
+ * pinned to exactly one screen.
+ */
+function useAutoFit(enabled: boolean) {
+  const inner = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    if (!enabled) {
+      setScale(1);
+      return;
+    }
+    const el = inner.current;
+    if (!el) return;
+
+    let width = window.innerWidth;
+
+    const fit = () => {
+      // Undo any current scale before measuring, or each pass compounds.
+      el.style.transform = "";
+      const content = el.getBoundingClientRect().height;
+      if (content === 0) return;
+
+      /* Read the section's real padding rather than assuming it. A fixed
+         allowance was wrong at every breakpoint the padding changes on, which
+         left a band of heights that measured as "fits" while still overflowing
+         by a few dozen pixels — enough to break the one-slide-per-scroll
+         promise without being obvious. */
+      const section = el.parentElement;
+      const cs = section ? getComputedStyle(section) : null;
+      const padY = cs
+        ? parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)
+        : 0;
+      const available = window.innerHeight - padY;
+
+      if (content <= available) {
+        setScale(1);
+        return;
+      }
+      const needed = available / content;
+      setScale(needed >= MIN_FIT_SCALE ? needed : 1);
+    };
+
+    fit();
+
+    /* Width-only: a mobile browser fires resize every time the URL bar
+       collapses, and re-fitting on that would visibly re-scale the slide
+       mid-scroll. Height changes there are chrome, not layout. */
+    const onResize = () => {
+      if (window.innerWidth === width) return;
+      width = window.innerWidth;
+      fit();
+    };
+    window.addEventListener("resize", onResize, { passive: true });
+
+    // Content settles as reveals run and fonts land, so re-fit when it changes.
+    const ro = new ResizeObserver(() => fit());
+    ro.observe(el);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      ro.disconnect();
+    };
+  }, [enabled]);
+
+  return { inner, scale, pinned: scale < 1 };
+}
+
 /* One deck slide = one full-viewport section, numbered exactly like the PPTX. */
 export function Slide({
   id,
@@ -122,17 +205,33 @@ export function Slide({
   wide?: boolean;
   center?: boolean;
 }) {
+  const reduced = useReducedMotion();
+  // Scaling is pointless under reduced motion and unhelpful when a screen
+  // reader or zoom user is driving; leave the document at its natural size.
+  const { inner, scale, pinned } = useAutoFit(!reduced);
+
   return (
     <section
       id={id}
       data-slide={no}
       data-layer={`${no} · ${kicker}`}
       className={clsx(
-        "relative mx-auto flex min-h-[100svh] w-full snap-start flex-col justify-center px-5 pt-24 pb-16 sm:pt-28 sm:pb-20",
+        "relative mx-auto flex w-full snap-start flex-col justify-center px-5 pt-24 pb-16 sm:pt-28 sm:pb-20",
+        // Pinned to exactly one screen once the content has been shrunk to fit,
+        // so the slide occupies a single snap step and nothing spills below.
+        pinned ? "h-[100svh] overflow-hidden" : "min-h-[100svh]",
         wide ? "max-w-6xl" : "max-w-2xl md:max-w-3xl lg:max-w-4xl",
         center && "items-center text-center",
       )}
     >
+      <div
+        ref={inner}
+        style={
+          scale < 1
+            ? { transform: `scale(${scale})`, transformOrigin: "center center" }
+            : undefined
+        }
+      >
       <SlideFrame mode={frameModeFor(no)}>
         <Reveal>
           <Kicker>{kicker}</Kicker>
@@ -173,6 +272,7 @@ export function Slide({
         </Reveal>
         {children ? <div className="mt-6 sm:mt-7">{children}</div> : null}
       </SlideFrame>
+      </div>
     </section>
   );
 }
