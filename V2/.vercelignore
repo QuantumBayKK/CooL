@@ -1,0 +1,24 @@
+# Build output and deps — Vercel builds these itself.
+.next
+node_modules
+.git
+tsconfig.tsbuildinfo
+
+# Source 3D assets (~59 MB). The optimised GLBs that actually ship live in
+# public/models/, produced by `npm run models`. Uploading the raw sources would
+# dominate the deployment for no runtime benefit.
+3d models
+
+# Scratch work and parked experiments.
+_parked
+
+# Pitch source material sitting at the repo root. Anchored with a leading slash
+# on purpose: a bare `*.jpg` would also swallow public/founders/*.jpg, which are
+# real runtime assets rendered on the team slide.
+/*.pdf
+/*.pptx
+/*.jpeg
+/*.jpg
+
+# Dev-only conformance script (kept in the repo, not needed on the server).
+scripts/verify-sdk.ts

@@ -1,0 +1,642 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* GitHub-dark hacker mode — one dark canvas, near-white ink, electric blue,
+     terminal green for "live/real", signal red for "fail".
+     The ✓ ⚠ ✕ glyphs still carry the meaning. */
+  --color-void: #0d1117;
+  --color-panel: #161b22;
+  --color-ink: #f0f6fc;
+  --color-line: rgba(240, 246, 252, 0.14);
+  --color-faint: rgba(240, 246, 252, 0.055);
+  --color-mist: #8b949e;
+  --color-fog: #c9d1d9;
+  --color-verify: #58a6ff;
+  --color-verify-deep: #1f6feb;
+  --color-live: #3fb950;
+  --color-mock: #8b949e;
+  --color-fail: #f85149;
+
+  --font-display: var(--font-anton), "Arial Narrow", "Impact", system-ui, sans-serif;
+  /* keynote voice — Inter Tight is the closest thing to SF Pro Display at the
+     sizes the investors page uses */
+  --font-keynote: var(--font-inter-tight), var(--font-inter), system-ui, sans-serif;
+  --font-poster: var(--font-bebas), var(--font-anton), "Arial Narrow", "Impact", sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+html {
+  background: var(--color-void);
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  /* Kill the elastic overscroll at the document ends. On a deck the bounce
+     reads as the page coming loose, and it also stops a downward flick at the
+     last slide from triggering pull-to-refresh. */
+  overscroll-behavior-y: none;
+  /* Deck mode, pointer devices only — see the coarse-pointer override below. */
+  scroll-snap-type: y mandatory;
+}
+
+/* On a mouse, SnapScroll drives the deck itself (one wheel gesture = exactly
+   one slide) and adds `.snap-js`. CSS snap steps aside then: a JS scroller and
+   CSS snap fighting over the same scrollTop is a classic source of stutter, so
+   exactly one of them is ever in charge. */
+html.snap-js {
+  scroll-snap-type: none;
+}
+
+[data-slide] {
+  scroll-snap-align: start;
+  /* never let a fast flick skip a slide */
+  scroll-snap-stop: always;
+}
+
+/* taller than the viewport → no snap point, so it can be read at leisure */
+[data-slide].is-tall {
+  scroll-snap-align: none;
+  scroll-snap-stop: normal;
+}
+
+/* ---- touch devices scroll normally ----
+   Mandatory snap and a phone are a bad pair here, for two compounding reasons.
+
+   First, these slides carry real content, and on a ~390px viewport most of them
+   are taller than the screen. A snap point on a slide you cannot see all of
+   means the browser keeps pulling you back to its top as you try to read the
+   bottom — which is exactly the rubber-banding this is fixing.
+
+   Second, mobile browsers change the viewport height as the URL bar collapses.
+   Any JS that re-measures "is this slide taller than the viewport?" therefore
+   re-runs mid-gesture, toggling snap points underneath a scroll that is already
+   in flight, and the scroller lurches.
+
+   The deck framing (full-bleed slides, the dot rail, the pager) all still work
+   without snap. So on coarse pointers the page is simply a page. */
+@media (hover: none), (pointer: coarse) {
+  html {
+    scroll-snap-type: none;
+  }
+  [data-slide],
+  [data-slide].is-tall {
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-snap-type: none;
+  }
+}
+
+/* custom cursor active (fine pointers only — set from Cursor.tsx) */
+.custom-cursor,
+.custom-cursor * {
+  cursor: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--color-void);
+  color: var(--color-fog);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  min-height: 100svh;
+}
+
+::selection {
+  background: rgba(88, 166, 255, 0.35);
+  color: #ffffff;
+}
+
+/* ---- display type ---- */
+.display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  line-height: 0.94;
+  letter-spacing: 0.005em;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+/* ---- cinematic kicker — poster type, no chip, no box ---- */
+.kicker {
+  font-family: var(--font-poster);
+  text-transform: uppercase;
+  letter-spacing: 0.34em;
+  color: var(--color-verify);
+  text-shadow: 0 0 24px rgba(88, 166, 255, 0.45);
+}
+
+/* ---- frosted glass (dark terminal panes) ----
+   The cipher field runs behind everything, so cards must frost it out: high
+   opacity + strong blur turns the sharp matrix into a soft wash and keeps
+   text crisp on top. */
+.glass {
+  background: rgba(20, 25, 32, 0.82);
+  border: 1px solid rgba(240, 246, 252, 0.12);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 rgba(240, 246, 252, 0.07),
+    0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.glass-strong {
+  background: rgba(20, 25, 32, 0.93);
+  border: 1px solid rgba(240, 246, 252, 0.14);
+  backdrop-filter: blur(32px) saturate(140%);
+  -webkit-backdrop-filter: blur(32px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 rgba(240, 246, 252, 0.09),
+    0 12px 36px rgba(0, 0, 0, 0.6);
+}
+
+/* ---- frosted panes ----
+   Any info box sits over the live cipher field, so it must frost that field
+   out. `.frost` is a plain dark frosted pane; the tinted variants keep a
+   highlight wash (blue / green) on top of the frost so accent cards stay
+   legible. Compose with border / rounded / shadow utilities as usual. */
+.frost {
+  background: rgba(20, 25, 32, 0.85);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+}
+.frost-verify {
+  background:
+    linear-gradient(rgba(88, 166, 255, 0.13), rgba(88, 166, 255, 0.13)),
+    rgba(18, 23, 30, 0.86);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+}
+.frost-live {
+  background:
+    linear-gradient(rgba(63, 185, 80, 0.13), rgba(63, 185, 80, 0.13)),
+    rgba(18, 23, 30, 0.86);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+}
+
+/* ---- film grain ---- */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---- hairline dividers ---- */
+.hairline {
+  border-color: var(--color-line);
+}
+
+/* ---- glow accents ---- */
+.glow-blue {
+  text-shadow: 0 0 26px rgba(88, 166, 255, 0.55);
+}
+
+/* ---- claymorphic bloom behind 3D objects ---- */
+.clay-glow {
+  background:
+    radial-gradient(ellipse 58% 52% at 50% 52%, rgba(88, 166, 255, 0.3), transparent 70%),
+    radial-gradient(ellipse 40% 34% at 50% 50%, rgba(240, 246, 252, 0.14), transparent 70%);
+  filter: blur(8px);
+}
+
+/* ---- shake (append-only / tamper feedback) ---- */
+@keyframes shake-x {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+
+.shake {
+  animation: shake-x 0.4s ease-in-out;
+}
+
+/* ---- border beam (the light that walks the ask's border) ---- */
+@keyframes beam-spin {
+  to { transform: rotate(360deg); }
+}
+.border-beam {
+  padding: 1px;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  overflow: hidden;
+}
+.border-beam::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 300deg,
+    rgba(31, 111, 235, 0.95) 340deg,
+    #58a6ff 355deg,
+    transparent 360deg
+  );
+  animation: beam-spin 5.5s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .border-beam::before {
+    animation: none;
+    opacity: 0.4;
+  }
+}
+
+/* ---- ticker ---- */
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-track {
+  animation: ticker-scroll linear infinite;
+}
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+/* ---- eye-follow button blink ---- */
+@keyframes eye-blink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.12); }
+}
+.eye-blink {
+  animation: eye-blink 5.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .eye-blink {
+    animation: none;
+  }
+}
+
+/* ---- horizontal scroller helpers ---- */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.edge-fade {
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+
+/* ---- scrollbars: thin, dark ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(240, 246, 252, 0.22) transparent;
+}
+
+/* ============================================================
+   AMBIENT MOTION — CSS only, on purpose.
+   Anything that loops forever lives here rather than in JS. These all animate
+   transform / opacity only, so the compositor runs them and they keep ticking
+   at full rate even while the main thread is busy. Every one of them is killed
+   under prefers-reduced-motion at the bottom of this block.
+   ============================================================ */
+
+/* the light that walks a border (buttons, the ask panel) */
+.shimmer-ring {
+  padding: 1px;
+  overflow: hidden;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+}
+.shimmer-ring::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 285deg,
+    rgba(88, 166, 255, 0.85) 332deg,
+    #dbeafe 352deg,
+    transparent 360deg
+  );
+  animation: beam-spin 3.4s linear infinite;
+}
+
+/* diagonal wipe on hover — transition, not a loop: it costs nothing at rest */
+.sheen {
+  pointer-events: none;
+  overflow: hidden;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  bottom: -50%;
+  left: -60%;
+  width: 40%;
+  transform: translateX(-40%) rotate(14deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.22),
+    transparent
+  );
+  opacity: 0;
+  transition:
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.4s ease;
+}
+.group:hover .sheen::after {
+  transform: translateX(420%) rotate(14deg);
+  opacity: 1;
+}
+
+/* cursor-tracking spotlight — position comes from JS-written custom props */
+.spot {
+  --spot-x: 50%;
+  --spot-y: 0%;
+  --spot-opacity: 0;
+}
+.spot-layer {
+  background: radial-gradient(
+    260px circle at var(--spot-x) var(--spot-y),
+    rgba(88, 166, 255, 0.14),
+    transparent 65%
+  );
+  opacity: var(--spot-opacity);
+  transition: opacity 0.4s ease;
+}
+
+/* gentle vertical bob */
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+.float-y {
+  animation: float-y 3.6s ease-in-out infinite;
+}
+
+/* a scan line crossing a card */
+@keyframes scan-y {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(320%);
+    opacity: 0;
+  }
+}
+.scan-y {
+  animation: scan-y 4.6s linear infinite;
+}
+
+/* seamless marquee — the track holds the content twice, so -50% loops cleanly */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x var(--marquee-duration, 38s) linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ---- carousel rail ---- */
+.carousel-rail {
+  scroll-padding-inline: 1.25rem;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  cursor: grab;
+}
+.carousel-rail.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+/* focus effect: the centred card is sharp, its neighbours recede. Driven by a
+   single class toggled from an IntersectionObserver — no per-frame JS. */
+.carousel-card {
+  opacity: 0.45;
+  transform: scale(0.955);
+  transition:
+    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.5s ease;
+}
+.carousel-card.is-active {
+  opacity: 1;
+  transform: scale(1);
+  border-color: rgba(88, 166, 255, 0.28);
+}
+
+/* ---- keynote type (the investors page) ----
+   Apple-keynote scale: very large, very tight, near-white on black, and almost
+   no letterspacing. The restraint is the effect. */
+.keynote {
+  font-family: var(--font-keynote), var(--font-inter), system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+.keynote-lead {
+  font-family: var(--font-keynote), var(--font-inter), system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 1.42;
+  color: var(--color-fog);
+  text-wrap: pretty;
+}
+
+/* ---- intro curtain ---- */
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: #000;
+}
+
+/* ---- reduced motion: stop every ambient loop ---- */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-ring::before,
+  .float-y,
+  .scan-y,
+  .marquee-track {
+    animation: none !important;
+  }
+  .scan-y {
+    opacity: 0;
+  }
+  .carousel-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .sheen::after {
+    transition: none;
+  }
+  /* a Reveal that never got the chance to run must not hide its content */
+  [data-reveal] {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
+@theme inline {
+  --font-heading: var(--font-display);
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: var(--color-void);
+  --foreground: var(--color-fog);
+  --card: var(--color-panel);
+  --card-foreground: var(--color-fog);
+  --popover: var(--color-panel);
+  --popover-foreground: var(--color-fog);
+  --primary: var(--color-verify-deep);
+  --primary-foreground: #ffffff;
+  --secondary: rgba(240, 246, 252, 0.055);
+  --secondary-foreground: var(--color-fog);
+  --muted: rgba(240, 246, 252, 0.055);
+  --muted-foreground: var(--color-mist);
+  --accent: rgba(88, 166, 255, 0.13);
+  --accent-foreground: var(--color-ink);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: var(--color-line);
+  --input: rgba(240, 246, 252, 0.14);
+  --ring: var(--color-verify);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}

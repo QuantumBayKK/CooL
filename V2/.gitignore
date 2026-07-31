@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# Raw source 3D assets — 59 MB, one file 37 MB. The optimised GLBs that ship
+# live in public/models/ (under 1 MB each) and ARE committed; regenerate them
+# with `npm run models`. Committing the sources directly would permanently slow
+# every clone. If they need versioning, use Git LFS rather than removing this.
+3d models/
+
+# Incidental screenshots dropped in the project root.
+WhatsApp Image*.jpeg
+WhatsApp Image*.jpg

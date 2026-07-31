@@ -40,3 +40,7 @@ yarn-error.log*
 /public/audio/**/*.ogg
 
 .vercel
+
+# Local snapshot taken before the V2 rebuild — not part of the project.
+/_backup_V2_2026-07-30/
+
