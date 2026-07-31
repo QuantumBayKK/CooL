@@ -1,14 +1,14 @@
-﻿"use client";
+"use client";
 
 import { Slide } from "@/components/Slide";
 import { Reveal, Note } from "@/components/ui";
 import InteractivePortrait from "@/components/InteractivePortrait";
 
 /**
- * Slide 11 â€” the team, as the intersection rather than two CVs.
+ * Slide 11 — the team, as the intersection rather than two CVs.
  *
  * The portraits use the lens mask: a desaturated base with full colour revealed
- * under the pointer, and on touch under a tap. One line of credential each â€”
+ * under the pointer, and on touch under a tap. One line of credential each —
  * the argument is the pairing, not the rÃ©sumÃ©.
  */
 

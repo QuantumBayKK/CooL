@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 
 import { Slide } from "@/components/Slide";
 import { Reveal, Note } from "@/components/ui";
 
 /**
- * Slide 9 â€” the comparison, reduced to the only row that decides anything.
+ * Slide 9 — the comparison, reduced to the only row that decides anything.
  *
  * A five-column capability matrix is unreadable on a phone and unnecessary on a
  * laptop: four of its five rows say the same thing in different words. This
@@ -13,9 +13,9 @@ import { Reveal, Note } from "@/components/ui";
  */
 
 const RIVALS = [
-  ["AI observability", "Langfuse, Datadog", "watches performance â€” proves nothing"],
-  ["Governance & GRC", "Credo AI, OneTrust", "holds policies â€” doesn't see your changes"],
-  ["Compliance automation", "Vanta, Drata", "covers your company â€” not your AI"],
+  ["AI observability", "Langfuse, Datadog", "watches performance — proves nothing"],
+  ["Governance & GRC", "Credo AI, OneTrust", "holds policies — doesn't see your changes"],
+  ["Compliance automation", "Vanta, Drata", "covers your company — not your AI"],
   ["Build it yourself", "", "a team, a year, and it still isn't tamper-proof"],
 ] as const;
 
@@ -54,7 +54,7 @@ export default function S08Competition() {
             <div className="flex flex-col items-center gap-0.5 sm:flex-row sm:justify-between sm:gap-6 sm:text-left">
               <p className="shrink-0 text-[15px] font-semibold text-verify">CooL</p>
               <p className="text-[13.5px] leading-snug text-live sm:text-right">
-                captures every change, seals it, and proves it â€” across every
+                captures every change, seals it, and proves it — across every
                 provider
               </p>
             </div>

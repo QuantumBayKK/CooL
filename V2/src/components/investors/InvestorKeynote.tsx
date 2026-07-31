@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -30,7 +30,7 @@ import {
  * Fourteen stages, one idea each, built in sequence. This is diligence material
  * presented rather than published: the same content a partner would otherwise
  * read as a memo, paced so the argument arrives in the order it should be
- * believed in â€” principles, then architecture, then an honest account of what
+ * believed in — principles, then architecture, then an honest account of what
  * is and is not built, then what the money does.
  *
  * Nothing here repeats the deck.
@@ -55,7 +55,7 @@ const STAGE_LABELS = [
   "Close",
 ];
 
-/** Right-edge progress rail. Desktop only â€” it is orientation, not navigation. */
+/** Right-edge progress rail. Desktop only — it is orientation, not navigation. */
 function Rail() {
   const [active, setActive] = useState(0);
 
@@ -197,7 +197,7 @@ export default function InvestorKeynote() {
           entirely — the stylesheet has already disabled snapping there. */}
       <SnapScroll />
 
-      {/* quiet chrome â€” a keynote has no navigation bar */}
+      {/* quiet chrome — a keynote has no navigation bar */}
       <div className="fixed inset-x-0 top-[calc(0.8rem+env(safe-area-inset-top))] z-50 flex justify-center px-4">
         <div className="glass-strong flex items-center gap-1 rounded-full py-1.5 pr-1.5 pl-3.5">
           <Link
@@ -225,7 +225,7 @@ export default function InvestorKeynote() {
       </div>
 
       <main className="relative z-10">
-        {/* â”€â”€ 01 Â· open â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ 01 · open â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="01">
           <Eyebrow>{HERO.kicker}</Eyebrow>
           <Headline size="xl">{HERO.title}</Headline>
@@ -237,7 +237,7 @@ export default function InvestorKeynote() {
           </Build>
         </Stage>
 
-        {/* â”€â”€ 02 Â· principles overture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ 02 · principles overture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="02">
           <Eyebrow>Design principles</Eyebrow>
           <Headline size="xl">
@@ -262,14 +262,14 @@ export default function InvestorKeynote() {
           </div>
         </Stage>
 
-        {/* â”€â”€ 03â€“07 Â· one principle per screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ 03–07 · one principle per screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <PrincipleStage no="03" index={0} />
         <PrincipleStage no="04" index={1} />
         <PrincipleStage no="05" index={2} />
         <PrincipleStage no="06" index={3} />
         <PrincipleStage no="07" index={4} />
 
-        {/* â”€â”€ 08 Â· architecture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ 08 · architecture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="08">
           <Eyebrow>Architecture</Eyebrow>
           <Headline>One boundary matters more than the rest.</Headline>
@@ -312,10 +312,10 @@ export default function InvestorKeynote() {
                     Orchestration
                   </p>
                   <p className="mt-1 font-mono text-[10.5px] leading-snug text-mist">
-                    Fleet health Â· updates Â· licensing Â· billing
+                    Fleet health · updates · licensing · billing
                   </p>
                   <p className="mt-3 text-[13px] leading-relaxed text-fog">
-                    Carries no customer evidence or PII â€” by construction, not by
+                    Carries no customer evidence or PII — by construction, not by
                     policy.
                   </p>
                 </div>
@@ -324,14 +324,14 @@ export default function InvestorKeynote() {
           </div>
         </Stage>
 
-        {/* â”€â”€ 09 Â· what works â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ 09 · what works â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="09">
           <Eyebrow>Build status</Eyebrow>
           <Headline>The hard cryptography already runs.</Headline>
           <StatusList states={["working"]} />
         </Stage>
 
-        {/* â”€â”€ 10 Â· what doesn't â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ 10 · what doesn't â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="10">
           <Eyebrow>Build status</Eyebrow>
           <Headline>And this part does not.</Headline>
@@ -371,7 +371,7 @@ export default function InvestorKeynote() {
           </Build>
         </Stage>
 
-        {/* â”€â”€ 11 Â· buy vs build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ 11 · buy vs build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="11">
           <Eyebrow>Capital efficiency</Eyebrow>
           <Headline>
@@ -426,7 +426,7 @@ export default function InvestorKeynote() {
           </div>
         </Stage>
 
-        {/* â”€â”€ 12 Â· deployments + the round â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ 12 · deployments + the round â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="12">
           <Eyebrow>How it reaches enterprise</Eyebrow>
           <Headline>One artifact. Three deployments.</Headline>
@@ -453,7 +453,7 @@ export default function InvestorKeynote() {
           </div>
         </Stage>
 
-        {/* â”€â”€ 13 Â· the money â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ 13 · the money â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="13">
           <Eyebrow>Validation</Eyebrow>
           <Headline>We asked the people who live with it.</Headline>
@@ -475,9 +475,9 @@ export default function InvestorKeynote() {
         </Stage>
 
         <Stage no="14">          <Eyebrow>Use of funds</Eyebrow>
-          <Headline>What â‚¹1 Cr becomes, in eight weeks.</Headline>
+          <Headline>What ₹1 Cr becomes, in eight weeks.</Headline>
           <Lead>
-            Not the full architecture â€” one thin vertical slice of it, shaped so
+            Not the full architecture — one thin vertical slice of it, shaped so
             nothing has to be thrown away later.
           </Lead>
 
@@ -605,7 +605,7 @@ export default function InvestorKeynote() {
           </Build>
           <Build>
             <p className="mt-8 font-mono text-[11px] leading-relaxed text-mist">
-              {TERMS.entity} Â· Pranauv Shrinaath S, CEO Â· Kailosh Kalimuthu, CTO
+              {TERMS.entity} · Pranauv Shrinaath S, CEO · Kailosh Kalimuthu, CTO
             </p>
           </Build>
         </Stage>
