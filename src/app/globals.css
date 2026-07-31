@@ -111,3 +111,25 @@ body {
   place-items: center;
   position: relative;
 }
+
+/* Glowing scroll cue — a point of verifiable light tracing downward, pulsing. */
+.scroll-cue-dot {
+  filter: drop-shadow(0 0 6px var(--color-verify));
+  animation: scroll-cue-fall 2.1s cubic-bezier(0.6, 0, 0.3, 1) infinite;
+}
+@keyframes scroll-cue-fall {
+  0% {
+    transform: translate(-50%, -120%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 340%);
+    opacity: 0;
+  }
+}

@@ -36,17 +36,20 @@ export function Realization() {
       const logo = root.querySelector<HTMLElement>(".real-logo");
       const proxy = { v: 0 };
 
-      gsap.set(lines, { autoAlpha: 0, y: 24 });
+      lines.forEach((line) => gsap.set(line, { autoAlpha: 0, y: 18 }));
       if (net) gsap.set(net, { autoAlpha: 0 });
       if (logo) gsap.set(logo, { autoAlpha: 0, y: 16, scale: 0.98 });
 
+      // Clean sequential reveal — one line at a time, fully clearing before the
+      // next, so nothing overlaps.
+      const STEP = 1.5;
       lines.forEach((line, i) => {
-        const at = 0.4 + i * 1.0;
-        tl.to(line, { autoAlpha: 1, y: 0, duration: 0.6, ease: EASE.cinematic }, at);
-        tl.to(line, { autoAlpha: 0, y: -16, duration: 0.6, ease: EASE.mass }, at + 0.8);
+        const at = 0.4 + i * STEP;
+        tl.to(line, { autoAlpha: 1, y: 0, duration: 0.7, ease: EASE.cinematic }, at);
+        tl.to(line, { autoAlpha: 0, y: -14, duration: 0.55, ease: EASE.mass }, at + 0.85);
       });
 
-      const netStart = 0.4 + lines.length * 1.0;
+      const netStart = 0.4 + lines.length * STEP;
       if (net) tl.to(net, { autoAlpha: 1, duration: 0.8 }, netStart - 0.2);
       tl.to(
         proxy,

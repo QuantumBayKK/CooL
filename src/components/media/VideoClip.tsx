@@ -30,31 +30,37 @@ export function VideoClip({ clipId, className, objectPosition, active, warm }: V
   const [failed, setFailed] = useState(false);
   const controlled = active !== undefined;
 
-  // Playback control.
+  const [visible, setVisible] = useState(false);
+
+  // Track real on-screen visibility so off-screen stories never decode (every
+  // stacked clip shares inset-0, so only the genuinely scrolled-to story plays).
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setVisible(!!entry?.isIntersecting),
+      { threshold: 0.01 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Play only while visible AND (controlled ? active|warm : true). A play() promise
+  // rejects with AbortError whenever a pause() lands before it settles (normal during
+  // fast crossfades) — that is NOT a failure, so we swallow it. Genuine load failures
+  // surface through the <video> onError handler instead. (This false-fail was what
+  // blanked the healthcare clips into the placeholder.)
   useEffect(() => {
     const el = videoRef.current;
     if (!el || failed) return;
-
-    if (!controlled) {
-      const io = new IntersectionObserver(
-        ([entry]) => {
-          if (!entry) return;
-          if (entry.isIntersecting) el.play().catch(() => setFailed(true));
-          else el.pause();
-        },
-        { threshold: 0.05 },
-      );
-      io.observe(el);
-      return () => io.disconnect();
-    }
-
-    if (active) {
-      el.play().catch(() => setFailed(true));
+    const shouldPlay = visible && (controlled ? active || warm : true);
+    if (shouldPlay) {
+      const p = el.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
     } else {
       el.pause();
     }
-    return undefined;
-  }, [active, controlled, failed]);
+  }, [visible, active, warm, controlled, failed]);
 
   // Release memory on unmount.
   useEffect(() => {
@@ -69,10 +75,12 @@ export function VideoClip({ clipId, className, objectPosition, active, warm }: V
   }, []);
 
   if (!clip || failed) {
-    return <ClipPlaceholder label={clip?.label ?? clipId} className={className} />;
+    return <ClipPlaceholder className={className} />;
   }
 
-  const preload = !controlled ? "none" : active || warm ? "auto" : "metadata";
+  // Keep a real first frame ready for every clip (metadata) and fully buffer the
+  // ones in/near play, so nothing reads as a missing/black clip.
+  const preload = active || warm ? "auto" : "metadata";
 
   return (
     <video
@@ -91,26 +99,20 @@ export function VideoClip({ clipId, className, objectPosition, active, warm }: V
 }
 
 /**
- * Tasteful fallback — a lit gradient in the void/human palette with a recessive
- * role label. Reads as intentional art direction, never as a broken asset.
+ * Tasteful fallback when a clip is genuinely absent — a quiet, unlabelled dark
+ * field with a faint depth wash. No role text (that read as a debug/AI artifact);
+ * it should simply look like part of the film.
  */
-function ClipPlaceholder({ label, className }: { label: string; className?: string }) {
+function ClipPlaceholder({ className }: { className?: string }) {
   return (
-    <div
-      className={cn("relative h-full w-full overflow-hidden bg-void", className)}
-      aria-hidden
-    >
+    <div className={cn("relative h-full w-full overflow-hidden bg-void", className)} aria-hidden>
       <div
-        className="absolute inset-0 opacity-70"
+        className="absolute inset-0 opacity-60"
         style={{
           background:
-            "radial-gradient(120% 90% at 30% 20%, color-mix(in oklab, var(--color-human) 22%, transparent), transparent 60%), radial-gradient(120% 120% at 80% 90%, color-mix(in oklab, var(--color-doubt) 40%, transparent), transparent 55%)",
+            "radial-gradient(120% 100% at 50% 40%, color-mix(in oklab, var(--color-doubt) 22%, transparent), transparent 70%)",
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-void" />
-      <span className="absolute bottom-6 left-6 text-caption uppercase tracking-[0.2em] text-mist">
-        {label}
-      </span>
     </div>
   );
 }

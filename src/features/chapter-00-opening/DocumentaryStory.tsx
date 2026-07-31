@@ -46,26 +46,31 @@ export function DocumentaryStory({ story }: { story: StoryBeat }) {
       gsap.set(lines, { autoAlpha: 0, y: 20 });
       if (question) gsap.set(question, { autoAlpha: 0, y: 20 });
 
-      // Gentle opacity crossfades on integer beats + a slow continuous push.
+      // Long, soft dissolves on integer beats + a slow continuous push. The wide
+      // overlap (incoming rises while outgoing falls over the same window) keeps the
+      // cut from ever reading as a hard gradient seam.
       clips.forEach((clip, i) => {
         if (i > 0) {
           const prev = clips[i - 1];
-          tl.to(clip, { autoAlpha: 1, duration: 0.7, ease: EASE.hold }, i - 0.35);
-          if (prev) tl.to(prev, { autoAlpha: 0, duration: 0.7, ease: EASE.hold }, i - 0.35);
+          tl.to(clip, { autoAlpha: 1, duration: 1.0, ease: EASE.hold }, i - 0.5);
+          if (prev) tl.to(prev, { autoAlpha: 0, duration: 1.0, ease: EASE.hold }, i - 0.5);
         }
-        tl.to(clip, { scale: 1, duration: 1.5, ease: EASE.linear }, i > 0 ? i - 0.35 : 0);
+        tl.to(clip, { scale: 1, duration: 1.8, ease: EASE.linear }, i > 0 ? i - 0.5 : 0);
       });
 
-      // Interstitial lines across the early clips.
+      // Interstitial lines — one at a time, each fully clearing before the next so
+      // no two lines ever share the frame.
+      const STEP = 1.1;
       lines.forEach((line, i) => {
-        const at = 0.4 + (i * (clips.length - 1)) / Math.max(1, lines.length);
-        tl.to(line, { autoAlpha: 1, y: 0, duration: 0.45, ease: EASE.cinematic }, at);
-        tl.to(line, { autoAlpha: 0, y: -14, duration: 0.45, ease: EASE.mass }, at + 0.65);
+        const at = 0.5 + i * STEP;
+        tl.to(line, { autoAlpha: 1, y: 0, duration: 0.5, ease: EASE.cinematic }, at);
+        tl.to(line, { autoAlpha: 0, y: -14, duration: 0.45, ease: EASE.mass }, at + 0.55);
       });
 
-      // Closing statement over the final (emotion) clip.
+      // Closing statement over the final (emotion) clip — after the last line is gone.
       if (question) {
-        tl.to(question, { autoAlpha: 1, y: 0, duration: 0.8, ease: EASE.cinematic }, clips.length - 0.6);
+        const qAt = Math.max(clips.length - 0.4, 0.5 + lines.length * STEP);
+        tl.to(question, { autoAlpha: 1, y: 0, duration: 0.8, ease: EASE.cinematic }, qAt);
       }
       tl.to({}, { duration: 0.9 });
     },
@@ -97,18 +102,23 @@ export function DocumentaryStory({ story }: { story: StoryBeat }) {
             />
           </div>
         ))}
+        {/* Gentle cinematic scrim — only enough to seat the text, with a soft
+            falloff so there's no hard gradient band between the dark and the clip. */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(120% 100% at 50% 38%, transparent 42%, rgba(5,6,10,0.62) 100%)",
+              "linear-gradient(to bottom, rgba(5,6,10,0.45) 0%, rgba(5,6,10,0) 26%, rgba(5,6,10,0) 60%, rgba(5,6,10,0.55) 100%)",
           }}
         />
       </div>
 
+      {/* The animated lines + question are aria-hidden: the sr-only transcript below
+          reads the whole story once, in order, without the scrub choreography. */}
       {story.lines.map((line) => (
         <CinematicLine
           key={line}
+          ariaHidden
           size="display"
           className="story-line absolute left-1/2 top-1/2 w-[min(90vw,46rem)] -translate-x-1/2 -translate-y-1/2 px-6 text-center text-paper"
         >
@@ -116,7 +126,10 @@ export function DocumentaryStory({ story }: { story: StoryBeat }) {
         </CinematicLine>
       ))}
 
-      <div className="story-question absolute left-1/2 top-1/2 w-[min(92vw,56rem)] -translate-x-1/2 -translate-y-1/2 px-6 text-center">
+      <div
+        aria-hidden
+        className="story-question absolute left-1/2 top-1/2 w-[min(92vw,56rem)] -translate-x-1/2 -translate-y-1/2 px-6 text-center"
+      >
         {story.question.map((q, i) => (
           <CinematicLine
             key={q}

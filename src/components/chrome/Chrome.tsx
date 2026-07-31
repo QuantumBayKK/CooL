@@ -2,21 +2,26 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useExperienceStore } from "@/stores/experience.store";
-import { SoundToggle } from "./SoundToggle";
 import { ChapterProgress } from "./ChapterProgress";
+import { SoundToggle } from "./SoundToggle";
 
 /**
  * The almost-invisible UI (CDS §6). Nothing during the Cold Open; once the film is
- * underway, a recessive progress column and the sound toggle fade in.
+ * underway, a recessive progress column fades in. The sound toggle is always
+ * available (audio auto-enables on the first gesture, so muting must never require
+ * scrolling somewhere first).
  */
 export function Chrome() {
   const activeChapterId = useExperienceStore((s) => s.activeChapterId);
   const visible = activeChapterId !== "opening";
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <>
+    <>
+      <div className="pointer-events-none fixed bottom-5 right-5 z-40 md:bottom-6 md:right-6">
+        <SoundToggle />
+      </div>
+      <AnimatePresence>
+        {visible && (
           <motion.div
             key="progress"
             initial={{ opacity: 0 }}
@@ -27,19 +32,8 @@ export function Chrome() {
           >
             <ChapterProgress />
           </motion.div>
-
-          <motion.div
-            key="sound"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            className="fixed bottom-6 left-6 z-40"
-          >
-            <SoundToggle />
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

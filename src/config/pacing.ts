@@ -8,8 +8,8 @@
  * experience feeling slow or inconsistent.
  */
 export const SCROLL = {
-  coldOpen: 2.4, // 3 lines
-  story: 3.2, // 4 clips + interstitials + question
+  coldOpen: 2.8, // 3 overlapping lines
+  story: 4.4, // 4 clips + interstitials + question — each clip gets room to breathe
   silence: 0.6, // a held beat, not a void
   realization: 4.0, // 3 lines + network expand + logo
   question: 2.0,

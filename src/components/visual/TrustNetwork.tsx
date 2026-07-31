@@ -66,6 +66,7 @@ export function TrustNetwork({ progressRef, className, nodeCount = 64 }: TrustNe
     window.addEventListener("resize", resize);
 
     let raf = 0;
+    let running = false;
     const start = performance.now();
 
     const ease = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -121,13 +122,35 @@ export function TrustNetwork({ progressRef, className, nodeCount = 64 }: TrustNe
         drawGlow(ctx, pos.x, pos.y, 1.5 + pos.a * 2.5, `rgba(127, 227, 184, ${pos.a * 0.9})`);
       }
 
-      raf = requestAnimationFrame(render);
+      if (running) raf = requestAnimationFrame(render);
     };
 
-    raf = requestAnimationFrame(render);
+    // Only render while the canvas is actually on screen — two of these run in the
+    // film and an always-on O(n²) glow pass is pure battery drain when scrolled past.
+    const setRunning = (next: boolean) => {
+      if (next === running) return;
+      running = next;
+      if (running) {
+        raf = requestAnimationFrame(render);
+      } else {
+        cancelAnimationFrame(raf);
+      }
+    };
+
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver(
+        (entries) => setRunning(entries.some((entry) => entry.isIntersecting)),
+        { threshold: 0 },
+      );
+      observer.observe(canvas);
+    } else {
+      setRunning(true);
+    }
 
     return () => {
-      cancelAnimationFrame(raf);
+      setRunning(false);
+      observer?.disconnect();
       window.removeEventListener("resize", resize);
     };
   }, [nodeCount, progressRef]);

@@ -4,6 +4,7 @@ import Lenis from "lenis";
 import { type ReactNode, useEffect } from "react";
 import { gsap, registerGsap, ScrollTrigger } from "@/engines/animation/gsap";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { scrollSound } from "@/engines/audio/ScrollSound";
 import { useExperienceStore } from "@/stores/experience.store";
 
 /**
@@ -24,10 +25,15 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     registerGsap();
 
+    let lastProgress = 0;
+
     if (reduced) {
       const onScroll = () => {
         const max = document.documentElement.scrollHeight - window.innerHeight;
-        setScrollProgress(max > 0 ? window.scrollY / max : 0);
+        const p = max > 0 ? window.scrollY / max : 0;
+        setScrollProgress(p);
+        scrollSound.onScroll(p, Math.abs(p - lastProgress));
+        lastProgress = p;
       };
       window.addEventListener("scroll", onScroll, { passive: true });
       onScroll();
@@ -35,17 +41,24 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
     }
 
     const lenis = new Lenis({
-      // lerp gives a consistent, responsive follow (the duration+easing mode reads
-      // as floaty/laggy and inconsistent across input devices).
-      lerp: 0.11,
+      // A slightly weightier follow than the default: smoother and more consistent
+      // across wheel/trackpad/touch so the film never feels too fast or too slow.
+      lerp: 0.085,
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 1.4,
+      wheelMultiplier: 0.85,
+      touchMultiplier: 1.25,
+      // Route same-page anchor links (#architecture, #security…) through Lenis so
+      // they glide instead of jumping and fighting the smoother.
+      anchors: true,
     });
 
     const onLenisScroll = () => {
       ScrollTrigger.update();
-      setScrollProgress(lenis.progress ?? 0);
+      const p = lenis.progress ?? 0;
+      setScrollProgress(p);
+      // Feed the synthesized scroll cue with progress + per-event velocity.
+      scrollSound.onScroll(p, Math.abs(p - lastProgress));
+      lastProgress = p;
     };
     lenis.on("scroll", onLenisScroll);
 

@@ -3,6 +3,7 @@
 import { Chrome } from "@/components/chrome/Chrome";
 import { FilmGrain } from "@/components/visual/FilmGrain";
 import { CursorLight } from "@/components/visual/CursorLight";
+import { DepthField } from "@/components/visual/DepthField";
 import { OpeningSequence } from "./chapter-00-opening/OpeningSequence";
 import { TheQuestion } from "./chapter-01-the-question/TheQuestion";
 import { TheQuietEdit } from "./chapter-02-the-quiet-edit/TheQuietEdit";
@@ -22,6 +23,7 @@ import { TheInvitation } from "./chapter-08-the-invitation/TheInvitation";
 export function StoryStage() {
   return (
     <>
+      <DepthField />
       <FilmGrain />
       <CursorLight />
       <Chrome />

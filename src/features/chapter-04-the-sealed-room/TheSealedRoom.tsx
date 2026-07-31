@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { EASE } from "@/config/motion.tokens";
 import { SCROLL } from "@/config/pacing";
 import { gsap } from "@/engines/animation/gsap";
@@ -8,12 +7,6 @@ import { usePinnedTimeline } from "@/engines/scene/usePinnedTimeline";
 import { CinematicLine } from "@/components/typography/CinematicLine";
 import { SealMark } from "@/components/visual/SealMark";
 import { useExperienceStore } from "@/stores/experience.store";
-
-// R3F is heavy and client-only — load it on demand, never on the server.
-const SealedRoomScene = dynamic(() => import("@/three/SealedRoomScene"), {
-  ssr: false,
-  loading: () => null,
-});
 
 /**
  * Chapter 4 — The Sealed Room (Story Bible Ch.5). TEE as metaphor before mechanism:
@@ -40,16 +33,32 @@ export function TheSealedRoom() {
   });
 
   return (
-    <section ref={ref} aria-label="The sealed room" className="frame-cinema overflow-hidden bg-void">
-      {/* The chamber */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        {reduced ? (
-          <SealMark size={220} className="opacity-80" />
-        ) : (
-          <div className="h-[min(80vh,40rem)] w-[min(90vw,40rem)]">
-            <SealedRoomScene />
-          </div>
-        )}
+    <section
+      ref={ref}
+      id="security"
+      aria-label="The sealed room"
+      className="frame-cinema overflow-hidden bg-void"
+    >
+      {/* The chamber — a sealed vault whose walls prove they were never opened.
+          Rendered in pure 2D/CSS (no 3D model) for a calm, premium read. */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative grid h-[min(70vw,32rem)] w-[min(70vw,32rem)] place-items-center">
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--color-verify) 12%, transparent), transparent 62%)",
+            }}
+          />
+          {/* Concentric chamber walls. */}
+          <div className="absolute inset-[12%] rounded-[2rem] border border-verify/15" />
+          <div className="absolute inset-[22%] rounded-[1.6rem] border border-verify/25" />
+          <div
+            className="absolute inset-[32%] rounded-[1.2rem] border border-verify/40"
+            style={{ boxShadow: "0 0 40px color-mix(in oklab, var(--color-verify) 18%, transparent)" }}
+          />
+          <SealMark size={148} className="relative opacity-90" />
+        </div>
       </div>
 
       <div className="pointer-events-none relative ml-auto w-full max-w-xl px-8 text-center md:mr-[6vw] md:text-right">

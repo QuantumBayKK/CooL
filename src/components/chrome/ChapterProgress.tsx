@@ -19,7 +19,9 @@ export function ChapterProgress() {
         const isPast = i < activeIndex;
         return (
           <span key={chapter.id} className="flex items-center gap-3">
+            {/* Invisible titles leave the a11y tree too — only the active one reads. */}
             <span
+              aria-hidden={!isActive}
               className={cn(
                 "text-caption uppercase tracking-[0.2em] transition-all duration-500",
                 isActive ? "text-paper opacity-100" : "text-mist opacity-0",

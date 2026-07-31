@@ -23,15 +23,19 @@ export function ColdOpen() {
     build: (tl, root) => {
       const lines = gsap.utils.toArray<HTMLElement>(".cold-line", root);
       const hint = root.querySelector<HTMLElement>(".cold-hint");
-      gsap.set(lines, { autoAlpha: 0, y: 24 });
+      // Clean sequential reveal — one line at a time, centered. Each line fully
+      // clears before the next arrives, so nothing ever overlaps.
+      lines.forEach((line) => gsap.set(line, { autoAlpha: 0, y: 18 }));
 
-      if (hint) tl.to(hint, { autoAlpha: 0, duration: 0.4 }, 0.2);
+      if (hint) tl.to(hint, { autoAlpha: 0, duration: 0.5 }, 0.3);
 
+      const STEP = 1.5; // time per line (in + hold + out), no overlap
       lines.forEach((line, i) => {
-        const at = 0.5 + i * 1.1;
+        const at = 0.5 + i * STEP;
         tl.to(line, { autoAlpha: 1, y: 0, duration: 0.7, ease: EASE.cinematic }, at);
         if (i < lines.length - 1) {
-          tl.to(line, { autoAlpha: 0, y: -16, duration: 0.6, ease: EASE.mass }, at + 0.9);
+          // Fully fade out before the next line begins (gap between out and next in).
+          tl.to(line, { autoAlpha: 0, y: -14, duration: 0.55, ease: EASE.mass }, at + 0.85);
         }
       });
       tl.to({}, { duration: 1 });
@@ -43,7 +47,7 @@ export function ColdOpen() {
   });
 
   return (
-    <section ref={ref} aria-label="Opening" className="frame-cinema bg-void">
+    <section ref={ref} aria-label="Opening" className="frame-cinema bg-transparent">
       {COLD_OPEN_LINES.map((line) => (
         <CinematicLine
           key={line}
@@ -54,8 +58,12 @@ export function ColdOpen() {
         </CinematicLine>
       ))}
 
-      <span className="cold-hint pointer-events-none absolute bottom-10 left-1/2 -translate-x-1/2 text-caption uppercase tracking-[0.35em] text-mist">
-        scroll
+      {/* Small, glowing scroll cue — a pulsing point of light tracing downward. */}
+      <span className="cold-hint pointer-events-none absolute bottom-10 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-mist">
+        <span className="text-caption uppercase tracking-[0.45em]">scroll</span>
+        <span className="scroll-cue relative block h-10 w-px overflow-hidden bg-white/15">
+          <span className="scroll-cue-dot absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-verify" />
+        </span>
       </span>
     </section>
   );

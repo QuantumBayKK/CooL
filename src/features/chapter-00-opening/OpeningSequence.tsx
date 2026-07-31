@@ -21,7 +21,7 @@ export function OpeningSequence() {
       ))}
 
       {/* Silence — a held beat before the realization (not a void). */}
-      <section aria-hidden className="h-[55vh] w-full bg-void" />
+      <section aria-hidden className="h-[55vh] w-full bg-transparent" />
 
       <Realization />
     </div>

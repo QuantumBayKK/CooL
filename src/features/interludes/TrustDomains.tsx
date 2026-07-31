@@ -65,6 +65,7 @@ export function TrustDomains() {
 
   return (
     <motion.section
+      id="architecture"
       aria-label="The anatomy of proof"
       onViewportEnter={() => setActive("the-turn")}
       viewport={{ amount: 0.3 }}
