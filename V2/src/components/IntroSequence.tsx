@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -13,8 +14,6 @@ import { animate, utils } from "animejs";
 import { FLUID, INTRO_DARK_MS, prefersReduced } from "@/lib/motion";
 
 const IntroScene = dynamic(() => import("@/three/IntroScene"), { ssr: false });
-
-const SESSION_KEY = "cool:intro-played";
 
 /** layout effects run before paint on the client, and are a no-op on the server */
 const useBeforePaint =
@@ -40,19 +39,14 @@ const useBeforePaint =
  * there is no flash of the site before the intro starts.
  */
 export default function IntroSequence() {
-  // Read the session flag during the very first render. On the server this is
-  // always false, so the black bed ships in the HTML and the first paint of a
-  // fresh visit is black. On a client-side navigation back to "/" the flag is
-  // already set, so the overlay is never rendered at all — without this the
-  // curtain would appear for a frame before the effect could remove it.
-  const [done, setDone] = useState(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      return sessionStorage.getItem(SESSION_KEY) === "1";
-    } catch {
-      return false;
-    }
-  });
+  /* The intro plays on every load of the home page.
+     It used to be gated behind a sessionStorage flag, which meant that after
+     one visit the site simply never opened again — the animation people had
+     built the page around was missing, and the black bed still shipped in the
+     server HTML, so a repeat visit flashed black and then cut hard to the deck.
+     At ~2.2s with nothing to download, replaying it is cheaper than explaining
+     why it vanished. */
+  const [done, setDone] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const bed = useRef<HTMLDivElement>(null);
   const glow = useRef<HTMLDivElement>(null);
@@ -61,14 +55,9 @@ export default function IntroSequence() {
   const finishing = useRef(false);
   const [mounted, setMounted] = useState(false);
 
-  /** release the page: unlock scrolling, drop the overlay, remember we played */
+  /** release the page: unlock scrolling and drop the overlay */
   const teardown = useCallback(() => {
     document.documentElement.style.overflow = "";
-    try {
-      sessionStorage.setItem(SESSION_KEY, "1");
-    } catch {
-      /* private mode — replaying the intro is a fine fallback */
-    }
     setDone(true);
   }, []);
 
@@ -78,14 +67,7 @@ export default function IntroSequence() {
     if (started.current) return;
     started.current = true;
 
-    let played = false;
-    try {
-      played = sessionStorage.getItem(SESSION_KEY) === "1";
-    } catch {
-      played = false;
-    }
-
-    if (played || prefersReduced()) {
+    if (prefersReduced()) {
       teardown();
       return;
     }
@@ -216,9 +198,10 @@ export default function IntroSequence() {
   /* safety net: never trap the user if WebGL fails or the GLB never loads */
   useEffect(() => {
     if (!mounted || done) return;
-    // a healthy run reaches the handoff at ~1.7s; this only fires if WebGL died
-    // or the GLB never arrived, so it sits just past that with room to spare
-    const bail = window.setTimeout(() => handoff(true), 3600);
+    // A healthy run reaches the handoff at ~1.6s. Nothing is downloaded, so the
+    // only way to miss it is WebGL failing outright — hence a tight failsafe.
+    // Whatever happens, the curtain lifts inside three seconds.
+    const bail = window.setTimeout(() => handoff(true), 2800);
     return () => window.clearTimeout(bail);
   }, [mounted, done, handoff]);
 
@@ -270,10 +253,13 @@ export default function IntroSequence() {
             }}
             camera={{ position: [0, 0.3, 6.8], fov: 42 }}
           >
-            <IntroScene
-              onSealed={dimGlow}
-              onLightsOut={() => handoff(false)}
-            />
+            {/* Belt and braces. IntroScene loads no assets and so cannot
+                suspend today, but a boundary here means that if it ever gains
+                one, a slow fetch degrades to "no cube" rather than to a black
+                screen that never lifts. */}
+            <Suspense fallback={null}>
+              <IntroScene onSealed={dimGlow} onLightsOut={() => handoff(false)} />
+            </Suspense>
           </Canvas>
         </div>
       ) : null}

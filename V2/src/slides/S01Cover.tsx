@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import dynamic from "next/dynamic";
 import { ArrowDown } from "lucide-react";
@@ -18,7 +18,7 @@ function LightPool() {
   );
 }
 
-/* Claymorphic bloom â€” soft light pooled behind the object so it reads on dark */
+/* Claymorphic bloom — soft light pooled behind the object so it reads on dark */
 function ClayGlow() {
   return (
     <div
@@ -50,22 +50,26 @@ function HeroStage({ className }: { className: string }) {
   );
 }
 
-/* The glowing ask â€” the point of this slide. */
-function AskBox({ compact = false }: { compact?: boolean }) {
+/**
+ * The ask.
+ *
+ * Rebuilt because the old card broke at both ends. `whitespace-nowrap` on a
+ * `15vw` display face set "₹1 Crore" wider than a 360px phone and shoved the
+ * card sideways, and the rotating shimmer ring drew a hard seam over the border
+ * on dark. It is now a plain figure that cannot overflow: the number sits on
+ * its own line and the type scales off the container rather than the viewport.
+ */
+function AskBox() {
   return (
-    <div className="relative mx-auto block w-full max-w-md overflow-hidden rounded-2xl border border-verify/40 bg-panel px-5 py-6 text-center shadow-[0_0_44px_rgba(88,166,255,0.28),0_8px_28px_rgba(0,0,0,0.4)] sm:w-fit sm:px-10">
-      <span aria-hidden className="shimmer-ring absolute inset-0 rounded-2xl" />
-      <p className="kicker relative border-b border-verify/40 pb-2 text-[15px]">
+    <div className="mx-auto w-full max-w-sm rounded-2xl border border-verify/35 bg-panel/80 px-5 py-5 text-center backdrop-blur-xl">
+      <p className="font-mono text-[10.5px] tracking-[0.24em] text-verify uppercase">
         Pre-seed ask
       </p>
-      <p
-        className={
-          compact
-            ? "display relative mt-3 text-[clamp(2.8rem,15vw,4.2rem)] whitespace-nowrap text-ink"
-            : "display relative mt-3 text-[clamp(3.4rem,9vw,5.4rem)] whitespace-nowrap text-ink"
-        }
-      >
-        â‚¹1 Crore
+      <p className="display mt-2.5 text-[clamp(2.4rem,7vw,3.2rem)] leading-none text-ink">
+        ₹1 Cr
+      </p>
+      <p className="mt-2.5 border-t border-line pt-2.5 font-mono text-[11px] leading-relaxed text-mist">
+        SAFE · ₹10 Cr cap · 12-month runway
       </p>
     </div>
   );
@@ -74,13 +78,9 @@ function AskBox({ compact = false }: { compact?: boolean }) {
 /**
  * One action.
  *
- * This used to be three buttons of near-equal weight â€” deck, demo, dashboard â€”
+ * This used to be three buttons of near-equal weight — deck, demo, dashboard —
  * which is three exits from the first screen and no path through it. A reader
  * who has to choose before they know anything usually chooses to leave.
- *
- * So the cover now asks for exactly one thing: start the story. The demo and
- * the console are still one tap away in the nav for anyone who wants to jump,
- * but they no longer compete with the only action that matters here.
  */
 function Cta({ stack = false }: { stack?: boolean }) {
   return (
@@ -98,9 +98,28 @@ function Cta({ stack = false }: { stack?: boolean }) {
         </ShimmerButton>
       </Magnetic>
       <p className="mt-2.5 font-mono text-[11px] leading-relaxed text-mist">
-        Two minutes. Ends with a live system you can break yourself.
+        Two minutes.
       </p>
     </div>
+  );
+}
+
+/**
+ * The promise, in one sentence.
+ *
+ * The previous version stacked four past-participles onto a dash — "documented,
+ * approved, filed and provable. Automatically." — which reads as a feature list
+ * wearing a sentence's clothes, and asks a compliance officer to work out the
+ * subject. This says who does what, in order, in the language a bank or a
+ * hospital already uses for this work.
+ */
+function Promise({ className }: { className?: string }) {
+  return (
+    <p className={className}>
+      Your teams change their AI every day. Every change has to be written up,
+      approved and filed for the auditor.{" "}
+      <span className="text-ink">CooL does all of it, by itself.</span>
+    </p>
   );
 }
 
@@ -109,7 +128,7 @@ export default function S01Cover() {
     <section
       id="cover"
       data-slide="01"
-      data-layer="01 Â· COVER"
+      data-layer="01 · COVER"
       className="relative mx-auto flex min-h-[100svh] w-full max-w-6xl snap-start items-center px-5 pt-24 pb-14 lg:pt-24 lg:pb-16"
     >
       <SlideFrame mode="fall" className="w-full">
@@ -121,30 +140,26 @@ export default function S01Cover() {
             </h1>
             <p className="kicker mt-1 text-[13px]">The black box for AI</p>
 
-            <p className="mx-auto mt-3 max-w-[34ch] text-[15px] leading-snug font-semibold text-ink">
-              Every AI change your company makes â€” documented, approved, filed and
-              provable. Automatically.
-            </p>
-
             <div className="mt-2">
-              <HeroStage className="h-[196px] w-full" />
+              <HeroStage className="h-[188px] w-full" />
             </div>
 
-            <p className="mx-auto max-w-[36ch] text-[13.5px] leading-relaxed text-fog">
-              Weeks of manual compliance work a year, gone. Costs down by up to
-              90%. Zero engineering time.
+            <Promise className="mx-auto max-w-[34ch] text-[15px] leading-relaxed font-medium text-fog" />
+
+            <p className="mx-auto mt-3 max-w-[32ch] text-[13.5px] leading-relaxed text-mist">
+              Weeks of manual work a year, gone. Audit costs down by up to 90%.
             </p>
 
-            <div className="mt-4">
-              <AskBox compact />
+            <div className="mt-5">
+              <AskBox />
             </div>
 
             <div className="mt-5 w-full">
               <Cta stack />
             </div>
 
-            <p className="mt-3 font-mono text-[11px] leading-relaxed font-semibold text-mist">
-              Northwind Cipher Pvt Ltd Â· Pranauv Shrinaath S, CEO Â· Kailosh
+            <p className="mt-4 font-mono text-[10.5px] leading-relaxed text-mist">
+              Northwind Cipher Pvt Ltd · Pranauv Shrinaath S, CEO · Kailosh
               Kalimuthu, CTO
             </p>
           </Reveal>
@@ -158,30 +173,26 @@ export default function S01Cover() {
             </h1>
             <p className="kicker mt-2 text-[15px]">The black box for AI</p>
 
-            <p className="mt-6 max-w-lg text-[22px] leading-tight font-semibold text-ink">
-              Every AI change your company makes â€” documented, approved, filed and
-              provable. Automatically.
-            </p>
+            <Promise className="mt-6 max-w-lg text-[20px] leading-relaxed font-medium text-fog" />
 
-            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-fog">
-              The paperwork behind AI changes burns weeks of engineering time a
-              year and stalls your biggest deals in security review. CooL deletes
-              that work and cuts the cost by up to 90%.
+            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-mist">
+              Weeks of manual work a year, gone. Audit costs down by up to 90%.
+              No engineering time.
             </p>
 
             <div className="mt-7">
               <Cta />
             </div>
 
-            <p className="mt-6 font-mono text-[12px] leading-relaxed font-semibold text-mist">
-              Northwind Cipher Pvt Ltd Â· Pranauv Shrinaath S, CEO Â· Kailosh
+            <p className="mt-6 font-mono text-[11.5px] leading-relaxed text-mist">
+              Northwind Cipher Pvt Ltd · Pranauv Shrinaath S, CEO · Kailosh
               Kalimuthu, CTO
             </p>
           </Reveal>
 
           <Reveal delay={0.15}>
             <HeroStage className="h-[230px] w-full sm:h-[260px]" />
-            <div className="mt-5">
+            <div className="mt-6">
               <AskBox />
             </div>
           </Reveal>

@@ -1,35 +1,39 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { useAnimations, useGLTF, RoundedBox } from "@react-three/drei";
+import { RoundedBox } from "@react-three/drei";
 import Stage from "./Stage";
-import { applyFinish, makeFinish } from "./materials";
+import { makeFinish } from "./materials";
 import { INTRO_DARK_MS } from "@/lib/motion";
 
-const MODEL = "/models/product.glb";
-const DRACO = "/draco/";
+/**
+ * IntroScene — the cold open.
+ *
+ * DELIBERATELY LOADS NOTHING. This used to pull `product.glb` through
+ * `useGLTF`, which suspends — and because the intro's Canvas has no Suspense
+ * boundary of its own, a cold or slow fetch of that 0.9 MB model meant the
+ * scene never mounted, `onLightsOut` never fired, and the black curtain sat
+ * over the site until the failsafe timer rescued it. A loading animation that
+ * can itself be blocked on a download is the one thing it must never be.
+ *
+ * So everything here is generated: a rounded cube and an emissive core, both
+ * primitives. The sequence is frame-accurate from the first paint, on any
+ * connection, every time.
+ *
+ * The beats: arrive → turn → open (the core rises out) → seal → the light dies.
+ * It ends sealed because that is exactly how the hero's cube sits at rest, so
+ * the handoff has nothing to jump. Budget is ~2.2s door to door — a cold open
+ * is a held breath, not a film.
+ */
 
 const CUBE = 1.9;
-const MODEL_SIZE = 2.6;
 
-/* ---- the beats, in seconds ----
-   arrive → turn → open (the core comes out) → seal again → the light dies.
-   Three things are deliberate:
-     · it ends sealed, because the hero's own cube sits at rest in exactly that
-       state, so the handoff has nothing to jump;
-     · the backlight is fully out before the object moves. The light is what
-       makes the cold open dramatic, and letting it fade first means the flight
-       to the cover reads as a quiet settling rather than a second flourish;
-     · the whole sequence is budgeted at ~2.5s door to door. A cold open is a
-       held breath, not a film — past about three seconds it stops being
-       atmosphere and starts being a toll gate on the way to the deck. Every
-       beat below is therefore the shortest version that still reads. */
-const T_IN = 0.3;
-const T_OPEN_START = 0.5;
-const T_OPEN_END = 1.0;
-const T_SEAL_END = 1.4;
+const T_IN = 0.28;
+const T_OPEN_START = 0.46;
+const T_OPEN_END = 0.94;
+const T_SEAL_END = 1.32;
 /** shared with the DOM bloom layer, so both halves of the light die as one */
 const T_DARK_END = T_SEAL_END + INTRO_DARK_MS / 1000;
 
@@ -42,13 +46,6 @@ const easeInOut = (t: number) =>
   t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
-/**
- * IntroScene — the cold open.
- *
- * A sealed graphite cube turns slowly in a shaft of blue backlight, opens so
- * the animated core can emerge, then closes around it again. One self-contained
- * clock drives all of it, so the beats never drift from React's render cycle.
- */
 export default function IntroScene({
   /** the cube has sealed — the DOM fades its own glow layer from here */
   onSealed,
@@ -60,7 +57,7 @@ export default function IntroScene({
 }) {
   const holder = useRef<THREE.Group>(null);
   const cube = useRef<THREE.Mesh>(null);
-  const core = useRef<THREE.Group>(null);
+  const core = useRef<THREE.Mesh>(null);
   const halo = useRef<THREE.Mesh>(null);
   const backLight = useRef<THREE.PointLight>(null);
   const sealedFired = useRef(false);
@@ -68,26 +65,17 @@ export default function IntroScene({
   const t0 = useRef<number | null>(null);
 
   const cubeMat = useMemo(() => makeFinish("graphite"), []);
-  const { scene, animations } = useGLTF(MODEL, DRACO);
-  const { actions } = useAnimations(animations, core);
-
-  useEffect(() => {
-    applyFinish(scene, "graphite");
-    for (const a of Object.values(actions)) {
-      if (!a) continue;
-      a.reset();
-      a.setLoop(THREE.LoopRepeat, Infinity);
-      a.timeScale = 0.7;
-      a.play();
-    }
-  }, [scene, actions]);
-
-  const fit = useMemo(() => {
-    const box = new THREE.Box3().setFromObject(scene);
-    const size = box.getSize(new THREE.Vector3());
-    const max = Math.max(size.x, size.y, size.z) || 1;
-    return MODEL_SIZE / max;
-  }, [scene]);
+  const coreMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: "#bcdcff",
+        emissive: "#58a6ff",
+        emissiveIntensity: 2.4,
+        roughness: 0.25,
+        metalness: 0.1,
+      }),
+    [],
+  );
 
   useFrame((state) => {
     if (t0.current == null) t0.current = state.clock.elapsedTime;
@@ -96,8 +84,7 @@ export default function IntroScene({
     // arrival — the cube swells out of nothing with a little overshoot
     const cubeIn = easeOutBack(clamp01(t / T_IN));
 
-    // the turn never stops, so the object always reads as alive. Faster than it
-    // was, because there is now only ~1.4s in which to read as turning at all.
+    // the turn never stops, so the object always reads as alive
     const g = holder.current;
     if (g) {
       g.rotation.y = t * 1.15;
@@ -109,24 +96,25 @@ export default function IntroScene({
     const opening = easeInOut(
       clamp01((t - T_OPEN_START) / (T_OPEN_END - T_OPEN_START)),
     );
-    const sealing = easeInOut(clamp01((t - T_OPEN_END) / (T_SEAL_END - T_OPEN_END)));
+    const sealing = easeInOut(
+      clamp01((t - T_OPEN_END) / (T_SEAL_END - T_OPEN_END)),
+    );
     const open = opening * (1 - sealing);
 
     if (cube.current) {
-      const s = cubeIn * (1 - open);
+      const s = cubeIn * (1 - open * 0.86);
       cube.current.scale.setScalar(Math.max(s, 0.0001));
       cube.current.visible = s > 0.002;
     }
     if (core.current) {
-      const s = fit * open;
+      const s = open * 0.62;
       core.current.scale.setScalar(Math.max(s, 0.0001));
       core.current.visible = open > 0.004;
+      core.current.rotation.y = t * 2.1;
+      core.current.rotation.x = t * 1.4;
     }
 
-    // the light behind it: a bloom that flares while the cube is open, then
-    // dies away completely once the cube is sealed again. The ramp has to
-    // finish inside the open beat, so it tracks T_OPEN_START rather than a
-    // fixed 1.8s that would now still be rising as the cube re-seals.
+    // the light behind it: flares while the cube is open, then dies completely
     const bloom = easeInOut(clamp01(t / T_OPEN_START)) * 0.7 + open * 1.05;
     const lightOut =
       1 - easeInOut(clamp01((t - T_SEAL_END) / (T_DARK_END - T_SEAL_END)));
@@ -141,6 +129,7 @@ export default function IntroScene({
     if (backLight.current) {
       backLight.current.intensity = (6 + bloom * 26) * lightOut;
     }
+    coreMat.emissiveIntensity = 2.4 * lightOut;
 
     if (!sealedFired.current && t >= T_SEAL_END) {
       sealedFired.current = true;
@@ -185,12 +174,11 @@ export default function IntroScene({
           receiveShadow
           material={cubeMat}
         />
-        <group ref={core} scale={0.0001} visible={false}>
-          <primitive object={scene} />
-        </group>
+        {/* the core — an icosahedron, so it reads as machined rather than a ball */}
+        <mesh ref={core} scale={0.0001} visible={false} material={coreMat}>
+          <icosahedronGeometry args={[1, 1]} />
+        </mesh>
       </group>
     </>
   );
 }
-
-useGLTF.preload(MODEL, DRACO);

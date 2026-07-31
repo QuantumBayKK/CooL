@@ -9,15 +9,19 @@ import SnapScroll from "@/components/SnapScroll";
 import { GithubMark } from "@/components/ui";
 import { INVEST_MAILTO, MEETING_URL } from "@/components/Nav";
 import { Build, Eyebrow, Headline, Lead, Stage } from "./KeynoteStage";
+import TestimonialRail from "@/components/TestimonialRail";
 import {
   BUY_BUILD,
+  FUNDS,
   HERO,
   LAYERS,
   MVP_SLICE,
+  PHASES,
   PRINCIPLES,
   STATUS,
   TERMS,
   TOPOLOGIES,
+  VOICES,
 } from "@/content/investors";
 
 /**
@@ -46,6 +50,7 @@ const STAGE_LABELS = [
   "What doesn't",
   "Buy vs build",
   "Deployments",
+  "Validation",
   "The round",
   "Close",
 ];
@@ -450,7 +455,26 @@ export default function InvestorKeynote() {
 
         {/* â”€â”€ 13 Â· the money â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="13">
-          <Eyebrow>Use of funds</Eyebrow>
+          <Eyebrow>Validation</Eyebrow>
+          <Headline>We asked the people who live with it.</Headline>
+          <Lead>
+            Fintech, payments and confidential computing — independently,
+            unprompted, before we had written a line of the pitch.
+          </Lead>
+          <Build>
+            <div className="mt-7">
+              <TestimonialRail quotes={VOICES} />
+            </div>
+          </Build>
+          <Build>
+            <p className="mt-6 text-[14px] leading-relaxed text-mist">
+              Pilot programmes and letters of intent are now in progress with
+              regulated-AI design partners.
+            </p>
+          </Build>
+        </Stage>
+
+        <Stage no="14">          <Eyebrow>Use of funds</Eyebrow>
           <Headline>What â‚¹1 Cr becomes, in eight weeks.</Headline>
           <Lead>
             Not the full architecture â€” one thin vertical slice of it, shaped so
@@ -471,6 +495,51 @@ export default function InvestorKeynote() {
               </Build>
             ))}
           </div>
+
+          {/* the twelve months around that slice */}
+          <Build>
+            <div className="mt-7 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+              {PHASES.map(([window, goal]) => (
+                <div key={window} className="flex items-baseline gap-3">
+                  <span className="w-24 shrink-0 font-mono text-[11px] text-verify">
+                    {window}
+                  </span>
+                  <span className="min-w-0 text-[13.5px] leading-snug text-fog">
+                    {goal}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Build>
+
+          {/* where the money actually goes — a stacked bar, because a
+              seven-slice pie is unreadable at this width */}
+          <Build>
+            <div className="mt-7">
+              <div className="flex h-2.5 w-full overflow-hidden rounded-full">
+                {FUNDS.map((f) => (
+                  <span
+                    key={f.label}
+                    className="h-full"
+                    style={{ width: `${f.pct}%`, background: f.color }}
+                    title={`${f.label} ${f.pct}%`}
+                  />
+                ))}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+                {FUNDS.map((f) => (
+                  <span key={f.label} className="flex items-center gap-1.5">
+                    <span
+                      className="size-2 shrink-0 rounded-full"
+                      style={{ background: f.color }}
+                    />
+                    <span className="text-[12.5px] text-fog">{f.label}</span>
+                    <span className="font-mono text-[11.5px] text-mist">{f.pct}%</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Build>
 
           <Build>
             <div className="mt-7 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -497,7 +566,7 @@ export default function InvestorKeynote() {
         </Stage>
 
         {/* â”€â”€ close â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        <Stage no="14">
+        <Stage no="15">
           <Build>
             <p className="keynote text-[clamp(1.6rem,5.2vw,3.1rem)] leading-tight">
               The cryptography is real and public.

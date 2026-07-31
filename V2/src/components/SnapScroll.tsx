@@ -40,10 +40,9 @@ export default function SnapScroll() {
 
     /** flag slides that don't fit, so CSS drops their snap point */
     const measure = () => {
-      // On touch the stylesheet turns snapping off outright, so `.is-tall`
-      // has nothing to switch. Measuring anyway would only add layout reads
-      // to every scroll on the least powerful devices we serve.
-      if (!fine.matches) return;
+      // Runs on every device now that snapping is on everywhere. A slide that
+      // outgrows the viewport must lose its snap point on a phone just as much
+      // as on a laptop — more so, since that is where it happens first.
       const vh = window.innerHeight;
       for (const s of slides) {
         s.classList.toggle("is-tall", s.offsetHeight > vh + 40);
@@ -57,7 +56,6 @@ export default function SnapScroll() {
     const ro = new ResizeObserver(measure);
     const observeAll = () => {
       ro.disconnect();
-      if (!fine.matches) return;
       for (const s of slides) ro.observe(s);
     };
 
@@ -170,18 +168,12 @@ export default function SnapScroll() {
 
     const sync = () => {
       collect();
-      if (fine.matches) {
-        measure();
-        observeAll();
-        attach();
-      } else {
-        // Dropping to a touch pointer (or a tablet rotating into one): stop
-        // observing and strip any `.is-tall` left behind, so nothing from the
-        // pointer path lingers in the DOM.
-        ro.disconnect();
-        clearTall();
-        detach?.();
-      }
+      measure();
+      observeAll();
+      // The wheel controller is still pointer-only: a touch device gets native
+      // CSS snap, which the compositor drives with correct momentum for free.
+      if (fine.matches) attach();
+      else detach?.();
     };
 
     sync();

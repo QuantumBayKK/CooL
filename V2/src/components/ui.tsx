@@ -199,6 +199,107 @@ export function GithubMark({ className }: { className?: string }) {
   );
 }
 
+/**
+ * Floating deck primitives.
+ *
+ * The deck is centre-aligned single-column, so these deliberately have no card,
+ * border or fill. A panel implies a region the eye must enter and leave; on a
+ * slide meant to be taken in at a glance, hairlines and spacing do the same
+ * separation work without breaking the column.
+ */
+
+/** A row of headline figures. Centre-aligned, no boxes. */
+export function Stats({
+  items,
+  tone = "verify",
+}: {
+  items: readonly (readonly [string, string])[];
+  tone?: "verify" | "live" | "fail";
+}) {
+  const color = { verify: "text-verify", live: "text-live", fail: "text-fail" }[tone];
+  return (
+    <div
+      className={clsx(
+        "mx-auto grid w-full max-w-3xl gap-x-6 gap-y-6",
+        items.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3",
+      )}
+    >
+      {items.map(([big, small]) => (
+        <div key={small}>
+          <p className={clsx("display text-[clamp(1.6rem,5.2vw,2.4rem)] leading-none", color)}>
+            {big}
+          </p>
+          <p className="mx-auto mt-2 max-w-[24ch] text-[13.5px] leading-snug text-fog">
+            {small}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * A centred list of "Term — explanation" lines, separated by hairlines.
+ * `mark` optionally colours the leading term (a tick, a number, a status).
+ */
+export function Lines({
+  items,
+  lead,
+}: {
+  items: readonly (readonly [string, string])[];
+  /** what sits before each term: a tick, a counter, or nothing */
+  lead?: "tick" | "count" | "none";
+}) {
+  return (
+    <div className="mx-auto w-full max-w-2xl">
+      {items.map(([term, rest], i) => (
+        <div
+          key={term}
+          className={clsx(
+            "flex items-baseline justify-center gap-2.5 py-2.5",
+            i > 0 && "border-t border-line",
+          )}
+        >
+          {lead === "tick" ? (
+            <span className="shrink-0 font-mono text-[12px] text-live">✓</span>
+          ) : null}
+          {lead === "count" ? (
+            <span className="shrink-0 font-mono text-[11px] text-fail">{i + 1}</span>
+          ) : null}
+          <p className="text-[14px] leading-snug text-fog sm:text-[15px]">
+            <span className="font-semibold text-ink">{term}</span>
+            <span className="text-mist"> — {rest}</span>
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** A single closing sentence, floating and centred. */
+export function Note({
+  children,
+  tone = "verify",
+}: {
+  children: ReactNode;
+  tone?: "verify" | "live" | "fail" | "mist";
+}) {
+  const color = {
+    verify: "text-verify",
+    live: "text-live",
+    fail: "text-fail",
+    mist: "text-mist",
+  }[tone];
+  return (
+    <p className="mx-auto mt-8 max-w-[52ch] text-[14.5px] leading-relaxed text-fog sm:text-[15.5px]">
+      <span aria-hidden className={clsx("mr-2", color)}>
+        —
+      </span>
+      {children}
+    </p>
+  );
+}
+
 /* Glass card */
 export function Glass({
   children,

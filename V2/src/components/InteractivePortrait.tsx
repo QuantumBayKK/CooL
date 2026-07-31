@@ -80,7 +80,13 @@ export default function InteractivePortrait({
     <motion.div
       ref={ref}
       onPointerMove={move}
+      /* A tap opens the lens on touch. Without this the effect needed a
+         drag to appear at all, so on a phone it read as a plain grey photo —
+         the interaction existed but was undiscoverable. */
+      onPointerDown={move}
+      onPointerUp={leave}
       onPointerLeave={leave}
+      onPointerCancel={leave}
       style={{ rotateX: rx, rotateY: ry, transformPerspective: 800 }}
       className={clsx("relative touch-pan-y overflow-hidden", className)}
     >

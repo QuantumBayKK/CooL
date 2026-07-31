@@ -10,15 +10,21 @@ import S02Problem from "@/slides/S02Problem";
 import S03Solution from "@/slides/S03Solution";
 import S04Technology from "@/slides/S04Technology";
 import S05Proof from "@/slides/S05Proof";
-import S06Validation from "@/slides/S06Validation";
-import S07Market from "@/slides/S07Market";
-import S08Model from "@/slides/S08Model";
-import S09Competition from "@/slides/S09Competition";
-import S10GTM from "@/slides/S10GTM";
-import S11Team from "@/slides/S11Team";
-import S12Funds from "@/slides/S12Funds";
-import S13Ask from "@/slides/S13Ask";
+import S06Market from "@/slides/S06Market";
+import S07Model from "@/slides/S07Model";
+import S08Competition from "@/slides/S08Competition";
+import S09GTM from "@/slides/S09GTM";
+import S10Team from "@/slides/S10Team";
+import S11Next from "@/slides/S11Next";
 
+/**
+ * The deck: eleven slides, one screen each.
+ *
+ * Industry validation and the use-of-funds breakdown used to sit here as slides
+ * of their own. Both moved to /investors — they are diligence material rather
+ * than pitch, and on the deck they interrupted the argument between "here is
+ * the problem" and "here is what to do about it".
+ */
 export default function Page() {
   return (
     <>
@@ -37,14 +43,12 @@ export default function Page() {
         <S03Solution />
         <S04Technology />
         <S05Proof />
-        <S06Validation />
-        <S07Market />
-        <S08Model />
-        <S09Competition />
-        <S10GTM />
-        <S11Team />
-        <S12Funds />
-        <S13Ask />
+        <S06Market />
+        <S07Model />
+        <S08Competition />
+        <S09GTM />
+        <S10Team />
+        <S11Next />
       </main>
 
       {/* last in the tree, highest layer: the cold open sits over everything

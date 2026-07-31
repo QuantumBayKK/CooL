@@ -239,6 +239,83 @@ export const MVP_SLICE: readonly string[] = [
   "Hybrid signatures from day one; the TEE attestation de-mocked as the tier lands.",
 ];
 
+/* ── 7 · practitioners, moved here from the deck ──────────────────────── */
+
+export interface Voice {
+  readonly quote: string;
+  readonly name: string;
+  readonly role: string;
+  readonly tag: string;
+}
+
+/**
+ * These sat on the deck as a slide of their own, which interrupted the argument
+ * between the problem and the solution. They belong here: they are evidence for
+ * someone already deciding, not persuasion for someone still listening.
+ */
+export const VOICES: readonly Voice[] = [
+  {
+    quote:
+      "As AI adoption grows in BFSI, an additional cryptographic verification layer for sensitive AI decisions would be valuable. Banking and financial institutions dealing with regulated customer data would definitely be interested in evaluating such a solution.",
+    name: "Lokesh G.A.",
+    role: "Head of Product Solutions & Strategy, Jio Payments",
+    tag: "FinTech",
+  },
+  {
+    quote:
+      "The idea is technically sound and aligns with the need to securely protect enterprise AI execution while keeping sensitive data within the company's own environment. This is the kind of product that would first be evaluated by engineering and product teams before moving through enterprise procurement.",
+    name: "Proneet Nibedit",
+    role: "Technical Lead — Backend Engineering, PayU",
+    tag: "Payments",
+  },
+  {
+    quote:
+      "Having built confidential computing infrastructure for over three years, I've seen how difficult the trust and verification layer is. CooL's backend SDK tackles this directly, and as AI moves onto confidential infrastructure, a verification layer like this becomes genuinely valuable.",
+    name: "Ayush Kumar Yadav",
+    role: "Backend Engineer (ex-Marlin Protocol / Oyster)",
+    tag: "Confidential computing",
+  },
+  {
+    quote:
+      "A cryptographically verifiable trust layer for AI is definitely a real problem worth solving. Having a trustworthy way to verify AI execution is an important direction for the industry.",
+    name: "Alluri Siddhartha",
+    role: "Research & Engineering, Ritual",
+    tag: "AI infrastructure",
+  },
+  {
+    quote:
+      "As AI systems become increasingly autonomous, this problem becomes much more relevant. I can definitely see organizations adopting a solution like this.",
+    name: "Ojas Tripathi",
+    role: "Associate Software Engineer, PayU",
+    tag: "Payments",
+  },
+];
+
+/* ── 8 · where the money goes ─────────────────────────────────────────── */
+
+export interface FundSlice {
+  readonly label: string;
+  readonly pct: number;
+  readonly color: string;
+}
+
+export const FUNDS: readonly FundSlice[] = [
+  { label: "People", pct: 30, color: "#58a6ff" },
+  { label: "Engineering & R&D", pct: 25, color: "#3fb950" },
+  { label: "Go-to-market", pct: 15, color: "#1f6feb" },
+  { label: "Infrastructure", pct: 12, color: "#8b949e" },
+  { label: "Compliance & legal", pct: 8, color: "#d29922" },
+  { label: "Marketing", pct: 6, color: "#a371f7" },
+  { label: "Buffer", pct: 4, color: "#484f58" },
+];
+
+export const PHASES: readonly (readonly [string, string])[] = [
+  ["0–2 months", "ship the product to first customers"],
+  ["2–6 months", "paid pilots with regulated design partners"],
+  ["6–9 months", "pilots convert to recurring revenue"],
+  ["9–12 months", "raise the seed on real usage"],
+];
+
 export const TERMS = {
   amount: "₹1 Crore",
   instrument: "SAFE",

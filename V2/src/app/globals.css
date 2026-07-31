@@ -62,31 +62,19 @@ html.snap-js {
   scroll-snap-stop: normal;
 }
 
-/* ---- touch devices scroll normally ----
-   Mandatory snap and a phone are a bad pair here, for two compounding reasons.
+/* ---- snapping is on everywhere, including touch ----
+   It was previously disabled on coarse pointers because the slides carried more
+   content than a ~390px screen could hold, and a snap point on a slide you
+   cannot fully see drags you back to its top as you try to read the bottom.
 
-   First, these slides carry real content, and on a ~390px viewport most of them
-   are taller than the screen. A snap point on a slide you cannot see all of
-   means the browser keeps pulling you back to its top as you try to read the
-   bottom — which is exactly the rubber-banding this is fixing.
+   The slides are now built to fit one viewport, so that conflict is gone and
+   every device gets the deck behaviour: one gesture reveals one whole slide.
 
-   Second, mobile browsers change the viewport height as the URL bar collapses.
-   Any JS that re-measures "is this slide taller than the viewport?" therefore
-   re-runs mid-gesture, toggling snap points underneath a scroll that is already
-   in flight, and the scroller lurches.
-
-   The deck framing (full-bleed slides, the dot rail, the pager) all still work
-   without snap. So on coarse pointers the page is simply a page. */
-@media (hover: none), (pointer: coarse) {
-  html {
-    scroll-snap-type: none;
-  }
-  [data-slide],
-  [data-slide].is-tall {
-    scroll-snap-align: none;
-    scroll-snap-stop: normal;
-  }
-}
+   Two safety nets remain, because "fits" is a promise about content and content
+   changes. `.is-tall` (set by SnapScroll) drops the snap point from any slide
+   that outgrows the viewport anyway — on phones too, now — and SnapScroll only
+   re-measures on width changes, so a collapsing mobile URL bar can never
+   retoggle snap points underneath a scroll already in flight. */
 
 @media (prefers-reduced-motion: reduce) {
   html {
