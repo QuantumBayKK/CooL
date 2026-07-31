@@ -1,47 +1,31 @@
 "use client";
 
 import { Slide } from "@/components/Slide";
-import { Reveal, GithubMark } from "@/components/ui";
+import { Aside, Body, Lead, Line, Page } from "@/components/Book";
+import InteractivePortrait from "@/components/InteractivePortrait";
 
 /**
- * Slide 11 — the team, framed as the intersection rather than two CVs.
+ * Slide 10 — the team, as the intersection rather than two CVs.
  *
- * The headline is the argument: this product needs applied post-quantum
- * cryptography AND trusted-execution experience in the same room, which is a
- * genuinely rare pairing.
+ * The portraits keep the lens mask: desaturated until the pointer crosses them,
+ * full colour underneath, and on touch a tap opens it. No card around them —
+ * the photograph is the object.
  */
 
-const FOUNDERS: {
-  name: string;
-  role: string;
-  field: string;
-  points: string[];
-  meta: string;
-  gh: string;
-}[] = [
+const FOUNDERS = [
   {
     name: "Pranauv Shrinaath S",
     role: "Founder & CEO",
-    field: "Post-quantum cryptography & blockchain",
-    points: [
-      "ipsec-pqc-ikev2 — maps ML-KEM into IKEv2",
-      "Research: decentralising public banks, secured with PQC + Hyperledger Fabric",
-      "Onsite research internship, NUS Singapore",
-    ],
-    meta: "5 years building (since 14)",
-    gh: "KenidoesCode",
+    line: "Published post-quantum cryptography, running in production networking code.",
+    src: "/founders/pranauv.jpg",
+    initials: "PS",
   },
   {
     name: "Kailosh Kalimuthu",
     role: "Co-Founder & CTO",
-    field: "Trusted execution environments & AI inference",
-    points: [
-      "Built BIFROST — decentralised P2P comms / storage / compute network",
-      "Repurposes idle hardware into an encrypted, distributed micro-cloud",
-      "6 months with US startup Decipher",
-    ],
-    meta: "3 years building (since 16)",
-    gh: "Sk1zmo",
+    line: "Built confidential-computing and distributed inference infrastructure.",
+    src: "/founders/kailosh.jpg",
+    initials: "KK",
   },
 ];
 
@@ -51,59 +35,49 @@ export default function S10Team() {
       id="team"
       no="10"
       kicker="Team"
-      title="The rare intersection: applied post-quantum cryptography and TEE inference."
-      sub="This product cannot be built by one of those disciplines alone. Both are in the room."
+      title="A rare pairing, and the reason this is buildable."
       wide
     >
-      <div className="grid gap-3 sm:grid-cols-2">
-        {FOUNDERS.map((f, i) => (
-          <Reveal key={f.name} delay={i * 0.1}>
-            <div className="frost flex h-full flex-col rounded-2xl border border-line px-4 py-4">
-              <p className="text-[16px] leading-snug font-semibold text-ink">
-                {f.name}
-              </p>
-              <p className="mt-0.5 font-mono text-[11.5px] tracking-[0.1em] text-verify uppercase">
-                {f.role}
-              </p>
-              <p className="mt-2 text-[13px] leading-relaxed text-mist italic">
-                {f.field}
-              </p>
+      <Page>
+        <Lead>
+          This product needs applied post-quantum cryptography and trusted
+          execution in the same room. Very few rooms have both.
+        </Lead>
 
-              <ul className="mt-3 flex-1 space-y-1.5">
-                {f.points.map((p) => (
-                  <li
-                    key={p}
-                    className="flex items-start gap-2 text-[13px] leading-snug text-fog"
-                  >
-                    <span className="mt-1.5 size-1 shrink-0 rounded-full bg-verify" />
-                    <span className="min-w-0">{p}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-2.5">
-                <span className="font-mono text-[11.5px] text-mist">{f.meta}</span>
-                <a
-                  href={`https://github.com/${f.gh}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 font-mono text-[11.5px] text-verify hover:underline"
-                >
-                  <GithubMark className="size-3.5" />
-                  {f.gh}
-                </a>
+        <div className="mt-8 grid max-w-3xl gap-8 sm:grid-cols-2">
+          {FOUNDERS.map((f) => (
+            <Line key={f.name}>
+              <div className="flex items-start gap-4">
+                <InteractivePortrait
+                  src={f.src}
+                  alt={f.name}
+                  initials={f.initials}
+                  className="aspect-[4/5] w-[104px] shrink-0 rounded-xl sm:w-[118px]"
+                />
+                <div className="min-w-0 pt-1">
+                  <p className="text-[15px] leading-snug font-semibold text-ink">
+                    {f.name}
+                  </p>
+                  <p className="mt-0.5 font-mono text-[10.5px] tracking-[0.14em] text-verify uppercase">
+                    {f.role}
+                  </p>
+                  <p className="mt-2 text-[13px] leading-relaxed text-mist">
+                    {f.line}
+                  </p>
+                </div>
               </div>
-            </div>
-          </Reveal>
-        ))}
-      </div>
+            </Line>
+          ))}
+        </div>
 
-      <Reveal delay={0.24}>
-        <p className="mt-4 rounded-xl border border-verify/30 bg-verify/[0.07] px-4 py-3.5 text-[14.5px] leading-relaxed text-fog">
-          Northwind Cipher Pvt. Ltd. — building the layer every AI change flows
-          through.
-        </p>
-      </Reveal>
+        <Body>
+          Between them: research published on mapping post-quantum key exchange
+          into production networking, and a decentralised compute network built
+          from the ground up. Both have been building since school.
+        </Body>
+
+        <Aside>Northwind Cipher Pvt. Ltd.</Aside>
+      </Page>
     </Slide>
   );
 }

@@ -216,7 +216,11 @@ export function Slide({
       data-slide={no}
       data-layer={`${no} · ${kicker}`}
       className={clsx(
-        "relative mx-auto flex w-full snap-start flex-col justify-center px-5 pt-24 pb-16 sm:pt-28 sm:pb-20",
+        /* Tight vertical padding. It was pt-28/pb-20 — 192px of a 900px laptop
+           screen spent on air, which pushed the two longest slides below the
+           auto-fit floor and left them scrolling. The top value still clears
+           the fixed nav; the rest was decoration the page could not afford. */
+        "relative mx-auto flex w-full snap-start flex-col justify-center px-5 pt-20 pb-10 sm:pt-24 sm:pb-12",
         // Pinned to exactly one screen once the content has been shrunk to fit,
         // so the slide occupies a single snap step and nothing spills below.
         pinned ? "h-[100svh] overflow-hidden" : "min-h-[100svh]",
