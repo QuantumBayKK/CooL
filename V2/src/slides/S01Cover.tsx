@@ -1,8 +1,7 @@
-"use client";
+﻿"use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
-import { ArrowDown, Play, LayoutDashboard } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { Reveal } from "@/components/ui";
 import { SlideFrame } from "@/components/Slide";
 import Magnetic from "@/components/Magnetic";
@@ -19,7 +18,7 @@ function LightPool() {
   );
 }
 
-/* Claymorphic bloom — soft light pooled behind the object so it reads on dark */
+/* Claymorphic bloom â€” soft light pooled behind the object so it reads on dark */
 function ClayGlow() {
   return (
     <div
@@ -51,7 +50,7 @@ function HeroStage({ className }: { className: string }) {
   );
 }
 
-/* The glowing ask — the point of this slide. */
+/* The glowing ask â€” the point of this slide. */
 function AskBox({ compact = false }: { compact?: boolean }) {
   return (
     <div className="relative mx-auto block w-full max-w-md overflow-hidden rounded-2xl border border-verify/40 bg-panel px-5 py-6 text-center shadow-[0_0_44px_rgba(88,166,255,0.28),0_8px_28px_rgba(0,0,0,0.4)] sm:w-fit sm:px-10">
@@ -66,17 +65,27 @@ function AskBox({ compact = false }: { compact?: boolean }) {
             : "display relative mt-3 text-[clamp(3.4rem,9vw,5.4rem)] whitespace-nowrap text-ink"
         }
       >
-        ₹1 Crore
+        â‚¹1 Crore
       </p>
     </div>
   );
 }
 
-/* Two doors: the story, or the working product. Investors take one of each. */
-function Ctas({ stack = false }: { stack?: boolean }) {
+/**
+ * One action.
+ *
+ * This used to be three buttons of near-equal weight â€” deck, demo, dashboard â€”
+ * which is three exits from the first screen and no path through it. A reader
+ * who has to choose before they know anything usually chooses to leave.
+ *
+ * So the cover now asks for exactly one thing: start the story. The demo and
+ * the console are still one tap away in the nav for anyone who wants to jump,
+ * but they no longer compete with the only action that matters here.
+ */
+function Cta({ stack = false }: { stack?: boolean }) {
   return (
-    <div className={stack ? "w-full space-y-2.5" : "flex flex-wrap items-center gap-2.5"}>
-      <Magnetic className={stack ? "block w-full" : undefined}>
+    <div className={stack ? "w-full" : undefined}>
+      <Magnetic className={stack ? "block w-full" : "inline-block"}>
         <ShimmerButton
           type="button"
           onClick={() =>
@@ -84,28 +93,13 @@ function Ctas({ stack = false }: { stack?: boolean }) {
           }
           className={stack ? "w-full" : undefined}
         >
-          See the deck
+          Show me
           <ArrowDown className="size-4" strokeWidth={2.2} />
         </ShimmerButton>
       </Magnetic>
-
-      <Link
-        href="/demo"
-        prefetch
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-verify/45 bg-verify/10 px-5 py-3 font-mono text-[12.5px] text-ink transition-colors hover:bg-verify/20 sm:w-auto"
-      >
-        <Play className="size-3.5" strokeWidth={2.4} />
-        Run the live demo
-      </Link>
-
-      <Link
-        href="/dashboard"
-        prefetch
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-line px-5 py-3 font-mono text-[12.5px] text-mist transition-colors hover:border-verify/40 hover:text-ink sm:w-auto"
-      >
-        <LayoutDashboard className="size-3.5" strokeWidth={2.4} />
-        Open the product
-      </Link>
+      <p className="mt-2.5 font-mono text-[11px] leading-relaxed text-mist">
+        Two minutes. Ends with a live system you can break yourself.
+      </p>
     </div>
   );
 }
@@ -115,7 +109,7 @@ export default function S01Cover() {
     <section
       id="cover"
       data-slide="01"
-      data-layer="01 · COVER"
+      data-layer="01 Â· COVER"
       className="relative mx-auto flex min-h-[100svh] w-full max-w-6xl snap-start items-center px-5 pt-24 pb-14 lg:pt-24 lg:pb-16"
     >
       <SlideFrame mode="fall" className="w-full">
@@ -128,7 +122,7 @@ export default function S01Cover() {
             <p className="kicker mt-1 text-[13px]">The black box for AI</p>
 
             <p className="mx-auto mt-3 max-w-[34ch] text-[15px] leading-snug font-semibold text-ink">
-              Every AI change your company makes — documented, approved, filed and
+              Every AI change your company makes â€” documented, approved, filed and
               provable. Automatically.
             </p>
 
@@ -146,11 +140,11 @@ export default function S01Cover() {
             </div>
 
             <div className="mt-5 w-full">
-              <Ctas stack />
+              <Cta stack />
             </div>
 
             <p className="mt-3 font-mono text-[11px] leading-relaxed font-semibold text-mist">
-              Northwind Cipher Pvt Ltd · Pranauv Shrinaath S, CEO · Kailosh
+              Northwind Cipher Pvt Ltd Â· Pranauv Shrinaath S, CEO Â· Kailosh
               Kalimuthu, CTO
             </p>
           </Reveal>
@@ -165,7 +159,7 @@ export default function S01Cover() {
             <p className="kicker mt-2 text-[15px]">The black box for AI</p>
 
             <p className="mt-6 max-w-lg text-[22px] leading-tight font-semibold text-ink">
-              Every AI change your company makes — documented, approved, filed and
+              Every AI change your company makes â€” documented, approved, filed and
               provable. Automatically.
             </p>
 
@@ -176,11 +170,11 @@ export default function S01Cover() {
             </p>
 
             <div className="mt-7">
-              <Ctas />
+              <Cta />
             </div>
 
             <p className="mt-6 font-mono text-[12px] leading-relaxed font-semibold text-mist">
-              Northwind Cipher Pvt Ltd · Pranauv Shrinaath S, CEO · Kailosh
+              Northwind Cipher Pvt Ltd Â· Pranauv Shrinaath S, CEO Â· Kailosh
               Kalimuthu, CTO
             </p>
           </Reveal>

@@ -43,20 +43,16 @@ export default function S05Proof() {
             Then try to cheat: alter the record and watch the same verifier reject
             it, and tell you exactly which domain broke.
           </p>
-          <div className="mt-3.5 flex flex-wrap gap-2.5">
+          {/* One action. The console is in the nav for anyone who wants it —
+              here, the only thing worth asking for is that they run it. */}
+          <div className="mt-3.5">
             <Link
               href="/demo"
               prefetch
-              className="inline-flex items-center gap-2 rounded-full bg-verify-deep px-4 py-2.5 font-mono text-[12.5px] text-white shadow-[0_0_22px_rgba(9,105,218,0.45)] transition-shadow hover:shadow-[0_0_34px_rgba(9,105,218,0.75)]"
+              className="inline-flex items-center gap-2 rounded-full bg-verify-deep px-5 py-3 font-mono text-[12.5px] text-white shadow-[0_0_22px_rgba(9,105,218,0.45)] transition-shadow hover:shadow-[0_0_34px_rgba(9,105,218,0.75)]"
             >
-              <Play className="size-3.5" strokeWidth={2.4} /> Run the live pipeline
-            </Link>
-            <Link
-              href="/dashboard"
-              prefetch
-              className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2.5 font-mono text-[12.5px] text-mist transition-colors hover:border-verify/40 hover:text-ink"
-            >
-              See the product <ArrowRight className="size-3.5" />
+              <Play className="size-3.5" strokeWidth={2.4} /> Run it yourself
+              <ArrowRight className="size-3.5" />
             </Link>
           </div>
         </div>

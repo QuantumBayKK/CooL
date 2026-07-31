@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowUpRight, Play } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Slide } from "@/components/Slide";
 import { Reveal } from "@/components/ui";
 import { INVEST_MAILTO, MEETING_URL } from "@/components/Nav";
@@ -84,28 +83,23 @@ export default function S13Ask() {
       </Reveal>
 
       <Reveal delay={0.22}>
-        <div className="mt-5 flex flex-wrap gap-2.5">
+        {/* The end of the path, so it asks for exactly one thing. Email stays
+            as a quiet fallback rather than a second button competing with it. */}
+        <div className="mt-5">
           <a
             href={MEETING_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-verify-deep px-5 py-3 font-mono text-[12.5px] text-white shadow-[0_0_24px_rgba(9,105,218,0.45)] transition-shadow hover:shadow-[0_0_36px_rgba(9,105,218,0.8)] sm:flex-none"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-verify-deep px-6 py-3.5 font-mono text-[13px] text-white shadow-[0_0_24px_rgba(9,105,218,0.45)] transition-shadow hover:shadow-[0_0_36px_rgba(9,105,218,0.8)] sm:w-auto"
           >
-            Book a meeting <ArrowUpRight className="size-3.5" />
+            Book a meeting <ArrowUpRight className="size-4" />
           </a>
-          <a
-            href={INVEST_MAILTO}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-verify/45 bg-verify/10 px-5 py-3 font-mono text-[12.5px] text-ink transition-colors hover:bg-verify/20 sm:flex-none"
-          >
-            Email the founders
-          </a>
-          <Link
-            href="/demo"
-            prefetch
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-line px-5 py-3 font-mono text-[12.5px] text-mist transition-colors hover:border-verify/40 hover:text-ink sm:flex-none"
-          >
-            <Play className="size-3.5" /> Run the demo first
-          </Link>
+          <p className="mt-2.5 font-mono text-[11.5px] leading-relaxed text-mist">
+            Or email us directly —{" "}
+            <a href={INVEST_MAILTO} className="text-verify hover:underline">
+              northwindcipher@gmail.com
+            </a>
+          </p>
         </div>
       </Reveal>
 
