@@ -102,20 +102,7 @@ export function SlideFrame({
 export const frameModeFor = (no: string): FrameMode =>
   (["fall", "left", "right"] as const)[(parseInt(no, 10) - 1) % 3]!;
 
-/**
- * One deck slide = one full screen, centred, holding one idea.
- *
- * Everything is centre-aligned and floating. There is no card, no panel and no
- * border by default, because a deck read at speed wants a single column the eye
- * falls down — boxes fragment that into regions and the reader has to choose
- * where to start.
- *
- * The hard rule this enforces is **one screen, one glance**. `100svh` with
- * `justify-center` and tight padding means a slide that does not fit is a slide
- * saying two things, and should be split. That constraint is also what makes
- * snapping safe on a phone: the earlier rubber-banding came entirely from
- * slides growing taller than the screen they were snapped to.
- */
+/* One deck slide = one full-viewport section, numbered exactly like the PPTX. */
 export function Slide({
   id,
   no,
@@ -124,6 +111,7 @@ export function Slide({
   sub,
   children,
   wide = false,
+  center = false,
 }: {
   id: string;
   no: string;
@@ -131,8 +119,8 @@ export function Slide({
   title: ReactNode;
   sub?: ReactNode;
   children?: ReactNode;
-  /** slightly wider column for slides carrying a diagram or a table */
   wide?: boolean;
+  center?: boolean;
 }) {
   return (
     <section
@@ -140,11 +128,12 @@ export function Slide({
       data-slide={no}
       data-layer={`${no} · ${kicker}`}
       className={clsx(
-        "relative mx-auto flex min-h-[100svh] w-full snap-start flex-col items-center justify-center px-5 py-20 text-center sm:py-24",
-        wide ? "max-w-5xl" : "max-w-3xl",
+        "relative mx-auto flex min-h-[100svh] w-full snap-start flex-col justify-center px-5 pt-24 pb-16 sm:pt-28 sm:pb-20",
+        wide ? "max-w-6xl" : "max-w-2xl md:max-w-3xl lg:max-w-4xl",
+        center && "items-center text-center",
       )}
     >
-      <SlideFrame mode={frameModeFor(no)} className="w-full">
+      <SlideFrame mode={frameModeFor(no)}>
         <Reveal>
           <Kicker>{kicker}</Kicker>
           {/* observe the (unclipped) wrapper, not the h2: at y:108% the h2 is
@@ -158,7 +147,7 @@ export function Slide({
             viewport={{ once: true, margin: "-60px" }}
           >
             <motion.h2
-              className="display mx-auto mt-3 max-w-[18ch] text-[clamp(2rem,6.4vw,3.4rem)]"
+              className="display mt-2 text-[clamp(2.3rem,9.5vw,3.6rem)]"
               variants={{
                 hidden: { y: "108%", skewY: 2.5 },
                 show: {
@@ -172,12 +161,17 @@ export function Slide({
             </motion.h2>
           </motion.div>
           {sub ? (
-            <p className="mx-auto mt-4 max-w-[46ch] text-[15px] leading-relaxed font-medium text-fog sm:text-[16.5px]">
+            <p
+              className={clsx(
+                "mt-3.5 max-w-prose text-[16px] leading-relaxed font-medium text-fog sm:text-[17px]",
+                center && "mx-auto",
+              )}
+            >
               {sub}
             </p>
           ) : null}
         </Reveal>
-        {children ? <div className="mt-7 w-full sm:mt-8">{children}</div> : null}
+        {children ? <div className="mt-6 sm:mt-7">{children}</div> : null}
       </SlideFrame>
     </section>
   );
