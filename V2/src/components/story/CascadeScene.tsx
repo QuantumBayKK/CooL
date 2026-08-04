@@ -184,9 +184,12 @@ function StepCard({
             <Pill tone={step.truth === "computed" ? "verify" : "warn"} glyph={false}>
               {step.truth === "computed" ? "computed live" : "staged"}
             </Pill>
-            {resolved && step.ms > 0 && (
+            {/* Timed only where there was work to time. Sub-0.05ms rounds to
+                zero, and printing "0.0 ms" reads as "not measured" — so the
+                floor is stated as a bound instead, which is what it is. */}
+            {resolved && step.truth === "computed" && (
               <span className="ml-auto font-mono text-[11px] text-mist">
-                {step.ms.toFixed(1)} ms
+                {step.ms > 0 ? `${step.ms.toFixed(1)} ms` : "<0.1 ms"}
               </span>
             )}
           </div>
