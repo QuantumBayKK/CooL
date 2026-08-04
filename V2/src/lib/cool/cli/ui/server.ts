@@ -396,6 +396,36 @@ export class Console {
       return;
     }
 
+    if (path === "/api/verify-all" && req.method === "POST") {
+      // Re-read from disk rather than verifying what is already in memory. The
+      // question this answers is "is the evidence on this machine still good",
+      // and only the bytes on disk can answer it — a cached object would still
+      // verify after someone had edited the file underneath it.
+      const stored = loadReceipts(this.options.root);
+      const started = performance.now();
+      const results = [];
+      for (const { path: file, receipt } of stored) {
+        const verdict = await this.verify(receipt);
+        results.push({
+          id: receipt.record.record_id,
+          file: file.split(/[\\/]/).pop() ?? file,
+          ok: verdict.ok,
+          reasons: verdict.reasons,
+          failed: Object.entries(verdict.checks)
+            .filter(([, check]) => check.status === "fail")
+            .map(([domain]) => domain),
+        });
+      }
+      json(res, 200, {
+        total: results.length,
+        valid: results.filter((r) => r.ok).length,
+        invalid: results.filter((r) => !r.ok).length,
+        ms: Math.round((performance.now() - started) * 10) / 10,
+        results,
+      });
+      return;
+    }
+
     if (path === "/api/pack") {
       const receipts = [...this.receipts.values()];
       const info = this.options.workspace.info;
