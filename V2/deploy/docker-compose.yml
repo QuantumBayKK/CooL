@@ -7,7 +7,7 @@
 services:
   evidence-plane:
     build: .
-    image: ghcr.io/northwindcipher/cool-evidence:2.4.0
+    image: ghcr.io/northwindcipher/cool-evidence:2.5.0
     restart: always
     environment:
       # The guest agent inside the CVM. `fetch` cannot open a unix socket, so
@@ -41,7 +41,7 @@ services:
   # Turning this on means setting `gateway_enabled: true` in app-compose.json.
   console:
     build: .
-    image: ghcr.io/northwindcipher/cool-evidence:2.4.0
+    image: ghcr.io/northwindcipher/cool-evidence:2.5.0
     restart: always
     depends_on:
       - evidence-plane

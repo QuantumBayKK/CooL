@@ -42,7 +42,7 @@ function resolveVersion(): string {
   } catch {
     // Running from source, or a packaging layout we do not recognise.
   }
-  return "2.4.0-dev";
+  return "2.5.0-dev";
 }
 
 export const VERSION = resolveVersion();

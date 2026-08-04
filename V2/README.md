@@ -467,6 +467,15 @@ falls back to ASCII on a legacy Windows console and to plain lines when piped.
 [`tests/cli.test.ts`](tests/cli.test.ts) drives the real binary in temp
 directories, including the exit codes CI depends on.
 
+### What 2.5.0 added — the console over a real project
+
+`cool ui` — the section above. It ships in the same package, with no new
+dependencies.
+
+2.5.0 also carries everything from 2.4.0, which was built but never published:
+the version on the registry went 2.3.0 → 2.5.0, so a `cool update` from 2.3.0
+picks up the anchor work and the console together.
+
 ### What 2.4.0 added — a real anchor
 
 The `anchor` domain used to report `absent` with the word "planned" next to it.
