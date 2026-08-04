@@ -175,9 +175,14 @@ export default function S01Cover() {
         {/* ---------- desktop: editorial split ---------- */}
         <div className="hidden w-full items-center gap-10 lg:grid lg:grid-cols-[1fr_1fr]">
           <Reveal>
-            <h1 className="display max-w-[8ch] text-[clamp(5.5rem,13vw,8.4rem)]">
+            {/* Not an `h1`. The phone and desktop layouts are separate branches
+                and both are in the DOM at every width — only one is displayed —
+                so making each a heading gave the page two `h1`s for a crawler
+                to weigh against each other. The mobile branch above carries the
+                real one; this is the same type, visually identical. */}
+            <p className="display max-w-[8ch] text-[clamp(5.5rem,13vw,8.4rem)]">
               CooL
-            </h1>
+            </p>
             <p className="kicker mt-2 text-[15px]">The black box for AI</p>
 
             <HeroPromise className="mt-6 max-w-lg text-[20px] leading-relaxed font-medium text-fog" />

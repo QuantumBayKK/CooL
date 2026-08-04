@@ -72,7 +72,19 @@ html {
      reads as the page coming loose, and it also stops a downward flick at the
      last slide from triggering pull-to-refresh. */
   overscroll-behavior-y: none;
-  /* Deck mode, pointer devices only — see the coarse-pointer override below. */
+}
+
+/* Snapping belongs to the deck, not to the document.
+
+   This used to sit on `html` unconditionally, which meant every route paid for
+   it — including the ones with no slides at all, where a mandatory snap axis
+   with no snap points still changes how a flick decelerates. The landing page
+   is ordinary prose that people read with a thumb, and it must scroll the way
+   every other page they have ever read does.
+
+   `SlideRail` sets `data-deck` on the html element while it is mounted, so the
+   deck keeps exactly the behaviour it had and nothing else inherits it. */
+html[data-deck] {
   scroll-snap-type: y mandatory;
 }
 
@@ -111,7 +123,7 @@ html.snap-js {
    retoggle snap points underneath a scroll already in flight. */
 
 @media (prefers-reduced-motion: reduce) {
-  html {
+  html[data-deck] {
     scroll-snap-type: none;
   }
 }

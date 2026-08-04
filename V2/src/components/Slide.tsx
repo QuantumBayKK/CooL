@@ -299,6 +299,21 @@ const SLIDE_IDS = [
 export function SlideRail() {
   const [active, setActive] = useState(0);
 
+  /**
+   * Claim deck mode for as long as this is mounted.
+   *
+   * Mandatory scroll-snap used to live on `html` for every route, so the
+   * landing page — ordinary prose, read with a thumb — inherited a snap axis
+   * it has no snap points for, which still changes how a flick decelerates.
+   * The rail is only ever rendered by the deck, which makes it the honest place
+   * to turn the behaviour on, and the cleanup guarantees no other route can be
+   * left holding it after a client-side navigation away.
+   */
+  useEffect(() => {
+    document.documentElement.setAttribute("data-deck", "");
+    return () => document.documentElement.removeAttribute("data-deck");
+  }, []);
+
   useEffect(() => {
     const els = SLIDE_IDS.map((id) => document.getElementById(id)).filter(
       (el): el is HTMLElement => !!el,

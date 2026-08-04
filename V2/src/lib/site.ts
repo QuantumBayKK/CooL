@@ -19,6 +19,9 @@ export const SITE = {
 /** Every indexable route, with the weighting the sitemap should carry. */
 export const ROUTES = [
   { path: "/", priority: 1, changeFrequency: "weekly" as const },
+  // The eleven-slide deck. Lower priority than the landing page on purpose:
+  // it is for presenting, and it is not the page a search result should open.
+  { path: "/deck", priority: 0.7, changeFrequency: "monthly" as const },
   // The long read. High priority because it is the page that answers the only
   // question a first-time reader actually has, and the one worth ranking for.
   { path: "/why", priority: 0.95, changeFrequency: "monthly" as const },
