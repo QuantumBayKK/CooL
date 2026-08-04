@@ -1,0 +1,113 @@
+name: ci
+
+# Everything that used to be "a script somebody ran once", on every push.
+#
+# The ordering is cheapest-first so a broken build fails in seconds rather than
+# minutes: types, lint, unit tests, then the two conformance suites, then the
+# consumer install check, then the site build. The consumer check is last of the
+# SDK jobs because it packs, installs and typechecks in a throwaway project —
+# slow, and worth it: it is the only step that sees the package the way a
+# stranger does.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      # The v1 evidence core against the published cool-spec vectors.
+      - name: Conformance — v1 receipts
+        run: npm run verify:sdk
+
+      # The confidential-compute tier, attacked: tampering, quote swapping,
+      # key rotation on redeploy, and a refused RA-TLS channel.
+      - name: Conformance — TEE tier
+        run: npm run verify:tee
+
+      # Pack, install into a clean project, run it, and typecheck a consumer
+      # under both nodenext and bundler resolution.
+      - name: Package works on install
+        run: npm run verify:package
+
+      - name: Build the SDK artefacts
+        run: npm run sdk:build
+
+      # The published page reads public/sdk/manifest.json, so a stale artefact
+      # would advertise a version nobody can download.
+      - name: Artefacts match the package version
+        run: |
+          node -e "
+            const pkg = require('./packages/cool-tee/package.json');
+            const manifest = require('./public/sdk/manifest.json');
+            if (pkg.version !== manifest.version) {
+              console.error('manifest ' + manifest.version + ' != package ' + pkg.version + ' — run: npm run sdk:build');
+              process.exit(1);
+            }
+            const fs = require('fs');
+            const tarball = 'public/sdk/cool-tee-' + pkg.version + '.tgz';
+            if (!fs.existsSync(tarball)) {
+              console.error('missing ' + tarball);
+              process.exit(1);
+            }
+            console.log('artefacts match v' + pkg.version);
+          "
+
+      - name: Build the site
+        run: npm run build
+
+  # Runs only when the secrets exist, so a fork's CI is not red for lacking a
+  # confidential VM. This is the job that will one day print `attestation: pass`
+  # against real silicon.
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Live endpoints
+        env:
+          DSTACK_ENDPOINT: ${{ secrets.DSTACK_ENDPOINT }}
+          QUOTE_VERIFIER_URL: ${{ secrets.QUOTE_VERIFIER_URL }}
+          QUOTE_VERIFIER_KEY: ${{ secrets.QUOTE_VERIFIER_KEY }}
+          PHALA_LLM_URL: ${{ secrets.PHALA_LLM_URL }}
+          PHALA_API_KEY: ${{ secrets.PHALA_API_KEY }}
+          COOL_PIN_MRTD: ${{ vars.COOL_PIN_MRTD }}
+          COOL_PIN_RTMR0: ${{ vars.COOL_PIN_RTMR0 }}
+          COOL_PIN_RTMR1: ${{ vars.COOL_PIN_RTMR1 }}
+          COOL_PIN_RTMR2: ${{ vars.COOL_PIN_RTMR2 }}
+          COOL_PIN_RTMR3: ${{ vars.COOL_PIN_RTMR3 }}
+        run: npm run verify:live

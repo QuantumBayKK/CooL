@@ -4,7 +4,12 @@ import Link from "next/link";
 import Backdrop from "@/components/Backdrop";
 import { ArrowLeft, Play } from "lucide-react";
 
-const Console = dynamic(() => import("@/components/dashboard/Console"));
+/**
+ * The console is the whole page below the fold and pulls in every chart, so it
+ * is code-split: the header and the honesty banner render immediately, and the
+ * application shell arrives with them rather than blocking them.
+ */
+const ConsoleApp = dynamic(() => import("@/components/console/ConsoleApp"));
 
 export const metadata: Metadata = {
   title: "Console",
@@ -101,7 +106,7 @@ export default function DashboardPage() {
         </header>
 
         <div className="mt-8">
-          <Console />
+          <ConsoleApp />
         </div>
       </main>
     </>

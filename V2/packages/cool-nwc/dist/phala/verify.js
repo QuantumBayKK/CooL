@@ -1,0 +1,254 @@
+import { multihashDigest } from "../multihash.js";
+import { hybridVerify } from "../sign.js";
+import { leafHash, verifyInclusion } from "../merkle.js";
+import { sthCore, sthSigningMessage } from "../record.js";
+import { bindingHashV2, coreOfV2, recordLeafDataV2, recordSigningMessageV2, recordSubjectLabel, } from "./record.js";
+import { checkQuoteStructure, enclaveReportData, measurementDiff, measurementEquals, quoteDigest, simulatedQuoteVerifier, } from "./quote.js";
+import { validateReceiptV2Shape } from "./structure.js";
+const ANCHOR_DETAIL = "NONE — not anchored to a public chain (planned)";
+function fail(detail) {
+    return { status: "fail", detail };
+}
+/** Verify a `cool.receipt.v2`. Never throws; problems surface as failed domains. */
+export async function verifyReceiptV2(receipt, options = {}) {
+    const shape = validateReceiptV2Shape(receipt);
+    if (!shape.receipt) {
+        const bad = fail("receipt failed cool.receipt.v2 structural validation");
+        const absent = { status: "absent", detail: "not evaluated — receipt malformed" };
+        return {
+            ok: false,
+            schema: "cool.receipt.v2",
+            subject: null,
+            checks: {
+                binding: bad,
+                signature: bad,
+                inclusion: absent,
+                witnesses: absent,
+                attestation: absent,
+                enclave: absent,
+                anchor: { status: "absent", detail: ANCHOR_DETAIL },
+            },
+            reasons: shape.errors,
+        };
+    }
+    const r = shape.receipt;
+    const reasons = [];
+    const core = coreOfV2(r.record);
+    const subject = {
+        kind: r.record.schema === "cool.inference.v2" ? "inference" : "change",
+        subject: recordSubjectLabel(core),
+        issued_at: r.record.time.issued_at,
+        record_id: r.record.record_id,
+        key_id: r.record.signature.key_id,
+        tee: `${r.record.runtime.tee_vendor} · ${r.record.runtime.mode}`,
+    };
+    /* ── binding ── */
+    const recomputed = bindingHashV2(core);
+    const bindingOk = recomputed === r.binding_hash;
+    const binding = bindingOk
+        ? { status: "pass", detail: "recomputed from record, matches" }
+        : fail(`FAILED — recomputed ${recomputed} ≠ stored ${r.binding_hash}`);
+    if (!bindingOk)
+        reasons.push("binding: recomputed binding_hash does not match the receipt");
+    /* ── signature ── */
+    const keyId = r.record.signature.key_id;
+    const signingEntry = r.key_directory[keyId];
+    let signature;
+    if (!signingEntry) {
+        signature = fail(`FAILED — no public key for key_id '${keyId}' in key_directory`);
+        reasons.push(`signature: key_directory has no entry for '${keyId}'`);
+    }
+    else {
+        const result = hybridVerify(recordSigningMessageV2(core, r.binding_hash), r.record.signature, signingEntry);
+        if (result.ok) {
+            signature = { status: "pass", detail: `ML-DSA-65 + Ed25519 valid (key ${keyId})` };
+        }
+        else {
+            const both = !result.mlDsaOk && !result.ed25519Ok;
+            const which = both ? "ML-DSA-65 and Ed25519" : !result.mlDsaOk ? "ML-DSA-65" : "Ed25519";
+            signature = fail(`FAILED — ${which} ${both ? "do" : "does"} not verify over core‖binding_hash`);
+            reasons.push(`signature: ${which} did not verify (record altered or wrong key)`);
+        }
+    }
+    /* ── inclusion ── */
+    const inclusion = verifyInclusionDomain(r, reasons);
+    /* ── witnesses ── */
+    const witnesses = verifyWitnessesDomain(r, options.witnessThreshold ?? 0);
+    /* ── attestation ── */
+    const attestation = await verifyAttestationDomain(r, options, reasons);
+    /* ── enclave binding ── */
+    const enclave = verifyEnclaveDomain(r, signingEntry, options, reasons, attestation.status);
+    const checks = {
+        binding,
+        signature,
+        inclusion,
+        witnesses,
+        attestation,
+        enclave,
+        anchor: { status: "absent", detail: ANCHOR_DETAIL },
+    };
+    const inclusionAcceptable = inclusion.status === "pass" || inclusion.status === "absent";
+    let ok = binding.status === "pass" &&
+        signature.status === "pass" &&
+        inclusionAcceptable &&
+        enclave.status !== "fail" &&
+        attestation.status !== "fail";
+    if (options.requireHardware && attestation.status !== "pass") {
+        ok = false;
+        reasons.push("policy: requireHardware is set and this receipt is not backed by a verified hardware quote");
+    }
+    return { ok, schema: "cool.receipt.v2", subject, checks, reasons };
+}
+/* ── domains ──────────────────────────────────────────────────────────── */
+function verifyInclusionDomain(r, reasons) {
+    if (!r.inclusion || !r.sth) {
+        return { status: "absent", detail: "absent (no transparency-log proof in this receipt)" };
+    }
+    const inc = r.inclusion;
+    const sth = r.sth;
+    if (inc.tree_size !== sth.tree_size) {
+        reasons.push("inclusion: inclusion.tree_size does not match sth.tree_size");
+        return fail(`FAILED — inclusion tree_size ${inc.tree_size} ≠ STH tree_size ${sth.tree_size}`);
+    }
+    if (inc.leaf_index < 0 || inc.leaf_index >= sth.tree_size) {
+        reasons.push("inclusion: leaf_index out of range for tree_size");
+        return fail(`FAILED — leaf_index ${inc.leaf_index} out of range for tree(${sth.tree_size})`);
+    }
+    try {
+        const rootOk = verifyInclusion(leafHash(recordLeafDataV2(r.binding_hash)), inc.leaf_index, sth.tree_size, inc.audit_path.map(multihashDigest), multihashDigest(sth.root_hash));
+        if (!rootOk) {
+            reasons.push("inclusion: audit path does not reconstruct the STH root");
+            return fail("FAILED — audit path does not reconstruct STH root");
+        }
+    }
+    catch {
+        reasons.push("inclusion: malformed audit path or root hash");
+        return fail("FAILED — malformed audit path or STH root hash");
+    }
+    const sthEntry = r.key_directory[sth.signature.key_id];
+    if (!sthEntry) {
+        reasons.push(`inclusion: key_directory has no entry for STH key '${sth.signature.key_id}'`);
+        return fail(`FAILED — no public key for STH key_id '${sth.signature.key_id}'`);
+    }
+    if (!hybridVerify(sthSigningMessage(sthCore(sth)), sth.signature, sthEntry).ok) {
+        reasons.push("inclusion: STH signature does not verify");
+        return fail("FAILED — STH signature invalid");
+    }
+    return {
+        status: "pass",
+        detail: `leaf ${inc.leaf_index} ∈ tree(${sth.tree_size}); STH signature valid`,
+    };
+}
+function verifyWitnessesDomain(r, threshold) {
+    if (!r.sth)
+        return { status: "absent", detail: "no STH (transparency-log proof absent)" };
+    const message = sthSigningMessage(sthCore(r.sth));
+    let external = 0;
+    let self = 0;
+    for (const w of r.sth.witnesses) {
+        if (!w.external) {
+            self++;
+            continue;
+        }
+        const entry = r.key_directory[w.id];
+        if (!entry)
+            continue;
+        const ok = hybridVerify(message, { alg: w.alg, key_id: w.id, ml_dsa: w.ml_dsa, ed25519: w.ed25519 }, entry).ok;
+        if (ok)
+            external++;
+    }
+    const note = self > 0 ? ` (${self} self-signature${self === 1 ? "" : "s"}, not counted)` : "";
+    return external >= Math.max(threshold, 1)
+        ? { status: "pass", detail: `${external} independent${note}` }
+        : { status: "absent", detail: `${external} independent${note}` };
+}
+async function verifyAttestationDomain(r, options, reasons) {
+    const quote = r.attestation.quote;
+    if (!quote) {
+        return { status: "mock", detail: "MOCK — no attestation quote in this receipt" };
+    }
+    const structural = checkQuoteStructure(quote);
+    if (structural) {
+        reasons.push(`attestation: ${structural.detail}`);
+        return structural;
+    }
+    const simulated = quote.root === "cool-sim-root";
+    const verifier = options.quoteVerifier ?? (simulated ? simulatedQuoteVerifier(r.key_directory) : null);
+    if (!verifier) {
+        return {
+            status: "absent",
+            detail: `quote present (root ${quote.root}, TCB ${quote.body.tcb_status}) — no verifier configured, so it is REPORTED, not verified`,
+        };
+    }
+    const verification = await verifier.verify(quote);
+    if (!verification.ok) {
+        reasons.push(`attestation: ${verification.detail}`);
+        return fail(`FAILED — ${verification.detail}`);
+    }
+    if (simulated || verification.root === "cool-sim-root") {
+        return {
+            status: "simulated",
+            detail: `${verification.detail} — this is NOT evidence that any hardware protected the run`,
+        };
+    }
+    return {
+        status: "pass",
+        detail: `verified against ${verification.root} · TCB ${verification.tcb_status}`,
+    };
+}
+function verifyEnclaveDomain(r, signingEntry, options, reasons, attestationStatus) {
+    const runtime = r.record.runtime;
+    const quote = r.attestation.quote;
+    if (!quote || !runtime.tee_quote) {
+        return { status: "absent", detail: "no quote to bind — record was not produced in a TEE" };
+    }
+    // 1. The quote is inside the signature: its digest is a field of the signed core.
+    const digest = quoteDigest(quote);
+    if (digest !== runtime.tee_quote) {
+        reasons.push("enclave: the attached quote is not the one the record signed over");
+        return fail("FAILED — quote digest ≠ runtime.tee_quote; the quote was swapped after signing");
+    }
+    // 2. The record's measurement is the quote's measurement.
+    if (!runtime.enclave_measurement) {
+        reasons.push("enclave: record carries a quote digest but no measurement");
+        return fail("FAILED — runtime.tee_quote present with no enclave_measurement");
+    }
+    if (!measurementEquals(runtime.enclave_measurement, quote.body.measurement)) {
+        const diff = measurementDiff(runtime.enclave_measurement, quote.body.measurement);
+        reasons.push("enclave: record measurement differs from the quoted measurement");
+        return fail(`FAILED — record and quote disagree on ${diff.join(", ")}`);
+    }
+    // 3. The quote's report_data commits to the key that signed the record.
+    if (!signingEntry) {
+        return fail("FAILED — cannot check key binding without the signing key");
+    }
+    const expectedReportData = enclaveReportData(signingEntry);
+    if (quote.body.report_data !== expectedReportData) {
+        reasons.push("enclave: quote report_data does not commit to the signing key");
+        return fail("FAILED — the quote attests a DIFFERENT key than the one that signed this record");
+    }
+    // 4. The measurement is the one the reader pinned (if they pinned one).
+    const pin = options.expectedMeasurement ?? r.attestation.expected_measurement ?? null;
+    let pinNote = "no measurement pinned by the verifier";
+    if (pin) {
+        if (!measurementEquals(pin, quote.body.measurement)) {
+            const diff = measurementDiff(pin, quote.body.measurement);
+            reasons.push("enclave: measurement does not match the pinned image");
+            return fail(`FAILED — running image differs from the approved one in ${diff.join(", ")}`);
+        }
+        pinNote = `matches the pinned image ${pin.mrtd.slice(4, 16)}…`;
+    }
+    const detail = `quote is inside the signature; measurement ${quote.body.measurement.mrtd.slice(4, 16)}… holds the signing key; ${pinNote}`;
+    return attestationStatus === "simulated"
+        ? { status: "simulated", detail: `${detail} — but the quote itself is simulated` }
+        : { status: "pass", detail };
+}
+/** Convenience: the seven domains in display order. */
+export function domainOrder() {
+    return ["binding", "signature", "inclusion", "witnesses", "attestation", "enclave", "anchor"];
+}
+/** Merge a verifier's own trusted key directory over a receipt's embedded one. */
+export function withTrustedKeys(receipt, trusted) {
+    return { ...receipt, key_directory: { ...receipt.key_directory, ...trusted } };
+}
+//# sourceMappingURL=verify.js.map

@@ -95,8 +95,26 @@ export const FEATURE_MODEL: readonly {
   },
 ] as const;
 
-/** Intercept — sets the base rate when every feature is zero. */
-const INTERCEPT = -3.4;
+/**
+ * Intercept — the base rate before any signal fires.
+ *
+ * Calibrated against the estate rather than guessed. Two of the eight features
+ * are effectively always-on in a regulated estate: `dataSensitivity` sits near
+ * 0.9 for most governed workflows and `blastRadius` near 0.7, which together
+ * contribute roughly 3.0 to every change regardless of what the change did.
+ * The median observed feature push is ~3.9.
+ *
+ * An intercept chosen as if the features rested near zero therefore put the
+ * MEDIAN change over the critical threshold, and a band that fires on two
+ * changes in three carries no information — an operator learns to ignore it,
+ * which is worse than having no band at all. At -5.8 the median change lands in
+ * `low` (p ≈ 0.13), and it takes a real combination — widened authority, a
+ * missing approval, sensitive data — to reach `critical`.
+ *
+ * Re-derive this whenever the feature set or the estate changes; it is a
+ * property of the two together, not a constant.
+ */
+export const INTERCEPT = -5.8;
 
 export type RiskBand = "low" | "elevated" | "high" | "critical";
 
@@ -134,7 +152,8 @@ export interface RiskAssessment {
 
 const sigmoid = (z: number) => 1 / (1 + Math.exp(-z));
 
-function bandFor(p: number): RiskBand {
+/** Which band a probability falls into. Thresholds are published, not hidden. */
+export function bandFor(p: number): RiskBand {
   if (p >= 0.6) return "critical";
   if (p >= 0.35) return "high";
   if (p >= 0.15) return "elevated";

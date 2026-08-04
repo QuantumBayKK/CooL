@@ -142,12 +142,30 @@ const ACTORS = [
   "r.subram",
 ];
 
-const KIND_LABEL: Record<ChangeKind, string> = {
+export const KIND_LABEL: Record<ChangeKind, string> = {
   prompt: "Prompt edited",
   model: "Model swapped",
   params: "Parameters changed",
   tools: "Tool access changed",
   policy: "Policy updated",
+};
+
+/** Display order for change kinds — also the categorical colour-slot order. */
+export const CHANGE_KINDS: readonly ChangeKind[] = [
+  "prompt",
+  "model",
+  "params",
+  "tools",
+  "policy",
+];
+
+/** Column headings and legend keys, where the full label is too long. */
+export const KIND_SHORT: Record<ChangeKind, string> = {
+  prompt: "Prompt",
+  model: "Model",
+  params: "Params",
+  tools: "Tools",
+  policy: "Policy",
 };
 
 export interface AIChange {
@@ -394,6 +412,128 @@ export function compliancePosture(changes: readonly AIChange[]): RegimePosture[]
       requirement: REGIME_REQUIREMENT[regime] ?? "",
     }))
     .sort((a, b) => b.inScope - a.inScope);
+}
+
+/* ── aggregates the console surface reads ─────────────────────────────── */
+
+/** One day's bucket of the change feed, broken out by kind. */
+export interface DayBucket {
+  readonly date: Date;
+  readonly total: number;
+  readonly byKind: Record<ChangeKind, number>;
+  readonly highRisk: number;
+}
+
+/** Change volume per day, oldest → newest. Drives the activity charts. */
+export function dailyBuckets(changes: readonly AIChange[], days = 21): DayBucket[] {
+  const buckets: DayBucket[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    buckets.push({
+      date: new Date(ESTATE_NOW.getTime() - i * 86_400_000),
+      total: 0,
+      byKind: { prompt: 0, model: 0, params: 0, tools: 0, policy: 0 },
+      highRisk: 0,
+    });
+  }
+
+  for (const c of changes) {
+    const ago = Math.floor((ESTATE_NOW.getTime() - c.at.getTime()) / 86_400_000);
+    if (ago < 0 || ago >= days) continue;
+    const bucket = buckets[days - 1 - ago]!;
+    (bucket as { total: number }).total += 1;
+    bucket.byKind[c.kind] += 1;
+    if (c.risk.band === "critical" || c.risk.band === "high") {
+      (bucket as { highRisk: number }).highRisk += 1;
+    }
+  }
+
+  return buckets;
+}
+
+/** Count of changes per risk band. */
+export function riskDistribution(changes: readonly AIChange[]) {
+  const counts = { critical: 0, high: 0, elevated: 0, low: 0 };
+  for (const c of changes) counts[c.risk.band] += 1;
+  return counts;
+}
+
+/** Per-workflow rollup for the estate table. */
+export interface WorkflowRollup {
+  readonly workflow: Workflow;
+  readonly changes: number;
+  readonly sealed: number;
+  readonly sealedPct: number;
+  readonly openApprovals: number;
+  readonly highRisk: number;
+  readonly meanRisk: number;
+  readonly topDriver: string | null;
+}
+
+export function rollupByWorkflow(changes: readonly AIChange[]): WorkflowRollup[] {
+  return WORKFLOWS.map((workflow) => {
+    const mine = changes.filter((c) => c.workflow.id === workflow.id);
+    const sealed = mine.filter((c) => c.evidence === "sealed").length;
+
+    // The driver that pushes hardest across this workflow's changes, summed —
+    // "what is repeatedly going wrong here", not "what went wrong once".
+    const driverTotals = new Map<string, number>();
+    for (const c of mine) {
+      for (const contribution of c.risk.contributions) {
+        driverTotals.set(
+          contribution.label,
+          (driverTotals.get(contribution.label) ?? 0) + contribution.contribution,
+        );
+      }
+    }
+
+    return {
+      workflow,
+      changes: mine.length,
+      sealed,
+      sealedPct: mine.length ? Math.round((sealed / mine.length) * 100) : 100,
+      openApprovals: mine.filter(
+        (c) => c.approval === "pending" || c.approval === "overdue",
+      ).length,
+      highRisk: mine.filter((c) => c.risk.band === "critical" || c.risk.band === "high")
+        .length,
+      meanRisk: mine.length
+        ? mine.reduce((s, c) => s + c.risk.probability, 0) / mine.length
+        : 0,
+      topDriver: [...driverTotals.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null,
+    };
+  }).sort((a, b) => b.meanRisk - a.meanRisk);
+}
+
+/**
+ * Which drivers account for the estate's risk overall.
+ * Summing contributions across every change is what turns "this change is
+ * risky" into "this is what is repeatedly wrong with how we ship".
+ */
+export function estateDrivers(changes: readonly AIChange[]) {
+  const totals = new Map<string, { label: string; total: number; because: string }>();
+  for (const c of changes) {
+    for (const contribution of c.risk.contributions) {
+      const entry = totals.get(contribution.key) ?? {
+        label: contribution.label,
+        total: 0,
+        because: contribution.because,
+      };
+      entry.total += contribution.contribution;
+      totals.set(contribution.key, entry);
+    }
+  }
+  const all = [...totals.values()].sort((a, b) => b.total - a.total);
+  const sum = all.reduce((s, d) => s + d.total, 0) || 1;
+  return all.map((d) => ({ ...d, share: d.total / sum }));
+}
+
+/** Provider mix, for the model-estate breakdown. */
+export function providerMix(changes: readonly AIChange[]) {
+  const counts = new Map<string, number>();
+  for (const c of changes) counts.set(c.provider, (counts.get(c.provider) ?? 0) + 1);
+  return [...counts.entries()]
+    .map(([provider, count]) => ({ provider, count, share: count / changes.length }))
+    .sort((a, b) => b.count - a.count);
 }
 
 /** Relative time, computed against the fixed estate clock (SSR-stable). */

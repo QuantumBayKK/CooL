@@ -1,0 +1,75 @@
+{
+  "name": "cool-nwc",
+  "version": "2.3.0",
+  "description": "Tamper-evident, offline-verifiable evidence for AI systems — sealed inside a hardware TEE. Hybrid post-quantum signatures (ML-DSA-65 + Ed25519), an RFC 6962 transparency log, measurement-sealed keys via Phala dstack, RA-TLS capture, and a verifier that trusts nothing but the bytes.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/tee.d.ts",
+      "default": "./dist/tee.js"
+    },
+    "./v1": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./phala": {
+      "types": "./dist/phala/index.d.ts",
+      "default": "./dist/phala/index.js"
+    },
+    "./cli": "./dist/cli/index.js",
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    }
+  },
+  "bin": {
+    "cool": "dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ai-governance",
+    "ai-audit-trail",
+    "eu-ai-act",
+    "transparency-log",
+    "rfc6962",
+    "post-quantum",
+    "ml-dsa",
+    "tee",
+    "intel-tdx",
+    "confidential-computing",
+    "phala",
+    "dstack",
+    "remote-attestation",
+    "ra-tls"
+  ],
+  "author": "Northwind Cipher Pvt. Ltd.",
+  "homepage": "https://northwindcipher.com/sdk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KenidoesCode/cool-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KenidoesCode/cool-sdk/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@noble/curves": "^1.9.1",
+    "@noble/hashes": "^1.8.0",
+    "@noble/post-quantum": "^0.4.1",
+    "ajv": "^8.20.0",
+    "cbor2": "^1.12.0",
+    "ulid": "^2.3.0"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "prepack": "node build.mjs"
+  }
+}

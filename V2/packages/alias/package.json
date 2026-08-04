@@ -1,0 +1,55 @@
+{
+  "name": "cool-tee",
+  "version": "2.1.1",
+  "description": "Alias for `cool-nwc` — the CooL confidential-evidence SDK. Both names install the same library.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./phala": {
+      "types": "./phala.d.ts",
+      "default": "./phala.js"
+    },
+    "./v1": {
+      "types": "./v1.d.ts",
+      "default": "./v1.js"
+    },
+    "./cli": "./cli.js"
+  },
+  "bin": {
+    "cool": "cli.js"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "phala.js",
+    "phala.d.ts",
+    "v1.js",
+    "v1.d.ts",
+    "cli.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "cool-nwc",
+    "ai-governance",
+    "confidential-computing",
+    "attestation"
+  ],
+  "author": "Northwind Cipher Pvt. Ltd.",
+  "homepage": "https://northwindcipher.com/sdk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KenidoesCode/cool-sdk.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "cool-nwc": "^2.1.0"
+  }
+}

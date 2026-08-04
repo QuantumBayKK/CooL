@@ -22,11 +22,15 @@ const LINKS = [
   { label: "Ask", href: "#ask" },
 ];
 
-/* The two product surfaces — separate from the deck anchors because they are
-   different pages, and an investor should be able to reach them from anywhere. */
+/* Pages rather than deck anchors — the long read and the two product surfaces.
+   Reachable from anywhere, because a reader who wants the argument in full or
+   wants to see the thing working should never have to go back to the top. */
 const PRODUCT_LINKS = [
+  { label: "Why", href: "/why" },
   { label: "Demo", href: "/demo" },
   { label: "Dashboard", href: "/dashboard" },
+  { label: "Studio", href: "/studio" },
+  { label: "SDK", href: "/sdk" },
 ];
 
 export default function Nav() {

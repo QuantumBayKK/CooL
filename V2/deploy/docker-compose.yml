@@ -1,0 +1,33 @@
+# Deploy with:  phala deploy -c docker-compose.yml -n cool-evidence
+#
+# The only host-specific line is the socket mount. Everything above it is an
+# ordinary container — which is dstack's whole argument, and ours: the evidence
+# engine is not TEE-aware code, it is normal code running somewhere measurable.
+
+services:
+  evidence-plane:
+    build: .
+    image: ghcr.io/northwindcipher/cool-evidence:2.3.0
+    restart: always
+    environment:
+      # The guest agent inside the CVM. `fetch` cannot open a unix socket, so
+      # CooL routes this through node:http — see src/lib/cool/phala/unix.ts.
+      - DSTACK_ENDPOINT=/var/run/dstack.sock
+      # The step that turns `attestation` from simulated into pass: something
+      # that chains the quote to Intel's root rather than to ours.
+      - QUOTE_VERIFIER_URL=${QUOTE_VERIFIER_URL:-https://api.phala.network/attest/verify}
+      - QUOTE_VERIFIER_KEY=${QUOTE_VERIFIER_KEY:-}
+      - COOL_ENV=prod
+      # Pin the image you reviewed. Until this is set, a quote proves "some TEE"
+      # rather than "the code we approved".
+      - COOL_PIN_MRTD=${COOL_PIN_MRTD:-}
+      - COOL_PIN_RTMR0=${COOL_PIN_RTMR0:-}
+      - COOL_PIN_RTMR1=${COOL_PIN_RTMR1:-}
+      - COOL_PIN_RTMR2=${COOL_PIN_RTMR2:-}
+      - COOL_PIN_RTMR3=${COOL_PIN_RTMR3:-}
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+      - evidence:/evidence
+
+volumes:
+  evidence:

@@ -1,0 +1,9 @@
+# cool-nwc v2.3.0 — sha256
+#
+# Verify what you downloaded:
+#   sha256sum cool-nwc-2.3.0.tgz
+#   shasum -a 256 cool-nwc.js
+
+c4dec05b765c86e784ba45c805f234113406527a485d05939ad4b3857efaa6bb  cool-nwc-2.3.0.tgz
+ea1d3ff29800895d44308215fe739bd57324cd3ff9d5d686613e6553643b9ac1  cool-nwc.js
+ea1d3ff29800895d44308215fe739bd57324cd3ff9d5d686613e6553643b9ac1  cool-nwc-2.3.0.js

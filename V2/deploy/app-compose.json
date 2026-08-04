@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "cool-evidence",
+  "runner": "docker-compose",
+  "docker_compose_file": "./docker-compose.yml",
+
+  "kms_enabled": true,
+  "gateway_enabled": false,
+  "local_key_provider_enabled": false,
+  "key_provider": "kms",
+
+  "public_logs": true,
+  "public_sysinfo": true,
+
+  "allowed_envs": ["QUOTE_VERIFIER_URL", "QUOTE_VERIFIER_KEY", "COOL_ENV", "COOL_PIN_MRTD", "COOL_PIN_RTMR0", "COOL_PIN_RTMR1", "COOL_PIN_RTMR2", "COOL_PIN_RTMR3"]
+}

@@ -19,8 +19,15 @@ export const SITE = {
 /** Every indexable route, with the weighting the sitemap should carry. */
 export const ROUTES = [
   { path: "/", priority: 1, changeFrequency: "weekly" as const },
+  // The long read. High priority because it is the page that answers the only
+  // question a first-time reader actually has, and the one worth ranking for.
+  { path: "/why", priority: 0.95, changeFrequency: "monthly" as const },
   { path: "/demo", priority: 0.9, changeFrequency: "monthly" as const },
   { path: "/dashboard", priority: 0.9, changeFrequency: "monthly" as const },
+  // The SDK + console + IDE. The page a technical partner is sent to.
+  { path: "/studio", priority: 0.9, changeFrequency: "monthly" as const },
+  // Install instructions and the published artefacts. The developer entry point.
+  { path: "/sdk", priority: 0.9, changeFrequency: "monthly" as const },
   { path: "/investors", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/billboard", priority: 0.6, changeFrequency: "monthly" as const },
 ] as const;

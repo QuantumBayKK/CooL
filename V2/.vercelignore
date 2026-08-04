@@ -20,5 +20,10 @@ _parked
 /*.jpeg
 /*.jpg
 
-# Dev-only conformance script (kept in the repo, not needed on the server).
+# Dev-only conformance scripts and the SDK packaging source (kept in the repo,
+# not needed on the server). The built artefacts they produce DO ship, under
+# public/sdk/, because that is where the published package is served from.
 scripts/verify-sdk.ts
+scripts/verify-tee.ts
+scripts/build-sdk.mjs
+packages
