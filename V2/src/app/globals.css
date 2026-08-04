@@ -1010,3 +1010,53 @@ html:has([data-app-shell]) {
     animation: none;
   }
 }
+
+/* ---- the demo ----
+   Four motions, and no more. Everything in the demo arrives without being
+   asked for, so the entrances have to read as "this happened" rather than as
+   decoration: short, downward, and finished before anyone waits on them. */
+
+/* The notification, dropping in from above the panel it lands on. */
+@keyframes story-drop {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: none; }
+}
+.story-drop {
+  animation: story-drop 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Each cascade step, rising into the list under the one before it. */
+@keyframes story-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.story-rise {
+  animation: story-rise 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* A record sealed during this visit, flashing once as it joins the timeline. */
+@keyframes story-flash {
+  from { background-color: rgba(88, 166, 255, 0.14); }
+  to { background-color: transparent; }
+}
+.story-flash {
+  animation: story-flash 1.6s ease-out 1;
+}
+
+/* The boot indicator. A pulse says "working" without a spinner's urgency. */
+@keyframes story-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.story-pulse {
+  animation: story-pulse 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-drop,
+  .story-rise,
+  .story-flash,
+  .story-pulse {
+    animation: none;
+  }
+}

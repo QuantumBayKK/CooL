@@ -22,7 +22,11 @@ export const ROUTES = [
   // The long read. High priority because it is the page that answers the only
   // question a first-time reader actually has, and the one worth ranking for.
   { path: "/why", priority: 0.95, changeFrequency: "monthly" as const },
-  { path: "/demo", priority: 0.9, changeFrequency: "monthly" as const },
+  // The demo: one prompt edit, and everything that follows from it. The link
+  // that gets sent to a partner who asked to see the thing working.
+  { path: "/demo", priority: 0.95, changeFrequency: "monthly" as const },
+  // The same machinery with the lid off, stage by stage.
+  { path: "/pipeline", priority: 0.85, changeFrequency: "monthly" as const },
   { path: "/dashboard", priority: 0.9, changeFrequency: "monthly" as const },
   // The SDK + console + IDE. The page a technical partner is sent to.
   { path: "/studio", priority: 0.9, changeFrequency: "monthly" as const },

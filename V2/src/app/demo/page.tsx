@@ -1,130 +1,37 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import Link from "next/link";
-import Backdrop from "@/components/Backdrop";
-import { ArrowLeft, LayoutDashboard } from "lucide-react";
 
-const DemoShell = dynamic(() => import("@/components/demo/DemoShell"));
+/**
+ * The demo.
+ *
+ * Seven stops, one screen each, driven by a single prompt edit. The whole route
+ * is client-rendered and code-split because the first meaningful thing on it is
+ * an enclave that has not booted yet — there is nothing here a server could
+ * usefully render ahead of time, and pretending otherwise would only put a
+ * skeleton of the real thing in front of the real thing.
+ */
+const StoryShell = dynamic(() => import("@/components/story/StoryShell"));
 
 export const metadata: Metadata = {
-  title: "Live evidence pipeline",
+  title: "Demo",
   description:
-    "Watch one AI change get captured, sealed with hybrid post-quantum signatures, written to a tamper-evident transparency log and verified offline — real cryptography, running live in your browser. Then try to forge it.",
+    "An engineer changes one line of a prompt and saves. Watch the governance record, the policy decision, the audit evidence and the cryptographic proof appear on their own — then verify the result offline, with the network instrumented and counted.",
   alternates: { canonical: "/demo" },
   openGraph: {
-    title: "Run the CooL evidence pipeline live",
+    title: "CooL — change one prompt, watch the paperwork do itself",
     description:
-      "Real ML-DSA-65 + Ed25519 signatures, a real RFC 6962 Merkle log, and an offline verifier — executing in your browser. Nothing pre-recorded.",
+      "One save produces a governance record, a policy decision, sealed evidence and an offline-verifiable proof. Real ML-DSA-65 + Ed25519 signatures and a real RFC 6962 log, computed in your browser.",
     url: "/demo",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Run the CooL evidence pipeline live",
+    title: "CooL — change one prompt, watch the paperwork do itself",
     description:
-      "Real post-quantum cryptography in your browser. Seal an AI change, then try to forge it.",
+      "Nobody opened a ticket. Every hash, signature and verdict on the page is computed live, and the verifier runs with zero network calls.",
   },
 };
 
-/**
- * The proof page.
- *
- * Everything cryptographic on this route executes on the visitor's machine
- * using the same SDK that is published on GitHub. The page exists so that the
- * claim "you don't have to trust us" can be tested rather than read.
- */
 export default function DemoPage() {
-  return (
-    <>
-      <Backdrop />
-      <div className="grain" aria-hidden />
-
-      <main className="relative z-10 mx-auto w-full max-w-6xl px-5 pt-10 pb-24">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 font-mono text-[12px] text-mist transition-colors hover:text-ink"
-          >
-            <ArrowLeft className="size-3.5" /> Back to the deck
-          </Link>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 font-mono text-[12px] text-mist transition-colors hover:border-verify/40 hover:text-ink"
-          >
-            <LayoutDashboard className="size-3.5" /> Open the dashboard
-          </Link>
-        </div>
-
-        <header className="mt-8 max-w-3xl">
-          <p className="kicker text-[14px]">Live · nothing pre-recorded</p>
-          <h1 className="display mt-3 text-[clamp(2.4rem,8vw,4.2rem)]">
-            Watch one AI change
-            <br />
-            become evidence.
-          </h1>
-          <p className="mt-5 text-[16px] leading-relaxed text-fog sm:text-[17px]">
-            A developer edits a prompt. Normally that starts hours of paperwork
-            across ten tools. Run it and watch what CooL does instead —
-            documented, governed, sealed and provable before the laptop closes.
-          </p>
-          <p className="mt-3 text-[15px] leading-relaxed text-fog">
-            Then open the other four views: the same change traced across every
-            system it touches, the connectors and exactly what each one writes
-            for you, what the model predicts is about to break, and the bytes
-            underneath all of it.
-          </p>
-          <p className="mt-3 text-[14px] leading-relaxed text-mist">
-            The cryptography here is real and runs on your machine: deterministic
-            CBOR, SHA-256 commitments, ML-DSA-65 + Ed25519 hybrid signatures, an
-            RFC 6962 transparency log, and the offline verifier. Steps that would
-            need a server or a third-party API are marked{" "}
-            <span className="font-mono text-[12px] text-mock">SIMULATED</span>,
-            and the estate data is synthetic — we don&apos;t dress either up.
-          </p>
-        </header>
-
-        <div className="mt-9">
-          <DemoShell />
-        </div>
-
-        <footer className="mt-14 border-t border-line pt-6">
-          <p className="font-mono text-[11.5px] leading-relaxed text-mist">
-            Source ·{" "}
-            <a
-              href="https://github.com/KenidoesCode/cool-sdk"
-              target="_blank"
-              rel="noreferrer"
-              className="text-verify hover:underline"
-            >
-              cool-sdk
-            </a>{" "}
-            ·{" "}
-            <a
-              href="https://github.com/KenidoesCode/cool-verifier"
-              target="_blank"
-              rel="noreferrer"
-              className="text-verify hover:underline"
-            >
-              cool-verifier
-            </a>{" "}
-            ·{" "}
-            <a
-              href="https://github.com/KenidoesCode/cool-spec"
-              target="_blank"
-              rel="noreferrer"
-              className="text-verify hover:underline"
-            >
-              cool-spec
-            </a>{" "}
-            · Apache-2.0 · Northwind Cipher Pvt. Ltd.
-          </p>
-          <p className="mt-2 font-mono text-[11px] leading-relaxed text-mist/80">
-            Hardware attestation is reported as MOCK and public anchoring as
-            ABSENT because neither ships yet. The verifier will never mark them
-            as passing.
-          </p>
-        </footer>
-      </main>
-    </>
-  );
+  return <StoryShell />;
 }

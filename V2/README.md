@@ -19,11 +19,72 @@ npm run verify:sdk   # prove the vendored SDK matches the published spec
 | Route | What it is |
 |---|---|
 | `/` | The 13-slide investor deck |
-| `/demo` | Five-view live demo — pipeline, timeline, integrations, intelligence, internals |
+| `/demo` | **The demo** — one prompt edit, and everything that follows from it, in seven stops |
+| `/pipeline` | The same machinery with the lid off — pipeline, timeline, integrations, intelligence, internals |
 | `/dashboard` | The SaaS console: estate, change feed, predictive risk, compliance, audit export |
 | `/investors` | Keynote-style technical & operational diligence, 14 stages |
 | `/billboard` | Terminal billboard — live-types the verify command and streams real output |
 | `/studio` | **The product itself** — the confidential-compute SDK, an Atlassian-shaped console over the evidence it produces, and a VS-Code-shaped IDE over the code that produces it |
+
+---
+
+## The demo (`/demo`)
+
+Seven stops, one screen each, about seven minutes. An engineer changes one line
+of a system prompt and saves; everything after that happens without anyone
+touching a form, a ticket or a checklist. `←`/`→` drive it.
+
+| Stop | What it shows |
+|---|---|
+| 01 The change | A VS-Code-shaped editor over `banking-agent`. Edit the prompt yourself, or press **Make the change** and it types at reading speed. `⌘S` saves. |
+| 02 What happened by itself | The cascade: record → policy → binding → signature → log → verdict, each with its measured duration |
+| 03 Verified offline | `cool verify` in a terminal, with the network instrumented and counted. Download the receipt and run the published package against it yourself |
+| 04 The console | The timeline. Every row re-verifies on click, and every row can be forged on click |
+| 05 The auditor's view | The same records pivoted onto obligations, counted from the receipts, exported as a checkable pack |
+| 06 Someone else's file | Drop in any receipt or pack — including one this page never produced |
+| 07 Where it runs | Measurement, RA-TLS handshake, quote⇄key binding, and the one object that separates a laptop from a CVM |
+
+### What is computed and what is staged
+
+[`cascade.ts`](src/lib/story/cascade.ts) takes the sealed receipt back apart and
+recomputes every value using the SDK's own exports — `coreOfV2`,
+`bindingHashV2`, `recordSigningMessageV2`, `recordLeafDataV2`, `leafHash`,
+`hybridVerify`, `verifyReceiptV2`. It is not a reimplementation of the pipeline
+and it does not compare against stored answers: each step recomputes a value and
+checks it against what the receipt carries. Timings come from `performance.now()`
+around the real work.
+
+Exactly one step is staged, and it is labelled `STAGED` in the UI from the
+step's own `truth` field rather than from copy — a browser tab has no git, so
+the commit metadata is synthetic. Everything after it is `COMPUTED LIVE`.
+
+The policy decision is not asserted by the page. The plane is configured with
+`governance: DEFAULT_POLICY`, `cool.change()` is called with **no approval
+block**, and the enclave decides and seals its own verdict; the cascade's policy
+step then reaches the same decision independently and shows both.
+
+### "Offline" is measured, not claimed
+
+For the duration of the verify call, [`VerifyScene.tsx`](src/components/story/VerifyScene.tsx)
+replaces `fetch`, `XMLHttpRequest.open`, `WebSocket`, `EventSource` and
+`sendBeacon` with counting wrappers, runs the verifier, restores them, and
+prints the counter. The panel renders the count, not a hard-coded zero. It is a
+measurement, not a sandbox — which is why the same receipt also downloads as a
+file and the same verifier is on npm:
+
+```sh
+npx cool-nwc verify ./change-receipt.json --offline
+```
+
+### Honesty, in this route specifically
+
+The attestation domain reports `simulated` and never `pass`, because a browser
+has no TDX — that rule is in [`verify.ts`](src/lib/cool/phala/verify.ts), not in
+the demo's copy, so no amount of presentation reaches it. The operational
+counters are split: three are projections over a stated demo estate and say
+`PROJECTED` with their arithmetic printed underneath; the fourth is counted from
+the records actually sealed in the tab and says `THIS SESSION`. Names are
+`*.example` per RFC 2606 — the demo does not borrow a bank's name.
 
 ---
 
@@ -120,7 +181,7 @@ The skip button is removed. Any wheel, touch or key still cuts straight through
 — the escape hatch is invisible rather than absent. The failsafe timeout dropped
 from 12s to 3.6s.
 
-### 3 · Live demo — five views
+### 3 · The pipeline route — five views
 
 [`DemoShell.tsx`](src/components/demo/DemoShell.tsx). Only the pipeline loads
 eagerly; the other four are code-split, so the route costs one view rather than

@@ -28,6 +28,7 @@ const LINKS = [
 const PRODUCT_LINKS = [
   { label: "Why", href: "/why" },
   { label: "Demo", href: "/demo" },
+  { label: "Pipeline", href: "/pipeline" },
   { label: "Dashboard", href: "/dashboard" },
   { label: "Studio", href: "/studio" },
   { label: "SDK", href: "/sdk" },
