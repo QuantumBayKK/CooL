@@ -201,6 +201,32 @@ export interface AttestationV2 {
     /** Recomputable commitment to the signing identity — see {@link QuoteBody.report_data}. */
     readonly key_binding: Multihash | null;
 }
+/**
+ * A public-chain anchor for a tree head.
+ *
+ * Every other proof in a receipt is signed by someone, and a signature can be
+ * made at any time by whoever holds the key. This one cannot: if the head is
+ * committed inside a Bitcoin block, it existed before that block was mined, and
+ * no later key compromise changes that.
+ *
+ * The proof is a detached OpenTimestamps file, base64-encoded — byte-identical
+ * to what the `ots` tool writes, so an auditor can extract it and run
+ * `ots verify` without any CooL code.
+ */
+export interface AnchorProof {
+    readonly kind: "opentimestamps";
+    readonly chain: "bitcoin";
+    /** The tree head root this proof is about. Must match the receipt's STH. */
+    readonly target: Multihash;
+    readonly tree_size: number;
+    /** The detached `.ots` proof, base64. */
+    readonly proof: string;
+    /** The calendars that accepted the digest — independent, and not ours. */
+    readonly calendars: readonly string[];
+    readonly submitted_at: string;
+    /** Block heights the proof commits into, once the calendars have aggregated. */
+    readonly heights: readonly number[];
+}
 /** The full `cool.receipt.v2` envelope. Self-contained and offline-verifiable. */
 export interface ReceiptV2 {
     readonly schema: "cool.receipt.v2";
@@ -209,14 +235,17 @@ export interface ReceiptV2 {
     readonly inclusion: Inclusion | null;
     readonly sth: STH | null;
     readonly attestation: AttestationV2;
-    readonly anchor: null;
+    readonly anchor: AnchorProof | null;
     readonly key_directory: KeyDirectory;
 }
 /**
  * Per-domain status. `simulated` exists so the simulator can be reported
- * accurately instead of being flattened into either `pass` or `mock`.
+ * accurately instead of being flattened into either `pass` or `mock`; `pending`
+ * exists because a Bitcoin anchor is genuinely in flight for an hour or so
+ * after submission, and calling that either a pass or an absence would be a
+ * lie in one direction or the other.
  */
-export type DomainStatusV2 = "pass" | "fail" | "absent" | "mock" | "simulated";
+export type DomainStatusV2 = "pass" | "fail" | "absent" | "mock" | "simulated" | "pending";
 export interface DomainCheckV2 {
     readonly status: DomainStatusV2;
     readonly detail: string;

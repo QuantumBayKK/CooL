@@ -322,6 +322,31 @@ falls back to ASCII on a legacy Windows console and to plain lines when piped.
 [`tests/cli.test.ts`](tests/cli.test.ts) drives the real binary in temp
 directories, including the exit codes CI depends on.
 
+### What 2.4.0 added — a real anchor
+
+The `anchor` domain used to report `absent` with the word "planned" next to it.
+It now commits tree heads to Bitcoin, and it is the only domain in the receipt
+that is not a signature.
+
+That distinction is the point. Every other proof says "someone holding this key
+asserts X" — which whoever holds the key can produce at any time, including
+later, about a past they would prefer. That is precisely the attack a
+transparency log exists to rule out, and no amount of signing fixes it. A block
+header cannot be backdated.
+
+[`anchor.ts`](src/lib/cool/phala/anchor.ts) is an OpenTimestamps client — the
+format, not a lookalike. The proofs it writes are byte-identical to the reference
+implementation's (checked against it, not assumed), so `cool anchor export` hands
+an auditor a `.ots` file they can verify with the standard tool and a Bitcoin
+node without running any CooL code. Four independently operated public calendars,
+no gas, no wallet, no key.
+
+The states are honest: `submitted` while the calendars hold it, `pending` once it
+commits to a block nobody has checked here, `pass` only when the commitment has
+been recomputed and matched against a real block header. Aggregation is hourly,
+so `pending` is where a fresh anchor legitimately sits for an hour — calling that
+a pass would be the same lie as calling a simulated quote hardware.
+
 ### What 2.3.0 added — the on-prem path
 
 2.2.0 could talk to a dstack agent over HTTP. Real deployments do not use HTTP:

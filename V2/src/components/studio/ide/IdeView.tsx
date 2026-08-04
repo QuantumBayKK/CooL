@@ -223,7 +223,7 @@ export default function IdeView() {
         print({ text: label, tone: "dim" });
         const domains = Object.entries(entry.verdict.checks) as [string, DomainCheckV2][];
         for (const [domain, check] of domains) {
-          const glyph = { pass: "✓", fail: "✗", simulated: "◐", absent: "·", mock: "·" }[check.status];
+          const glyph = { pass: "✓", fail: "✗", simulated: "◐", pending: "◔", absent: "·", mock: "·" }[check.status];
           const tone =
             check.status === "pass"
               ? "ok"

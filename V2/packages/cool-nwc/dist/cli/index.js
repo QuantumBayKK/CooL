@@ -26,6 +26,7 @@ import { Progress, c, clear, g, out } from "./tty.js";
 import { updateNotice } from "./update.js";
 import { updateCommand } from "./update-command.js";
 import { wire } from "./wire.js";
+import { anchorCommand } from "./anchor.js";
 const USAGE = `
   ${c.bold("cool")} ${c.faint("— tamper-evident evidence for AI, sealed in a TEE")}
 
@@ -106,6 +107,8 @@ async function run(name, args, workspace) {
         case "update":
         case "upgrade":
             return updateCommand(args);
+        case "anchor":
+            return workspace ? anchorCommand(workspace, args) : 1;
         case "wire":
             return workspace ? wire(workspace) : 1;
         case "doctor":

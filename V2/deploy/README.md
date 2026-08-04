@@ -19,7 +19,7 @@ over the receipt. Three of them cannot:
 | --- | --- | --- |
 | `attestation` | a **vendor root** verified the quote | Intel DCAP / Trust Authority |
 | `witnesses` | an independent party co-signed the tree head | your auditor, not CooL |
-| `anchor` | the tree head is posted somewhere public | not implemented |
+| `anchor` | the head is committed in a Bitcoin block | the chain — `cool anchor submit` |
 
 A CooL self-signature is never counted as a witness, and a simulated quote is
 never upgraded to a pass by pointing a hardware verifier at it. That is
@@ -134,12 +134,27 @@ continuity across a code change would defeat the point of measuring the code.
 
 ## Witnesses and anchoring
 
-`witnesses` is one command away once an auditor holds a key:
+Both are independent of the hardware path — they work today, on any machine.
 
 ```bash
-cool witness cosign --key auditor
+cool witness cosign --key auditor    # an independent party co-signs the head
+cool anchor submit                   # commit the head to Bitcoin (free, no key)
+cool anchor upgrade                  # ~1h later: collect the block
+cool anchor verify                   # check the commitment against the header
 ```
 
-`anchor` is not implemented. It needs tree heads posted to a public chain on a
-schedule, and shipping a stub that says `pass` would be exactly the kind of lie
-this system exists to prevent.
+Anchoring is the one domain that is not a signature. Everything else in a
+receipt says "someone holding this key asserts X", which whoever holds the key
+can produce at any time — including later, about a past they would prefer. A
+Bitcoin block header cannot be backdated, so an anchored head provably existed
+before that block was mined even if the enclave key is compromised afterwards.
+
+Run it on a schedule; once an hour is plenty, since one head covers every record
+beneath it:
+
+```yaml
+# in the CVM, or anywhere with the receipts
+0 * * * *  cool anchor submit && cool anchor upgrade
+```
+
+Set `BITCOIN_HEADER_URL` to your own node and verification depends on nobody.

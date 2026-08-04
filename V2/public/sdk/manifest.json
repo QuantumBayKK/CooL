@@ -1,6 +1,6 @@
 {
   "name": "cool-nwc",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "license": "Apache-2.0",
   "description": "Tamper-evident, offline-verifiable evidence for AI systems — sealed inside a hardware TEE. Hybrid post-quantum signatures (ML-DSA-65 + Ed25519), an RFC 6962 transparency log, measurement-sealed keys via Phala dstack, RA-TLS capture, and a verifier that trusts nothing but the bytes.",
   "docs": "https://northwindcipher.com/sdk",
@@ -10,25 +10,25 @@
     "global": "npm install -g cool-nwc"
   },
   "install": {
-    "npm": "npm install https://northwindcipher.com/sdk/cool-nwc-2.3.0.tgz",
+    "npm": "npm install https://northwindcipher.com/sdk/cool-nwc-2.4.0.tgz",
     "esm": "https://northwindcipher.com/sdk/cool-nwc.js",
-    "esmPinned": "https://northwindcipher.com/sdk/cool-nwc-2.3.0.js"
+    "esmPinned": "https://northwindcipher.com/sdk/cool-nwc-2.4.0.js"
   },
   "artefacts": [
     {
-      "file": "cool-nwc-2.3.0.tgz",
-      "bytes": 172832,
-      "sha256": "c4dec05b765c86e784ba45c805f234113406527a485d05939ad4b3857efaa6bb"
+      "file": "cool-nwc-2.4.0.tgz",
+      "bytes": 191721,
+      "sha256": "2d7e23656873c9cbfc69b7467bd71a258ab54a7794f9f004809bd032c7a3bcfc"
     },
     {
       "file": "cool-nwc.js",
-      "bytes": 126516,
-      "sha256": "ea1d3ff29800895d44308215fe739bd57324cd3ff9d5d686613e6553643b9ac1"
+      "bytes": 140670,
+      "sha256": "a69e5bef2df92a61ff3054aca879626b1c0a548c5d88fa0a4261f8c0eb28fc6c"
     },
     {
-      "file": "cool-nwc-2.3.0.js",
-      "bytes": 126516,
-      "sha256": "ea1d3ff29800895d44308215fe739bd57324cd3ff9d5d686613e6553643b9ac1"
+      "file": "cool-nwc-2.4.0.js",
+      "bytes": 140670,
+      "sha256": "a69e5bef2df92a61ff3054aca879626b1c0a548c5d88fa0a4261f8c0eb28fc6c"
     }
   ]
 }

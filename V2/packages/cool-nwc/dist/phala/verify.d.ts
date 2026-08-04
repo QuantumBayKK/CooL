@@ -27,6 +27,7 @@
  */
 import type { KeyDirectory } from "../types.js";
 import type { QuoteVerifier } from "./quote.js";
+import type { BlockHeaderSource } from "./anchor.js";
 import type { ReceiptV2, VerdictChecksV2, VerdictV2, VerifyOptionsV2 } from "./types.js";
 /** Verifier options, plus the optional root-of-trust checker. */
 export type VerifyArgsV2 = VerifyOptionsV2 & {
@@ -35,6 +36,12 @@ export type VerifyArgsV2 = VerifyOptionsV2 & {
      * is reported as present-but-unverified rather than assumed good.
      */
     readonly quoteVerifier?: QuoteVerifier;
+    /**
+     * Reads a Bitcoin block header's merkle root. Omit it and an anchor is
+     * reported as pending rather than passing — a timestamp nobody checked
+     * against the chain is not an anchor.
+     */
+    readonly blockHeaders?: BlockHeaderSource;
 };
 /** Verify a `cool.receipt.v2`. Never throws; problems surface as failed domains. */
 export declare function verifyReceiptV2(receipt: unknown, options?: VerifyArgsV2): Promise<VerdictV2>;

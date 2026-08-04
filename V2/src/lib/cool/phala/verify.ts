@@ -46,6 +46,8 @@ import {
   simulatedQuoteVerifier,
 } from "./quote";
 import type { QuoteVerifier } from "./quote";
+import { base64ToBytes, bytesToHex, parseProof, verifyAnchor } from "./anchor";
+import type { BlockHeaderSource, Timestamp as AnchorTimestamp } from "./anchor";
 import { validateReceiptV2Shape } from "./structure";
 import type {
   DomainCheckV2,
@@ -57,7 +59,7 @@ import type {
   VerifyOptionsV2,
 } from "./types";
 
-const ANCHOR_DETAIL = "NONE — not anchored to a public chain (planned)";
+const ANCHOR_ABSENT = "NONE — this head was never submitted to a public chain";
 
 /** Verifier options, plus the optional root-of-trust checker. */
 export type VerifyArgsV2 = VerifyOptionsV2 & {
@@ -66,6 +68,12 @@ export type VerifyArgsV2 = VerifyOptionsV2 & {
    * is reported as present-but-unverified rather than assumed good.
    */
   readonly quoteVerifier?: QuoteVerifier;
+  /**
+   * Reads a Bitcoin block header's merkle root. Omit it and an anchor is
+   * reported as pending rather than passing — a timestamp nobody checked
+   * against the chain is not an anchor.
+   */
+  readonly blockHeaders?: BlockHeaderSource;
 };
 
 function fail(detail: string): DomainCheckV2 {
@@ -92,7 +100,7 @@ export async function verifyReceiptV2(
         witnesses: absent,
         attestation: absent,
         enclave: absent,
-        anchor: { status: "absent", detail: ANCHOR_DETAIL },
+        anchor: absent,
       },
       reasons: shape.errors,
     };
@@ -154,6 +162,9 @@ export async function verifyReceiptV2(
   /* ── enclave binding ── */
   const enclave = verifyEnclaveDomain(r, signingEntry, options, reasons, attestation.status);
 
+  /* ── anchor ── */
+  const anchor = await verifyAnchorDomain(r, options, reasons);
+
   const checks: VerdictChecksV2 = {
     binding,
     signature,
@@ -161,7 +172,7 @@ export async function verifyReceiptV2(
     witnesses,
     attestation,
     enclave,
-    anchor: { status: "absent", detail: ANCHOR_DETAIL },
+    anchor,
   };
 
   const inclusionAcceptable = inclusion.status === "pass" || inclusion.status === "absent";
@@ -183,6 +194,69 @@ export async function verifyReceiptV2(
 }
 
 /* ── domains ──────────────────────────────────────────────────────────── */
+
+/**
+ * The anchor domain: did this tree head exist at a point in time nobody can
+ * move?
+ *
+ * Four outcomes, and the distinctions between them are the whole point:
+ *
+ *   absent   no anchor was ever submitted
+ *   pending  submitted, or committed to a block nobody checked here
+ *   pass     the recomputed commitment equals a real block's merkle root
+ *   fail     it does not, or the proof is about a different head
+ *
+ * `pending` is not a soft pass. It is the honest state of a Bitcoin timestamp
+ * for the hour between submission and aggregation, and the honest state of any
+ * proof verified without a block header source.
+ */
+async function verifyAnchorDomain(
+  r: ReceiptV2,
+  options: VerifyArgsV2,
+  reasons: string[],
+): Promise<DomainCheckV2> {
+  if (!r.anchor) return { status: "absent", detail: ANCHOR_ABSENT };
+  const anchor = r.anchor;
+
+  if (!r.sth) {
+    reasons.push("anchor: an anchor is attached but the receipt carries no tree head");
+    return fail("FAILED — anchor present without an STH to anchor");
+  }
+  if (anchor.target !== r.sth.root_hash) {
+    reasons.push("anchor: the proof is about a different tree head than this receipt's");
+    return fail(`FAILED — anchor targets ${anchor.target}, receipt head is ${r.sth.root_hash}`);
+  }
+  if (anchor.tree_size !== r.sth.tree_size) {
+    reasons.push("anchor: the proof's tree size does not match the receipt's");
+    return fail(`FAILED — anchor at size ${anchor.tree_size}, receipt at ${r.sth.tree_size}`);
+  }
+
+  let digest: Uint8Array;
+  let timestamp: AnchorTimestamp;
+  try {
+    digest = multihashDigest(anchor.target);
+    const parsed = parseProof(base64ToBytes(anchor.proof));
+    if (bytesToHex(parsed.digest) !== bytesToHex(digest)) {
+      reasons.push("anchor: the proof file is about a different digest than it claims");
+      return fail("FAILED — the .ots proof does not cover this tree head");
+    }
+    timestamp = parsed.timestamp;
+  } catch (error) {
+    reasons.push(`anchor: the proof could not be parsed (${(error as Error).message})`);
+    return fail(`FAILED — unreadable proof: ${(error as Error).message}`);
+  }
+
+  const check = await verifyAnchor(digest, timestamp, options.blockHeaders);
+  switch (check.status) {
+    case "confirmed":
+      return { status: "pass", detail: check.detail };
+    case "fail":
+      reasons.push(`anchor: ${check.detail}`);
+      return fail(`FAILED — ${check.detail}`);
+    default:
+      return { status: "pending", detail: check.detail };
+  }
+}
 
 function verifyInclusionDomain(r: ReceiptV2, reasons: string[]): DomainCheckV2 {
   if (!r.inclusion || !r.sth) {

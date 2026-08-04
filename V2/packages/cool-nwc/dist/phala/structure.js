@@ -93,8 +93,22 @@ export function validateReceiptV2Shape(value) {
     if (root["schema"] !== "cool.receipt.v2") {
         c.errors.push("(root).schema: expected 'cool.receipt.v2'");
     }
-    if (root["anchor"] !== null) {
-        c.errors.push("(root).anchor: must be null — anchoring is not implemented");
+    // An anchor is attached after the fact — a head cannot be timestamped before
+    // it exists — so it is null on a fresh receipt and an object once submitted.
+    if (root["anchor"] !== null && root["anchor"] !== undefined) {
+        const anchor = c.obj("anchor", root["anchor"]);
+        if (anchor) {
+            c.oneOf("anchor.kind", anchor["kind"], ["opentimestamps"]);
+            c.oneOf("anchor.chain", anchor["chain"], ["bitcoin"]);
+            c.str("anchor.target", anchor["target"], MULTIHASH);
+            c.int("anchor.tree_size", anchor["tree_size"], 1);
+            c.str("anchor.proof", anchor["proof"], /^[A-Za-z0-9+/]+={0,2}$/);
+            c.str("anchor.submitted_at", anchor["submitted_at"]);
+            if (!Array.isArray(anchor["calendars"]))
+                c.errors.push("anchor.calendars: expected an array");
+            if (!Array.isArray(anchor["heights"]))
+                c.errors.push("anchor.heights: expected an array");
+        }
     }
     c.str("(root).binding_hash", root["binding_hash"], MULTIHASH);
     /* record */

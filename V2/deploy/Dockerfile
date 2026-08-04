@@ -8,7 +8,7 @@ FROM node:22-alpine
 
 # Pinned by version, not by tag drift: the image's digest is what gets measured
 # into MRTD, so "which code is running" must be answerable from this file alone.
-ARG COOL_VERSION=2.3.0
+ARG COOL_VERSION=2.4.0
 RUN npm install -g cool-nwc@${COOL_VERSION} && cool --version
 
 # Evidence lives on a volume so a redeploy does not orphan the log. The signing

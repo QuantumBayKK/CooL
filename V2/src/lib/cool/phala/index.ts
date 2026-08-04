@@ -124,6 +124,22 @@ export type {
 export { disclosableFields, disclose, verifyDisclosure } from "./disclose";
 export type { DisclosableField, Disclosure, DisclosureVerdict } from "./disclose";
 
+export {
+  anchorHead,
+  attachAnchor,
+  upgradeProof,
+  submit as submitToCalendars,
+  upgrade as upgradeTimestamp,
+  parseProof,
+  serialiseProof,
+  verifyAnchor,
+  explorerHeaders,
+  reachable,
+  base64ToBytes,
+  bytesToBase64,
+  CALENDARS,
+} from "./anchor";
+export type { AnchorCheck, BlockHeaderSource, Timestamp as AnchorTimestamp } from "./anchor";
 export { attachWitness, cosign, countWitnesses } from "./witness";
 export type { WitnessStatement } from "./witness";
 

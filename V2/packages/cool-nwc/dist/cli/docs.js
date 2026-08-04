@@ -160,6 +160,25 @@ export const COMMANDS = [
         seeAlso: ["witnesses", "verify"],
     },
     {
+        name: "anchor",
+        args: "[submit|upgrade|verify|export|status]",
+        summary: "commit the tree head to Bitcoin",
+        description: "Every other proof in a receipt is a signature, and a signature can be made at any " +
+            "time by whoever holds the key — including later, about a past they would prefer. A " +
+            "Bitcoin block header cannot be backdated. `submit` hands the current head to four " +
+            "independent public calendars; an hour or so later `upgrade` collects the block they " +
+            "aggregated it into; `verify` recomputes the commitment and checks it against the " +
+            "block's merkle root. Until that last step succeeds the domain reads `pending`, never " +
+            "`pass`.",
+        examples: [
+            { run: "cool anchor submit", does: "timestamp the current head — free, no key needed" },
+            { run: "cool anchor upgrade", does: "collect the Bitcoin block once aggregated" },
+            { run: "cool anchor verify", does: "check the commitment against the block header" },
+            { run: "cool anchor export head.ots", does: "write a proof anyone can check with `ots`" },
+        ],
+        seeAlso: ["anchoring", "log", "verify"],
+    },
+    {
         name: "pack",
         args: "[build|verify <file>]",
         summary: "build or check an audit pack",
@@ -231,7 +250,7 @@ export const COMMANDS = [
         examples: [
             { run: "cool update", does: "upgrade to the latest release" },
             { run: "cool update --check", does: "exit 1 if an update exists; for CI" },
-            { run: "cool update 2.3.0", does: "install an exact version" },
+            { run: "cool update 2.4.0", does: "install an exact version" },
         ],
         seeAlso: ["doctor"],
     },
@@ -411,9 +430,33 @@ export const TOPICS = [
                 "present but unverifiable here.",
             "enclave — the quote, the measurement and the signing key are one chain. This is the " +
                 "domain that makes a quote mean something about THIS record.",
-            "anchor — public anchoring. Not implemented, and never reported as a pass.",
+            "anchor — the tree head is committed into a Bitcoin block. `pass` only once the " +
+                "commitment has been recomputed and matched against a real block header; `pending` " +
+                "between submission and aggregation, and whenever no header source was consulted.",
         ],
-        seeAlso: ["verify", "attestation"],
+        seeAlso: ["verify", "attestation", "anchoring"],
+    },
+    {
+        name: "anchoring",
+        title: "Why anchor to Bitcoin",
+        body: [
+            "Six of the seven domains are signatures, and a signature says 'someone holding this " +
+                "key asserts X'. It does not say when. Whoever holds the key can produce one at any " +
+                "time, including about a past they would prefer — which is exactly the attack a " +
+                "transparency log is supposed to rule out.",
+            "A block header cannot be backdated. Commit the tree head into one and the head " +
+                "provably existed before that block was mined, no matter who later obtains the key. " +
+                "That is the one property cryptography alone cannot give you.",
+            "CooL uses OpenTimestamps: the head's root hash goes to four independently operated " +
+                "public calendars, which aggregate submissions into a single Bitcoin transaction " +
+                "about once an hour. The cost is nothing and the proof is a standard `.ots` file, so " +
+                "`cool anchor export` gives an auditor something they can check with the reference " +
+                "tool and a Bitcoin node, without running any CooL code.",
+            "One submission covers every record in the log up to that size, because the head " +
+                "commits to all of them. Anchoring per-record would be thousands of transactions " +
+                "proving nothing extra.",
+        ],
+        seeAlso: ["anchor", "log", "verifier"],
     },
     {
         name: "production",

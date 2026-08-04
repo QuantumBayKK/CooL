@@ -140,6 +140,23 @@ match.
 **Why:** it makes the `witnesses` domain passable by someone who is not CooL. A
 transparency log that only its operator vouches for is a ledger, not a proof.
 
+### `cool anchor [submit|upgrade|verify|export|status]`
+Commits the current tree head into a Bitcoin block via OpenTimestamps. `submit`
+hands the head's root hash to four independently operated public calendars;
+`upgrade` collects the block once they have aggregated it (about an hour);
+`verify` recomputes the commitment and matches it against the block's merkle
+root; `export` writes a standard `.ots` file. Until the header check succeeds the
+domain reads `pending`, never `pass`.
+
+**Why:** it is the only domain that is not a signature. Every other proof says
+"someone holding this key asserts X" — which whoever holds the key can produce at
+any time, including about a past they would prefer. A block header cannot be
+backdated, so an anchored head provably existed before that block was mined even
+if the enclave key is later compromised. For Phala this is the answer to "what if
+the operator is the adversary?", and it costs nothing: no gas, no wallet, no key.
+Point `BITCOIN_HEADER_URL` at your own node and the proof depends on no third
+party at all.
+
 ### `cool log [--consistency <n>]`
 Shows tree size, root, the signed head, and proves that the tree only grew
 between two sizes.

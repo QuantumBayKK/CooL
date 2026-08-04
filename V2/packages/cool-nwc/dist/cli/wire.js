@@ -130,9 +130,9 @@ export async function wire(workspace) {
             `${c.grey("enclave")}      ${verdict.checks.enclave.detail}`,
         ], c.green);
         out();
-        out(`  ${c.faint("Two domains remain absent by design and are separate features:")}`);
-        out(`    ${c.brand("witnesses")} ${c.faint("— one command away:")} ${c.dim("cool witness cosign --key auditor")}`);
-        out(`    ${c.brand("anchor")}    ${c.faint("— unimplemented; needs posting tree heads to a public chain")}`);
+        out(`  ${c.faint("Two domains are separate features, each one command away:")}`);
+        out(`    ${c.brand("witnesses")} ${c.faint("— an independent party co-signs the head:")} ${c.dim("cool witness cosign --key auditor")}`);
+        out(`    ${c.brand("anchor")}    ${c.faint("— commit the head to Bitcoin:")} ${c.dim("cool anchor submit")} ${c.faint("then")} ${c.dim("cool anchor upgrade")} ${c.faint("an hour later")}`);
         out();
         return 0;
     }

@@ -17,6 +17,7 @@ const STATUS: Record<DomainStatusV2, { tone: Tone; glyph: string; label: string 
   pass: { tone: "success", glyph: "✓", label: "pass" },
   fail: { tone: "danger", glyph: "✕", label: "fail" },
   simulated: { tone: "teal", glyph: "◐", label: "simulated" },
+  pending: { tone: "warn", glyph: "◔", label: "pending" },
   absent: { tone: "neutral", glyph: "·", label: "absent" },
   mock: { tone: "neutral", glyph: "·", label: "mock" },
 };

@@ -35,6 +35,7 @@ export { createUlid, ulid } from "./ulid.js";
 export { diffStat, lineDiff, unifiedDiff } from "./diff.js";
 export { DEFAULT_POLICY, approvalFrom, evaluate, policyHash } from "./policy.js";
 export { disclosableFields, disclose, verifyDisclosure } from "./disclose.js";
+export { anchorHead, attachAnchor, upgradeProof, submit as submitToCalendars, upgrade as upgradeTimestamp, parseProof, serialiseProof, verifyAnchor, explorerHeaders, reachable, base64ToBytes, bytesToBase64, CALENDARS, } from "./anchor.js";
 export { attachWitness, cosign, countWitnesses } from "./witness.js";
 export { OBLIGATIONS, coverage, gaps } from "./compliance.js";
 export { buildAuditPack, verifyAuditPack } from "./pack.js";

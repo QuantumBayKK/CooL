@@ -195,6 +195,8 @@ export function status(kind: string): string {
       return c.red(`${g.fail} fail`);
     case "simulated":
       return c.cyan(`${g.partial} simulated`);
+    case "pending":
+      return c.yellow(`${g.partial} pending`);
     case "warn":
       return c.yellow(`${g.warn} warn`);
     default:

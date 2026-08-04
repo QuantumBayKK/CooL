@@ -1,0 +1,155 @@
+{
+  "package": {
+    "name": "cool-nwc",
+    "version": "2.4.0"
+  },
+  "site": {
+    "name": "cool-site-v2",
+    "version": "2.0.0"
+  },
+  "generated_at": "2026-08-04T12:37:28.703Z",
+  "node": "v24.18.0",
+  "overall": "pass",
+  "checks": [
+    {
+      "name": "typecheck",
+      "what": "TypeScript, strict, whole repo",
+      "ok": true,
+      "code": 0,
+      "ms": 2395
+    },
+    {
+      "name": "lint",
+      "what": "next lint",
+      "ok": true,
+      "code": 0,
+      "ms": 4052
+    },
+    {
+      "name": "unit tests",
+      "what": "node:test across the SDK and the CLI",
+      "ok": true,
+      "code": 0,
+      "ms": 11204
+    },
+    {
+      "name": "conformance · v1",
+      "what": "published cool-spec vectors",
+      "ok": true,
+      "code": 0,
+      "ms": 940
+    },
+    {
+      "name": "conformance · TEE tier",
+      "what": "tamper, quote-swap, key rotation, refused channel",
+      "ok": true,
+      "code": 0,
+      "ms": 935
+    },
+    {
+      "name": "consumer install",
+      "what": "pack → install → run → typecheck → CLI",
+      "ok": true,
+      "code": 0,
+      "ms": 10576
+    }
+  ],
+  "tests": {
+    "total": 74,
+    "pass": 73,
+    "fail": 0
+  },
+  "audit": {
+    "shipped": {
+      "where": "shipped dependencies",
+      "ok": true,
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "note": "no high or critical advisories"
+    },
+    "site": {
+      "where": "site build tree",
+      "ok": false,
+      "counts": {
+        "info": 0,
+        "low": 4,
+        "moderate": 7,
+        "high": 4,
+        "critical": 2,
+        "total": 17
+      },
+      "note": "6 high/critical"
+    }
+  },
+  "smoke": {
+    "ok": true,
+    "steps": [
+      {
+        "step": "seal a change",
+        "ok": true
+      },
+      {
+        "step": "seal a second change",
+        "ok": true
+      },
+      {
+        "step": "one log, two leaves",
+        "ok": true
+      },
+      {
+        "step": "both verify offline",
+        "ok": true
+      },
+      {
+        "step": "independent witness counted",
+        "ok": true
+      },
+      {
+        "step": "--require-hardware refuses simulated",
+        "ok": true
+      },
+      {
+        "step": "selective disclosure opens one field",
+        "ok": true
+      },
+      {
+        "step": "a wrong disclosure is refused",
+        "ok": true
+      },
+      {
+        "step": "audit pack builds and verifies",
+        "ok": true
+      }
+    ],
+    "packPath": "F:\\CooL\\website\\V2\\reports\\audit-pack.json",
+    "obligations": "4 of 7"
+  },
+  "artefacts": [
+    {
+      "file": "cool-nwc-2.4.0.tgz",
+      "bytes": 191721,
+      "sha256": "2d7e23656873c9cbfc69b7467bd71a258ab54a7794f9f004809bd032c7a3bcfc"
+    },
+    {
+      "file": "cool-nwc.js",
+      "bytes": 140670,
+      "sha256": "a69e5bef2df92a61ff3054aca879626b1c0a548c5d88fa0a4261f8c0eb28fc6c"
+    },
+    {
+      "file": "cool-nwc-2.4.0.js",
+      "bytes": 140670,
+      "sha256": "a69e5bef2df92a61ff3054aca879626b1c0a548c5d88fa0a4261f8c0eb28fc6c"
+    }
+  ],
+  "registry": {
+    "published": false,
+    "install": "npm install cool-nwc",
+    "global": "npm install -g cool-nwc"
+  }
+}

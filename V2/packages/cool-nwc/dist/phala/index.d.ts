@@ -48,6 +48,8 @@ export { DEFAULT_POLICY, approvalFrom, evaluate, policyHash } from "./policy.js"
 export type { Decision, PolicyInput, PolicyMatch, PolicyOutcome, PolicyRule, PolicySet, } from "./policy.js";
 export { disclosableFields, disclose, verifyDisclosure } from "./disclose.js";
 export type { DisclosableField, Disclosure, DisclosureVerdict } from "./disclose.js";
+export { anchorHead, attachAnchor, upgradeProof, submit as submitToCalendars, upgrade as upgradeTimestamp, parseProof, serialiseProof, verifyAnchor, explorerHeaders, reachable, base64ToBytes, bytesToBase64, CALENDARS, } from "./anchor.js";
+export type { AnchorCheck, BlockHeaderSource, Timestamp as AnchorTimestamp } from "./anchor.js";
 export { attachWitness, cosign, countWitnesses } from "./witness.js";
 export type { WitnessStatement } from "./witness.js";
 export { OBLIGATIONS, coverage, gaps } from "./compliance.js";
