@@ -41,6 +41,6 @@ yarn-error.log*
 
 .vercel
 
-# Local snapshot taken before the V2 rebuild — not part of the project.
-/_backup_V2_2026-07-30/
+# Local snapshots taken before big rewrites — not part of the project.
+/_backup_*/
 
