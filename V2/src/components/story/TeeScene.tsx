@@ -21,10 +21,14 @@
  * and nothing else — which is the claim the code panel makes checkable rather
  * than asserting.
  */
-import { Cpu, Server } from "lucide-react";
+import { useCallback, useState } from "react";
+import { Cpu, Server, ShieldAlert } from "lucide-react";
 import { CodeBlock } from "@/components/studio/CodeBlock";
+import { verifyReceiptV2 } from "@/lib/cool/phala";
+import type { VerdictV2 } from "@/lib/cool/phala";
+import { DEPLOY_STEPS, HARDWARE_TABLE } from "@/lib/story/hardware";
 import { useStory } from "./session";
-import { Digest, Label, Panel, Pill } from "./ui";
+import { Button, Digest, Label, Panel, Pill } from "./ui";
 
 /** What the connect call becomes on a real CVM. The whole difference, in one object. */
 const PRODUCTION = `const cool = await CoolTee.connect({
@@ -52,6 +56,76 @@ const TARGETS = [
   { name: "AWS Nitro Enclaves", detail: "NSM attestation document · same verifier interface", ready: false },
   { name: "AMD SEV-SNP", detail: "quote format wired, root not yet pinned", ready: false },
 ];
+
+/**
+ * The switch an auditor flips, run for real.
+ *
+ * This is the strongest thing the act can do without hardware, and it works
+ * precisely because it fails. `requireHardware` is a real option on the real
+ * verifier: set it and a receipt that is not backed by a vendor-rooted quote is
+ * rejected outright, no matter how many other domains pass. Pressing this on a
+ * laptop produces `INVALID` and prints the verifier's own reason string.
+ *
+ * A demo that could only ever show green would prove nothing about the gate.
+ * Showing it refuse — on a record the audience watched get created and verified
+ * a minute earlier — proves the gate exists, is enforced, and is not something
+ * the UI can talk its way past. The same call on a CVM returns VALID, and by
+ * then the audience has seen what it costs to get there.
+ */
+function HardwareGate() {
+  const { rows } = useStory();
+  const receipt = rows[0]?.receipt ?? null;
+  const [verdict, setVerdict] = useState<VerdictV2 | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const run = useCallback(async () => {
+    if (!receipt) return;
+    setBusy(true);
+    setVerdict(await verifyReceiptV2(receipt, { requireHardware: true }));
+    setBusy(false);
+  }, [receipt]);
+
+  return (
+    <Panel className="p-4" style={verdict ? { borderColor: "rgba(210,153,34,0.45)" } : undefined}>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <Label>The auditor&rsquo;s switch</Label>
+          <p className="mt-2 max-w-prose text-[12px] leading-relaxed text-mist">
+            <code className="font-mono text-fog">--require-hardware</code> is a real option on the
+            real verifier. Set it and a receipt without a vendor-rooted quote is rejected outright,
+            however many other domains pass. Run it here, on the record sealed a minute ago.
+          </p>
+        </div>
+        <Button tone="default" onClick={() => void run()} disabled={!receipt || busy}>
+          <ShieldAlert size={13} />
+          {busy ? "verifying…" : "cool verify --require-hardware"}
+        </Button>
+      </div>
+
+      {verdict && (
+        <div className="mt-3 border-t border-line pt-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Pill tone={verdict.ok ? "live" : "fail"}>{verdict.ok ? "VALID" : "REFUSED"}</Pill>
+            <span className="font-mono text-[11.5px] text-mist">
+              attestation: {verdict.checks.attestation.status}
+            </span>
+          </div>
+          {verdict.reasons.map((reason) => (
+            <p key={reason} className="mt-2 font-mono text-[11.5px] leading-relaxed text-fail">
+              {reason}
+            </p>
+          ))}
+          <p className="mt-2 max-w-prose text-[11.5px] leading-relaxed text-mist">
+            That refusal is the product working. The same call inside a Phala CVM, with{" "}
+            <code className="font-mono text-fog">QUOTE_VERIFIER_URL</code> set, returns VALID —
+            because by then something has actually checked a chain to Intel. Nothing on this page
+            can produce that here, which is the point.
+          </p>
+        </div>
+      )}
+    </Panel>
+  );
+}
 
 export function TeeScene() {
   const { enclave, handshake, rows } = useStory();
@@ -85,6 +159,12 @@ export function TeeScene() {
           </div>
         </div>
       </Panel>
+
+      {/* The switch comes before the detail. In a live run this is the beat that
+          lands — the verifier refusing on the record they just watched being
+          created — and it should not be something a presenter has to scroll to
+          find while the room is waiting. */}
+      <HardwareGate />
 
       <div className="grid gap-3 lg:grid-cols-2">
         {/* measurement */}
@@ -168,6 +248,98 @@ export function TeeScene() {
             </span>
           </div>
         </div>
+      </Panel>
+
+      {/* what deploying actually changes, domain by domain */}
+      <Panel className="overflow-hidden">
+        <div className="flex flex-wrap items-center gap-2 border-b border-line px-4 py-2.5">
+          <Label>On this laptop → on a Phala CVM</Label>
+          <Pill tone="warn" glyph={false}>
+            projection
+          </Pill>
+          <span className="ml-auto text-[11px] text-mist">
+            derived from the rules in verify.ts — not a result
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[680px] border-collapse text-left">
+            <thead>
+              <tr className="border-b border-line">
+                {["Domain", "Here", "On hardware", "What has to supply it"].map((h) => (
+                  <th key={h} className="px-4 py-2 text-[11px] font-medium text-mist">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {HARDWARE_TABLE.map((row) => (
+                <tr key={row.domain} className="border-b border-line/60 last:border-0 align-top">
+                  <td className="px-4 py-2.5 font-mono text-[11.5px] text-fog">{row.domain}</td>
+                  <td className="px-4 py-2.5">
+                    <Pill
+                      tone={
+                        row.here === "pass" ? "live" : row.here === "simulated" ? "verify" : "mock"
+                      }
+                    >
+                      {row.here}
+                    </Pill>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <Pill
+                      tone={
+                        row.onHardware === "pass"
+                          ? "live"
+                          : row.onHardware.includes("pass")
+                            ? "warn"
+                            : "mock"
+                      }
+                    >
+                      {row.onHardware}
+                    </Pill>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <div className="text-[11.5px] text-fog">{row.provider}</div>
+                    <div className="mt-0.5 max-w-[46ch] text-[11px] leading-snug text-mist">
+                      {row.because}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="border-t border-line px-4 py-2.5 text-[11.5px] leading-relaxed text-mist">
+          Three domains change when you deploy. Four do not — and{" "}
+          <span className="font-mono text-fog">witnesses</span> is the honest one to point at:
+          it needs a second party who is not CooL and not Phala, so no amount of silicon moves
+          it. A tool that turned all seven green on deployment would be a worse tool.
+        </div>
+      </Panel>
+
+      {/* the five steps */}
+      <Panel className="overflow-hidden">
+        <div className="border-b border-line px-4 py-2.5">
+          <Label>From here to a verified quote — five steps</Label>
+        </div>
+        <ol className="divide-y divide-line">
+          {DEPLOY_STEPS.map((step) => (
+            <li key={step.n} className="flex gap-3 px-4 py-3">
+              <span className="mt-[1px] grid size-5 shrink-0 place-items-center rounded-full bg-raised font-mono text-[11px] text-mist">
+                {step.n}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[12.5px] font-medium text-ink">{step.title}</div>
+                <div className="mt-0.5 max-w-prose text-[11.5px] leading-relaxed text-mist">
+                  {step.why}
+                </div>
+                <pre className="mt-2 overflow-x-auto rounded-md border border-line bg-void px-3 py-2 font-mono text-[11px] leading-relaxed text-fog">
+                  {step.powershell}
+                </pre>
+              </div>
+            </li>
+          ))}
+        </ol>
       </Panel>
 
       {/* the gap, in code */}

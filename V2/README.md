@@ -42,7 +42,7 @@ touching a form, a ticket or a checklist. `←`/`→` drive it.
 | 04 The console | The timeline. Every row re-verifies on click, and every row can be forged on click |
 | 05 The auditor's view | The same records pivoted onto obligations, counted from the receipts, exported as a checkable pack |
 | 06 Someone else's file | Drop in any receipt or pack — including one this page never produced |
-| 07 Where it runs | Measurement, RA-TLS handshake, quote⇄key binding, and the one object that separates a laptop from a CVM |
+| 07 Where it runs | Measurement, RA-TLS handshake, quote⇄key binding, the auditor's `--require-hardware` switch, and exactly what deploying changes |
 
 ### What is computed and what is staged
 
@@ -75,6 +75,52 @@ file and the same verifier is on npm:
 ```sh
 npx cool-nwc verify ./change-receipt.json --offline
 ```
+
+### Showing a real `pass` — the auditor's switch
+
+Stop 07 runs `verifyReceiptV2(receipt, { requireHardware: true })` on the record
+sealed sixty seconds earlier, and it **refuses**:
+
+```text
+REFUSED   attestation: simulated
+policy: requireHardware is set and this receipt is not backed by a verified hardware quote
+```
+
+That refusal is the demo's strongest moment, and it works precisely because it
+fails. `requireHardware` is a real option on the real verifier — set it and a
+receipt without a vendor-rooted quote is rejected outright, however many other
+domains pass. A demo that could only ever show green would prove nothing about
+the gate; watching it refuse proves the gate is enforced and that the UI cannot
+talk its way past it. The same call inside a CVM returns VALID.
+
+Beside it, [`hardware.ts`](src/lib/story/hardware.ts) states what deploying
+changes, per domain, derived from the rules in
+[`verify.ts`](src/lib/cool/phala/verify.ts) rather than from marketing — and
+labelled `projection`, because it is one. Three domains change on a CVM. Four do
+not, and `witnesses` is the honest one to point at: it needs a second party who
+is not CooL and not Phala, so no amount of silicon moves it.
+
+### Getting to that pass
+
+```powershell
+npm install -g phala
+phala login                              # interactive; the API key stays yours
+node scripts/deploy-phala.mjs --dry-run  # check the path without touching anything
+node scripts/deploy-phala.mjs            # deploy, read the measurement, write the pin
+```
+
+[`deploy-phala.mjs`](scripts/deploy-phala.mjs) runs the five steps from
+[`deploy/README.md`](deploy/README.md) in order and stops at the first that
+cannot proceed. It shells out to the CLI itself, so there is no `&&`, no
+`export` and no quoting to get wrong on PowerShell. `--dry-run` skips only the
+commands that change something — the checks still execute, because a dry run
+that faked its own auth check would cheerfully report "authenticated" to
+somebody who is not.
+
+It finishes by handing the question to the verifier rather than declaring
+success: `cool wire` seals a probe record and verifies it under
+`--require-hardware`, so a green run means the path works, not that the config
+looks right.
 
 ### Honesty, in this route specifically
 
