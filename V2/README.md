@@ -375,7 +375,45 @@ cool help            # 13 command pages + 10 concept pages
 |---|---|
 | evidence | `seal` `verify` `records` `disclose` `log` `witness` |
 | governance | `policy` `compliance` `pack` |
-| runtime | `status` `attest` `stats` `doctor` |
+| runtime | `status` `attest` `stats` `doctor` `wire` `ui` |
+
+### `cool ui` — the console, over a real project
+
+The same experience `/demo` shows, with the two things a website cannot have:
+your files and your hardware.
+
+```sh
+cool ui                          # watch this folder
+cool ui ./agents --env prod      # watch a subfolder, record it as production
+```
+
+It opens a folder, seeds a baseline from **git** so the first change is a real
+diff rather than an invented blank, and seals every save into the project's own
+on-disk log. Then it serves a console at `http://127.0.0.1:4319`.
+
+Everything on it is real: the paths are your paths, the actor is your git
+identity, the branch and commit are recorded as labels inside the signed record,
+the policy decision is reached by the enclave and sealed by the same signature
+as the change, and the log in `.cool/log` grows across restarts instead of
+starting a fresh tree of size one each run.
+
+| It does | Because |
+|---|---|
+| Debounces per path, then compares content | Editors write a file three times per save, and identical bytes are not a change |
+| Watches each directory flatly, never `recursive: true` | Recursive `fs.watch` can **abort the process** from inside libuv on Windows (`!_wcsnicmp(filename, dir, dirlen)`); an assertion cannot be caught, and this ships inside other people's applications |
+| Verifies server-side and ships the verdict | Reimplementing the verifier in browser JavaScript would create a second verifier that can disagree with the one that matters |
+| Binds to loopback | It reads your source and can seal records; it has no auth because it is not meant to be reachable |
+
+The runtime badge never flatters: it reads `hardware` only when a guest agent
+answered **and** a vendor root actually checked the quote. Without
+`QUOTE_VERIFIER_URL` a real quote is carried and digested into the record but
+reported as `absent`, because unverified is not verified. The Attestation tab
+prints the exact five steps from wherever you are to `pass`.
+
+Inside a CVM it is the second service in
+[`docker-compose.yml`](deploy/docker-compose.yml) — same volume, same enclave,
+published only through dstack-gateway, whose TLS certificate is bound to the
+CVM's own measurement.
 
 Zero dependencies beyond the ones a signature already needs: the panels,
 spinners, bars and sparklines are [`cli/tty.ts`](src/lib/cool/cli/tty.ts), which

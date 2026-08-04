@@ -37,17 +37,19 @@ import { updateNotice } from "./update";
 import { updateCommand } from "./update-command";
 import { wire } from "./wire";
 import { anchorCommand } from "./anchor";
+import { ui } from "./ui/index";
 
 const USAGE = `
   ${c.bold("cool")} ${c.faint("— tamper-evident evidence for AI, sealed in a TEE")}
 
   ${c.brand("cool")}                        open the interactive session
+  ${c.brand("cool ui")} [folder]            watch a real project in a browser console
   ${c.brand("cool walkthrough")}            learn the whole model in three minutes
   ${c.brand("cool help")} [command|topic]   the manual, including the concepts
 
   ${c.faint("evidence")}   seal · verify · records · disclose · log · witness
   ${c.faint("governance")} policy · compliance · pack
-  ${c.faint("runtime")}    status · attest · stats · doctor · update · wire
+  ${c.faint("runtime")}    status · attest · stats · doctor · update · wire · ui
 
   ${c.faint("env")}  DSTACK_ENDPOINT      talk to a real guest agent inside a CVM
        QUOTE_VERIFIER_URL   chain hardware quotes to Intel/AMD
@@ -124,6 +126,10 @@ async function run(name: string, args: string[], workspace: Workspace | null): P
       return workspace ? anchorCommand(workspace, args) : 1;
     case "wire":
       return workspace ? wire(workspace) : 1;
+    case "ui":
+    case "console":
+    case "dashboard":
+      return ui(workspace, args);
     case "doctor":
       return doctor(workspace);
     default:
@@ -152,6 +158,7 @@ const SLASH = [
   "/doctor",
   "/update",
   "/wire",
+  "/ui",
   "/clear",
   "/exit",
 ];
@@ -249,6 +256,12 @@ async function main(): Promise<void> {
     name === "policy" ||
     name === "update" ||
     name === "upgrade" ||
+    // `ui` takes a folder and opens the plane for THAT folder. Booting one here
+    // first would create a `.cool/` in whatever directory the command happened
+    // to be typed in — a stray log, in someone else's repository.
+    name === "ui" ||
+    name === "console" ||
+    name === "dashboard" ||
     (name === "verify" && args.some((arg) => !arg.startsWith("--") && arg.includes(".")));
   const workspace = readOnly ? null : await boot(true);
 

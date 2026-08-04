@@ -243,6 +243,30 @@ export const COMMANDS: readonly CommandDoc[] = [
     seeAlso: ["pack", "governance"],
   },
   {
+    name: "ui",
+    args: "[folder]",
+    summary: "watch a real project in a browser console",
+    description:
+      "Opens a folder, seeds a baseline from git so the first change is a real diff, and " +
+      "seals every save into the project's own on-disk log. The console it serves is the " +
+      "same one the website demonstrates, with the two things a demo cannot have: your " +
+      "files and your hardware. Records land in .cool/receipts and the tree in .cool/log, " +
+      "so history survives a restart. Bound to loopback — it can seal records and read " +
+      "your source, so it is not meant to be reachable from anywhere else.",
+    examples: [
+      { run: "cool ui", does: "watch the current folder" },
+      { run: "cool ui ./agents --env prod", does: "watch a subfolder, record it as production" },
+      { run: "cool ui --host 0.0.0.0 --no-open", does: "inside a CVM, behind the gateway" },
+    ],
+    flags: [
+      { flag: "--port <n>", does: "listen somewhere other than 4319" },
+      { flag: "--host <addr>", does: "bind address; defaults to 127.0.0.1" },
+      { flag: "--env <name>", does: "environment recorded on each change (default: COOL_ENV or dev)" },
+      { flag: "--no-open", does: "do not launch a browser" },
+    ],
+    seeAlso: ["wire", "attest", "attestation"],
+  },
+  {
     name: "attest",
     args: "",
     summary: "the quote and the measurement registers",

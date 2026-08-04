@@ -15,7 +15,15 @@
  */
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
-import { readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import {
+  copyFileSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -81,4 +89,28 @@ if (unresolved > 0) {
   process.exit(1);
 }
 
-console.log(`cool-tee: compiled and patched ${patched} files into dist/`);
+/* 3 · copy the static assets tsc does not know about
+ *
+ * `cool ui` serves one self-contained HTML file, read from beside its own
+ * module at runtime. tsc only emits .js/.d.ts, so without this step the command
+ * would compile perfectly and then 500 on its first request — which is exactly
+ * the class of breakage step 2 exists to prevent, so it is fatal here too. */
+const ASSETS = [["cli/ui/app.html", "cli/ui/app.html"]];
+const source = resolve(here, "../../src/lib/cool");
+
+for (const [from, to] of ASSETS) {
+  const src = join(source, from);
+  const dest = join(dist, to);
+  try {
+    statSync(src);
+  } catch {
+    console.error(`\nmissing asset ${from} — refusing to build.`);
+    process.exit(1);
+  }
+  mkdirSync(dirname(dest), { recursive: true });
+  copyFileSync(src, dest);
+}
+
+console.log(
+  `cool-tee: compiled and patched ${patched} files into dist/, copied ${ASSETS.length} asset(s)`,
+);

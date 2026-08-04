@@ -29,5 +29,35 @@ services:
       - /var/run/dstack.sock:/var/run/dstack.sock
       - evidence:/evidence
 
+  # The console, serving the same evidence from inside the same enclave.
+  #
+  # Separate service, same volume: the plane keeps sealing whether or not anyone
+  # is looking, and the console is a reader that can be restarted, scaled to
+  # zero, or left off entirely without touching the evidence. It binds 0.0.0.0
+  # because the only route to it is dstack-gateway, which terminates TLS with a
+  # certificate bound to this CVM's own measurement — the port is not open to
+  # the internet, it is open to the gateway.
+  #
+  # Turning this on means setting `gateway_enabled: true` in app-compose.json.
+  console:
+    build: .
+    image: ghcr.io/northwindcipher/cool-evidence:2.4.0
+    restart: always
+    depends_on:
+      - evidence-plane
+    environment:
+      - DSTACK_ENDPOINT=/var/run/dstack.sock
+      - QUOTE_VERIFIER_URL=${QUOTE_VERIFIER_URL:-https://api.phala.network/attest/verify}
+      - QUOTE_VERIFIER_KEY=${QUOTE_VERIFIER_KEY:-}
+      - COOL_ENV=prod
+      - COOL_PIN_MRTD=${COOL_PIN_MRTD:-}
+      - COOL_PIN_RTMR3=${COOL_PIN_RTMR3:-}
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+      - evidence:/evidence
+    ports:
+      - "4319:4319"
+    command: ["cool", "ui", "/evidence", "--host", "0.0.0.0", "--no-open"]
+
 volumes:
   evidence:

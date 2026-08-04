@@ -5,7 +5,8 @@
   "docker_compose_file": "./docker-compose.yml",
 
   "kms_enabled": true,
-  "gateway_enabled": false,
+  "_gateway_note": "true publishes the console service on a measurement-bound TLS endpoint; false keeps the CVM sealed and evidence reachable only by pulling the volume.",
+  "gateway_enabled": true,
   "local_key_provider_enabled": false,
   "key_provider": "kms",
 

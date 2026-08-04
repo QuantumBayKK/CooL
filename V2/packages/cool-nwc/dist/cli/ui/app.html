@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CooL — evidence console</title>
+<style>
+  /* One file, no fonts to fetch, no CDN. This runs inside a CVM with no
+     outbound network as happily as it runs on a laptop. */
+  :root {
+    --void:#0d1117; --panel:#161b22; --raised:#1c2430;
+    --ink:#f0f6fc; --fog:#c9d1d9; --mist:#8b949e;
+    --line:rgba(240,246,252,.14); --line-strong:rgba(240,246,252,.22);
+    --live:#3fb950; --verify:#58a6ff; --fail:#f85149; --warn:#d29922; --mock:#8b949e;
+    --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Inter,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--void);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--verify)}
+  code,.mono{font-family:var(--mono)}
+  button{font:inherit;cursor:pointer}
+  .wrap{max-width:1440px;margin:0 auto;padding:0 20px}
+
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--void);z-index:10}
+  .head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 0}
+  .brand{font-weight:600;letter-spacing:.02em}
+  .brand span{color:var(--mist);font-weight:400}
+  .grow{flex:1}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-family:var(--mono);font-size:11.5px;color:var(--mist)}
+  .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .pulse{animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:10px}
+  nav button{background:transparent;border:1px solid var(--line);color:var(--mist);border-radius:7px;padding:5px 12px;font-size:13px;white-space:nowrap}
+  nav button[aria-selected=true]{border-color:var(--verify);background:rgba(88,166,255,.1);color:var(--ink)}
+
+  main{padding:18px 0 60px}
+  .panel{border:1px solid var(--line);background:var(--panel);border-radius:9px}
+  .pad{padding:16px}
+  .grid{display:grid;gap:12px}
+  @media(min-width:900px){.g2{grid-template-columns:1fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}}
+  .label{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist)}
+  .muted{color:var(--mist)}
+  .fog{color:var(--fog)}
+  .big{font-family:var(--mono);font-size:26px;line-height:1}
+  .pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 8px;font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+  .p-live{color:var(--live);background:rgba(63,185,80,.12)}
+  .p-verify{color:var(--verify);background:rgba(88,166,255,.12)}
+  .p-warn{color:var(--warn);background:rgba(210,153,34,.14)}
+  .p-fail{color:var(--fail);background:rgba(248,81,73,.13)}
+  .p-mock{color:var(--mock);background:rgba(139,148,158,.12)}
+  .btn{background:var(--raised);border:1px solid var(--line-strong);color:var(--ink);border-radius:7px;padding:5px 11px;font-size:12.5px}
+  .btn:hover{filter:brightness(1.15)}
+  .btn.primary{background:var(--verify);color:#06121f;border-color:transparent}
+  .btn.ghost{background:transparent;color:var(--mist)}
+  .btn.danger{background:transparent;color:var(--fail);border-color:rgba(248,81,73,.4)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .kv{display:flex;justify-content:space-between;gap:12px;padding:3px 0;font-size:11.5px}
+  .kv b{font-weight:400;color:var(--mist)}
+  .kv span{font-family:var(--mono);color:var(--fog);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+
+  .rec{border:1px solid var(--line);background:var(--panel);border-radius:9px;overflow:hidden}
+  .rec+.rec{margin-top:8px}
+  .rec.fresh{animation:flash 1.6s ease-out 1}
+  @keyframes flash{from{background:rgba(88,166,255,.14)}to{background:var(--panel)}}
+  .rec .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px}
+  .rec .body{border-top:1px solid var(--line);padding:14px 16px}
+  .rise{animation:rise .3s cubic-bezier(.22,1,.36,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .diff{border:1px solid var(--line);border-radius:7px;overflow:hidden;font-family:var(--mono);font-size:11.5px;max-height:280px;overflow-y:auto}
+  .diff div{padding:2px 10px;white-space:pre-wrap;word-break:break-word}
+  .diff .del{background:rgba(248,81,73,.07);color:#ff9b93}
+  .diff .add{background:rgba(63,185,80,.07);color:var(--live)}
+  .diff .ctx{color:var(--mist)}
+
+  .drop{border:1px dashed var(--line-strong);border-radius:9px;padding:36px;text-align:center;cursor:pointer}
+  .drop.over{border-color:var(--verify);background:rgba(88,166,255,.06)}
+  .empty{text-align:center;padding:56px 20px}
+  .empty h2{font-weight:500;font-size:19px;margin:0 0 8px}
+  pre.code{background:#141414;border:1px solid var(--line);border-radius:7px;padding:12px;overflow:auto;font-family:var(--mono);font-size:11.5px;color:var(--fog);margin:0}
+  .hide{display:none!important}
+  @media(prefers-reduced-motion:reduce){.rise,.rec.fresh,.pulse{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="head">
+      <div class="brand">CooL <span id="proj">—</span></div>
+      <div class="chip" id="gitchip"></div>
+      <div class="grow"></div>
+      <div class="chip" id="runchip"></div>
+      <div class="chip" id="logchip"></div>
+    </div>
+    <nav id="nav"></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="v-changes"></section>
+  <section id="v-attest" class="hide"></section>
+  <section id="v-compliance" class="hide"></section>
+  <section id="v-verify" class="hide"></section>
+</main>
+
+<script>
+"use strict";
+/* The page renders; it does not verify. Every verdict on screen was computed by
+   the real verifier in the CLI process and shipped here — duplicating the
+   cryptography in browser JavaScript would create a second verifier that can
+   disagree with the one that matters. */
+
+const $ = (s, el) => (el || document).querySelector(s);
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const esc = (s) => String(s == null ? "" : s);
+const short = (s, n) => { const raw = String(s || "").split(":").pop() || ""; return raw.length <= (n || 16) ? raw : raw.slice(0, n || 16) + "…"; };
+const clock = (iso) => { try { return new Date(iso).toISOString().slice(11, 19) + " UTC"; } catch { return "—"; } };
+
+const TONE = { pass:"p-live", fail:"p-fail", pending:"p-warn", simulated:"p-verify", mock:"p-mock", absent:"p-mock" };
+const pill = (text, cls) => { const p = el("span", "pill " + (cls || "p-mock")); p.textContent = text; return p; };
+
+let STATE = null;
+const VIEWS = [
+  { id:"changes",    label:"Changes" },
+  { id:"attest",     label:"Attestation" },
+  { id:"compliance", label:"Compliance" },
+  { id:"verify",     label:"Verify a file" },
+];
+let view = "changes";
+
+/* ── chrome ─────────────────────────────────────────────────────────── */
+
+function renderNav() {
+  const nav = $("#nav");
+  nav.innerHTML = "";
+  for (const v of VIEWS) {
+    const b = el("button", null, v.label);
+    b.setAttribute("aria-selected", String(v.id === view));
+    b.onclick = () => { view = v.id; renderNav(); renderView(); };
+    nav.appendChild(b);
+  }
+}
+
+function renderChrome() {
+  const s = STATE;
+  $("#proj").textContent = s.project.name;
+
+  const g = $("#gitchip");
+  g.innerHTML = "";
+  if (s.project.git.root) {
+    g.appendChild(document.createTextNode(
+      "⎇ " + (s.project.git.branch || "detached") +
+      (s.project.git.commit ? " · " + s.project.git.commit : "") +
+      (s.project.git.dirty ? " · dirty" : "")
+    ));
+  } else {
+    g.appendChild(document.createTextNode("not a git repository"));
+  }
+
+  /* The runtime chip is the one thing on this page that must never flatter the
+     truth: hardware only when a guest agent answered AND a vendor root checked
+     the quote. Anything else is named for what it is. */
+  const r = $("#runchip");
+  r.innerHTML = "";
+  const hw = s.runtime.hardware && s.runtime.verifierConfigured;
+  const d = el("span", "dot");
+  d.style.background = hw ? "var(--live)" : "var(--warn)";
+  r.appendChild(d);
+  r.appendChild(document.createTextNode(
+    hw ? s.runtime.vendor + " · hardware"
+       : s.runtime.vendor + " · " + s.runtime.mode +
+         (s.runtime.mode !== "hardware" ? "" : " · unverified root")
+  ));
+
+  $("#logchip").textContent = "log " + s.log.treeSize;
+}
+
+/* ── changes ────────────────────────────────────────────────────────── */
+
+function diffLines(before, after) {
+  const a = (before == null ? "" : before).split("\n");
+  const b = (after == null ? "" : after).split("\n");
+  const out = [];
+  const max = Math.max(a.length, b.length);
+  for (let i = 0; i < max; i++) {
+    if (a[i] === b[i]) { if (out.length < 200) out.push(["ctx", a[i] == null ? "" : a[i]]); continue; }
+    if (a[i] != null) out.push(["del", a[i]]);
+    if (b[i] != null) out.push(["add", b[i]]);
+  }
+  return out;
+}
+
+function recordCard(row) {
+  const card = el("div", "rec rise" + (row.fresh ? " fresh" : ""));
+  card.dataset.id = row.id;
+
+  const top = el("div", "top");
+  top.appendChild(el("span", "mono muted", clock(row.at)));
+  top.appendChild(el("strong", null, row.kind));
+  top.appendChild(el("span", "mono muted", row.path || row.ref));
+  if (row.decision && row.decision !== "—") {
+    const bad = row.decision === "rejected";
+    top.appendChild(pill(row.decision + (row.policyRule ? " · " + row.policyRule : ""), bad ? "p-warn" : "p-verify"));
+  }
+  const spacer = el("span", "grow"); top.appendChild(spacer);
+  if (row.verdict) top.appendChild(pill(row.verdict.ok ? "verified" : "invalid", row.verdict.ok ? "p-live" : "p-fail"));
+
+  const vbtn = el("button", "btn", "Verify");
+  const tbtn = el("button", "btn danger", "Forge");
+  const dbtn = el("a", "btn ghost", "Receipt");
+  dbtn.href = "/api/receipt/" + encodeURIComponent(row.id);
+  dbtn.style.textDecoration = "none";
+  const xbtn = el("button", "btn ghost", "Details");
+  top.appendChild(vbtn); top.appendChild(tbtn); top.appendChild(dbtn); top.appendChild(xbtn);
+  card.appendChild(top);
+
+  const body = el("div", "body hide");
+  card.appendChild(body);
+
+  function paintBody(verdict, forged) {
+    body.innerHTML = "";
+    const grid = el("div", "grid g2");
+
+    const left = el("div");
+    left.appendChild(el("div", "label", "Evidence"));
+    const kv = [
+      ["Record id", row.id], ["Ref", row.ref], ["Actor", row.actor],
+      ["Environment", row.environment], ["Decision", row.decision],
+      ["Sealed at", row.at],
+    ];
+    for (const [k, v] of kv) {
+      const line = el("div", "kv");
+      line.appendChild(el("b", null, k));
+      line.appendChild(el("span", null, esc(v)));
+      left.appendChild(line);
+    }
+    grid.appendChild(left);
+
+    const right = el("div");
+    const h = el("div", "row");
+    h.appendChild(el("div", "label", "Verification"));
+    h.appendChild(el("div", "grow"));
+    if (verdict) {
+      const t = el("span", "mono");
+      t.style.color = verdict.ok ? "var(--live)" : "var(--fail)";
+      t.textContent = verdict.ok ? "VALID" : "INVALID";
+      h.appendChild(t);
+    }
+    right.appendChild(h);
+    if (verdict) {
+      for (const c of verdict.checks) {
+        const line = el("div", "row");
+        line.style.gap = "8px";
+        const name = el("span", "mono muted", c.domain);
+        name.style.width = "84px"; name.style.flex = "none"; name.style.fontSize = "11px";
+        line.appendChild(name);
+        line.appendChild(pill(c.status, TONE[c.status] || "p-mock"));
+        const det = el("span", "muted", c.detail);
+        det.style.fontSize = "11px"; det.style.flex = "1"; det.style.minWidth = "0";
+        line.appendChild(det);
+        right.appendChild(line);
+      }
+    }
+    if (forged) {
+      const w = el("div", "muted");
+      w.style.marginTop = "8px"; w.style.fontSize = "11.5px"; w.style.color = "var(--fail)";
+      w.textContent = "One field of a copy was edited. Your receipt on disk is untouched — this is the verifier catching the edit.";
+      right.appendChild(w);
+    }
+    grid.appendChild(right);
+    body.appendChild(grid);
+
+    if (row.before != null || row.after != null) {
+      const d = el("div"); d.style.marginTop = "12px";
+      d.appendChild(el("div", "label", "What changed"));
+      const box = el("div", "diff"); box.style.marginTop = "6px";
+      for (const [cls, text] of diffLines(row.before, row.after)) {
+        const ln = el("div", cls, (cls === "del" ? "− " : cls === "add" ? "+ " : "  ") + text);
+        box.appendChild(ln);
+      }
+      d.appendChild(box);
+      const note = el("div", "muted");
+      note.style.fontSize = "11px"; note.style.marginTop = "6px";
+      note.textContent = "Shown from this session. The receipt holds salted commitments to these strings, never the strings themselves.";
+      d.appendChild(note);
+      body.appendChild(d);
+    }
+  }
+
+  xbtn.onclick = () => {
+    body.classList.toggle("hide");
+    if (!body.classList.contains("hide")) paintBody(row.verdict, false);
+  };
+  vbtn.onclick = async () => {
+    vbtn.disabled = true; vbtn.textContent = "verifying…";
+    const res = await fetch("/api/verify/" + encodeURIComponent(row.id), { method: "POST" });
+    const data = await res.json();
+    row.verdict = data.verdict;
+    vbtn.disabled = false; vbtn.textContent = "Verify (" + data.ms + " ms)";
+    body.classList.remove("hide");
+    paintBody(data.verdict, false);
+    renderChanges();
+  };
+  tbtn.onclick = async () => {
+    tbtn.disabled = true; tbtn.textContent = "forging…";
+    const res = await fetch("/api/tamper/" + encodeURIComponent(row.id), { method: "POST" });
+    const data = await res.json();
+    tbtn.disabled = false; tbtn.textContent = "Forge";
+    body.classList.remove("hide");
+    paintBody(data.verdict, true);
+  };
+
+  return card;
+}
+
+function renderChanges() {
+  const host = $("#v-changes");
+  host.innerHTML = "";
+  const s = STATE;
+
+  for (const note of s.notes) {
+    const n = el("div", "panel pad");
+    n.style.marginBottom = "12px";
+    n.style.borderColor = "rgba(210,153,34,.4)";
+    n.appendChild(el("div", "label", "Note"));
+    n.appendChild(el("div", "fog", note));
+    host.appendChild(n);
+  }
+
+  if (s.rows.length === 0) {
+    const e = el("div", "panel empty");
+    const h = el("h2", null, "Watching " + s.project.name);
+    e.appendChild(h);
+    const p = el("p", "muted");
+    p.textContent = "Edit and save any prompt, config or policy file in this folder. Nothing else — no ticket, no form.";
+    e.appendChild(p);
+    const p2 = el("p", "mono muted");
+    p2.style.fontSize = "11.5px";
+    p2.textContent = s.project.root;
+    e.appendChild(p2);
+    host.appendChild(e);
+    return;
+  }
+
+  const bar = el("div", "row");
+  bar.style.marginBottom = "10px";
+  bar.appendChild(el("div", "label", "Change timeline"));
+  bar.appendChild(el("div", "grow"));
+  const cnt = el("span", "muted");
+  cnt.style.fontSize = "11.5px";
+  cnt.textContent = s.rows.length + " records · newest first";
+  bar.appendChild(cnt);
+  host.appendChild(bar);
+
+  const list = el("div");
+  for (const row of s.rows) list.appendChild(recordCard(row));
+  host.appendChild(list);
+}
+
+/* ── attestation ────────────────────────────────────────────────────── */
+
+function renderAttest() {
+  const host = $("#v-attest");
+  host.innerHTML = "";
+  const r = STATE.runtime;
+  const hw = r.hardware && r.verifierConfigured;
+
+  const head = el("div", "panel pad");
+  head.appendChild(el("div", "label", "Trusted execution"));
+  const line = el("div", "row"); line.style.marginTop = "8px";
+  const big = el("span", "big", r.vendor); line.appendChild(big);
+  line.appendChild(pill(hw ? "hardware" : r.mode, hw ? "p-live" : "p-warn"));
+  head.appendChild(line);
+
+  const why = el("p", "muted");
+  why.style.marginTop = "10px"; why.style.fontSize = "12px"; why.style.maxWidth = "70ch";
+  if (hw) {
+    why.textContent = "A guest agent answered and a vendor root checked the quote. The attestation domain reads pass because something actually verified it — not because this page says so.";
+  } else if (r.endpoint && !r.verifierConfigured) {
+    why.textContent = "A guest agent is answering at " + r.endpoint + ", but no QUOTE_VERIFIER_URL is set, so the quote is carried and digested into the record but never chained to Intel. The domain reads absent, which is what unverified means.";
+  } else if (r.endpoint) {
+    why.textContent = "Talking to " + r.endpoint + ". The mode is still " + r.mode + " because there is no silicon behind that endpoint — it proves the wiring, not the hardware.";
+  } else {
+    why.textContent = "No DSTACK_ENDPOINT is set, so this is CooL's in-process simulator and every receipt says so in its own body. Point it at a CVM's guest agent and nothing else has to change.";
+  }
+  head.appendChild(why);
+  host.appendChild(head);
+
+  const grid = el("div", "grid g2"); grid.style.marginTop = "12px";
+
+  const m = el("div", "panel pad");
+  m.appendChild(el("div", "label", "Measurement"));
+  const md = el("div"); md.style.marginTop = "8px";
+  for (const slot of ["mrtd", "rtmr0", "rtmr1", "rtmr2", "rtmr3"]) {
+    const k = el("div", "kv");
+    k.appendChild(el("b", null, slot.toUpperCase()));
+    k.appendChild(el("span", null, short(r.measurement[slot], 34)));
+    md.appendChild(k);
+  }
+  for (const [k2, v2] of [["App id", r.appId], ["Instance", r.instanceId], ["Image", r.imageDigest], ["TCB", r.tcbStatus]]) {
+    const k = el("div", "kv");
+    k.appendChild(el("b", null, k2));
+    k.appendChild(el("span", null, short(v2, 34)));
+    md.appendChild(k);
+  }
+  m.appendChild(md);
+  grid.appendChild(m);
+
+  const h = el("div", "panel pad");
+  h.appendChild(el("div", "label", "RA-TLS handshake"));
+  const hd = el("div"); hd.style.marginTop = "8px";
+  for (const step of r.handshake) {
+    const line2 = el("div", "row"); line2.style.alignItems = "flex-start"; line2.style.marginBottom = "6px";
+    line2.appendChild(pill(step.ok ? "ok" : "fail", step.ok ? "p-live" : "p-fail"));
+    const t = el("div"); t.style.minWidth = "0";
+    t.appendChild(el("div", "mono fog", step.label));
+    const dt = el("div", "muted", step.detail); dt.style.fontSize = "11px";
+    t.appendChild(dt);
+    line2.appendChild(t);
+    hd.appendChild(line2);
+  }
+  h.appendChild(hd);
+  grid.appendChild(h);
+  host.appendChild(grid);
+
+  if (!hw) {
+    const path = el("div", "panel pad"); path.style.marginTop = "12px";
+    path.appendChild(el("div", "label", "How this reaches pass"));
+    const pre = el("pre", "code");
+    pre.style.marginTop = "8px";
+    pre.textContent =
+      "# 1 · deploy the evidence plane into a confidential VM\n" +
+      "cd deploy && phala deploy -c docker-compose.yml -n cool-evidence\n\n" +
+      "# 2 · point cool at the guest agent inside it\n" +
+      "export DSTACK_ENDPOINT=/var/run/dstack.sock\n\n" +
+      "# 3 · give it a vendor root to check the quote against\n" +
+      "export QUOTE_VERIFIER_URL=https://api.phala.network/attest/verify\n\n" +
+      "# 4 · pin the measurement you approved\n" +
+      "phala cvms attestation <cvm-id>\n" +
+      "export COOL_PIN_MRTD=hex:<mrtd>\n\n" +
+      "# 5 · prove it end to end\n" +
+      "cool wire && cool verify last --require-hardware";
+    path.appendChild(pre);
+    host.appendChild(path);
+  }
+}
+
+/* ── compliance ─────────────────────────────────────────────────────── */
+
+function renderCompliance() {
+  const host = $("#v-compliance");
+  host.innerHTML = "";
+  const obs = STATE.obligations;
+  const met = obs.filter((o) => o.covered).length;
+
+  const tiles = el("div", "grid g4");
+  const data = [["Obligations in scope", obs.length, "var(--ink)"], ["Evidenced", met, "var(--live)"], ["Gaps", obs.length - met, obs.length - met ? "var(--warn)" : "var(--live)"], ["Records", STATE.rows.length, "var(--live)"]];
+  for (const [label, value, colour] of data) {
+    const t = el("div", "panel pad");
+    const b = el("div", "big", String(value)); b.style.color = colour;
+    t.appendChild(b);
+    t.appendChild(el("div", "fog", label));
+    tiles.appendChild(t);
+  }
+  host.appendChild(tiles);
+
+  const list = el("div", "panel"); list.style.marginTop = "12px";
+  obs.forEach((o, i) => {
+    const r = el("div"); r.className = "pad";
+    if (i) r.style.borderTop = "1px solid var(--line)";
+    const top = el("div", "row");
+    top.appendChild(el("strong", null, o.regime));
+    top.appendChild(el("span", "mono muted", o.clause));
+    top.appendChild(el("div", "grow"));
+    const c = el("span", "mono muted"); c.style.fontSize = "11.5px";
+    c.textContent = o.records + (o.records === 1 ? " record" : " records");
+    top.appendChild(c);
+    top.appendChild(pill(o.covered ? "evidenced" : "gap", o.covered ? "p-live" : "p-warn"));
+    r.appendChild(top);
+    const req = el("div", "muted", o.requirement); req.style.fontSize = "11.5px"; req.style.marginTop = "4px";
+    r.appendChild(req);
+    const by = el("div", "mono fog", "satisfied by: " + o.satisfiedBy); by.style.fontSize = "11px"; by.style.marginTop = "2px";
+    r.appendChild(by);
+    list.appendChild(r);
+  });
+  host.appendChild(list);
+
+  const exp = el("div", "panel pad"); exp.style.marginTop = "12px";
+  exp.appendChild(el("div", "label", "Export"));
+  const p = el("p", "muted");
+  p.style.fontSize = "12px"; p.style.maxWidth = "70ch";
+  p.textContent = "One file: every receipt, the obligation mapping, the enclave the records were produced in, and the keys a verifier needs. Checked with `cool pack verify`, offline, by the recipient.";
+  exp.appendChild(p);
+  const a = el("a", "btn primary", "Download audit-pack.json");
+  a.href = "/api/pack"; a.style.textDecoration = "none"; a.style.display = "inline-block";
+  exp.appendChild(a);
+  host.appendChild(exp);
+}
+
+/* ── verify a file ──────────────────────────────────────────────────── */
+
+function renderVerify() {
+  const host = $("#v-verify");
+  if (host.dataset.built) return;
+  host.dataset.built = "1";
+
+  const drop = el("div", "drop");
+  drop.innerHTML = "";
+  drop.appendChild(el("div", null, "Drop a receipt or an audit pack"));
+  const sub = el("div", "muted");
+  sub.style.fontSize = "11.5px"; sub.style.marginTop = "6px";
+  sub.textContent = "Including one this project never produced. Nothing is uploaded anywhere — it is read here and verified by this process.";
+  drop.appendChild(sub);
+
+  const input = el("input"); input.type = "file"; input.accept = "application/json,.json"; input.className = "hide";
+  const out = el("div"); out.style.marginTop = "12px";
+
+  async function handle(file) {
+    out.innerHTML = "";
+    const text = await file.text();
+    const res = await fetch("/api/verify-file", { method: "POST", headers: { "content-type": "application/json" }, body: text });
+    const data = await res.json();
+    const card = el("div", "panel pad");
+    const top = el("div", "row");
+    top.appendChild(el("span", "mono fog", file.name));
+    top.appendChild(el("div", "grow"));
+    if (data.kind === "receipt") top.appendChild(pill(data.verdict.ok ? "evidence valid" : "evidence invalid", data.verdict.ok ? "p-live" : "p-fail"));
+    if (data.kind === "pack") top.appendChild(pill(data.ok ? "pack valid" : "pack invalid", data.ok ? "p-live" : "p-fail"));
+    if (data.kind === "error") top.appendChild(pill("unreadable", "p-fail"));
+    card.appendChild(top);
+
+    const bodyEl = el("div"); bodyEl.style.marginTop = "10px";
+    if (data.kind === "receipt") {
+      for (const c of data.verdict.checks) {
+        const line = el("div", "row"); line.style.gap = "8px"; line.style.alignItems = "flex-start";
+        const n = el("span", "mono muted", c.domain); n.style.width = "84px"; n.style.flex = "none"; n.style.fontSize = "11px";
+        line.appendChild(n);
+        line.appendChild(pill(c.status, TONE[c.status] || "p-mock"));
+        const d = el("span", "muted", c.detail); d.style.fontSize = "11px"; d.style.flex = "1"; d.style.minWidth = "0";
+        line.appendChild(d);
+        bodyEl.appendChild(line);
+      }
+    } else if (data.kind === "pack") {
+      bodyEl.className = "muted";
+      bodyEl.textContent = data.total + " receipts checked, " + data.failed + " failed. The pack's own summary is ignored and recomputed.";
+    } else {
+      bodyEl.className = "mono";
+      bodyEl.style.color = "var(--fail)"; bodyEl.style.fontSize = "11.5px";
+      bodyEl.textContent = data.message;
+    }
+    card.appendChild(bodyEl);
+    out.appendChild(card);
+  }
+
+  drop.onclick = () => input.click();
+  drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("over"); };
+  drop.ondragleave = () => drop.classList.remove("over");
+  drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("over"); if (e.dataTransfer.files[0]) handle(e.dataTransfer.files[0]); };
+  input.onchange = () => { if (input.files[0]) handle(input.files[0]); };
+
+  host.appendChild(drop);
+  host.appendChild(input);
+  host.appendChild(out);
+}
+
+/* ── wiring ─────────────────────────────────────────────────────────── */
+
+function renderView() {
+  for (const v of VIEWS) $("#v-" + v.id).classList.toggle("hide", v.id !== view);
+  if (view === "changes") renderChanges();
+  if (view === "attest") renderAttest();
+  if (view === "compliance") renderCompliance();
+  if (view === "verify") renderVerify();
+}
+
+async function load() {
+  const res = await fetch("/api/state");
+  STATE = await res.json();
+  renderChrome();
+  renderNav();
+  renderView();
+}
+
+function connect() {
+  const src = new EventSource("/api/events");
+  src.addEventListener("record", (e) => {
+    const data = JSON.parse(e.data);
+    /* Newest first, and mark everything else stale so only the arrival flashes. */
+    for (const r of STATE.rows) r.fresh = false;
+    STATE.rows.unshift(data.row);
+    if (data.treeSize != null) STATE.log.treeSize = data.treeSize;
+    renderChrome();
+    if (view !== "changes") { view = "changes"; renderNav(); }
+    renderView();
+    if (view === "compliance") renderCompliance();
+  });
+  src.addEventListener("note", (e) => {
+    STATE.notes.push(JSON.parse(e.data).message);
+    if (view === "changes") renderChanges();
+  });
+  /* A dropped stream means the CLI stopped. Say so rather than looking live. */
+  src.onerror = () => {
+    const c = $("#logchip");
+    c.textContent = "disconnected";
+    c.style.color = "var(--fail)";
+  };
+}
+
+load().then(connect);
+</script>
+</body>
+</html>
