@@ -44,3 +44,8 @@ yarn-error.log*
 # Local snapshots taken before big rewrites — not part of the project.
 /_backup_*/
 
+
+# The CLI's per-project working directory: receipts, the transparency log
+# and the update-check cache. Evidence belongs to the project it describes,
+# not to this repository.
+.cool/
