@@ -7,22 +7,57 @@ import { ArrowLeft, ArrowUpRight, Play, LayoutDashboard } from "lucide-react";
 import Backdrop from "@/components/Backdrop";
 import SnapScroll from "@/components/SnapScroll";
 import { GithubMark } from "@/components/ui";
-import { INVEST_MAILTO, MEETING_URL } from "@/components/Nav";
+// The booking URL comes from lib/contact rather than from components/Nav.
+// Same value, but importing it from Nav dragged Nav's whole client module into
+// this route's chunk — and Nav carried a second copy of the investor mailto
+// that names the round. Import surface is leak surface.
+import { CONTACT } from "@/lib/contact";
 import { Build, Eyebrow, Headline, Lead, Stage } from "./KeynoteStage";
 import TestimonialRail from "@/components/TestimonialRail";
 import {
   BUY_BUILD,
-  FUNDS,
-  HERO,
   LAYERS,
   MVP_SLICE,
-  PHASES,
   PRINCIPLES,
   STATUS,
-  TERMS,
   TOPOLOGIES,
-  VOICES,
 } from "@/content/investors";
+// `import type` only — TypeScript erases these entirely, so nothing from the
+// restricted module reaches this client chunk. The VALUES arrive as a prop from
+// the server component that checked access. See content/investors-restricted.ts.
+import type { FundSlice, Voice } from "@/content/investors-restricted";
+
+/**
+ * The half of the content that is not allowed to live in this bundle.
+ *
+ * The ask, the money, the twelve-month plan and the five named practitioners
+ * used to be imported here like everything else, which compiled them straight
+ * into a public JavaScript chunk on a route that had no gate. They now arrive
+ * as a prop, rendered by a server component that has already verified access —
+ * so an unauthorised request never causes them to be serialised at all.
+ */
+export interface RestrictedKeynoteContent {
+  readonly voices: readonly Voice[];
+  readonly funds: readonly FundSlice[];
+  readonly phases: readonly (readonly [string, string])[];
+  /** Prose that names the round. Copy leaks as readily as data. */
+  readonly copy: {
+    readonly fundsHeadline: string;
+    readonly buyBuildLead: string;
+    readonly fundsEyebrow: string;
+    readonly heroKicker: string;
+    readonly heroTitle: string;
+    readonly heroLead: string;
+    readonly investMailto: string;
+  };
+  readonly terms: {
+    readonly amount: string;
+    readonly instrument: string;
+    readonly cap: string;
+    readonly runway: string;
+    readonly entity: string;
+  };
+}
 
 /**
  * The investors keynote.
@@ -183,7 +218,11 @@ function StatusList({ states }: { states: readonly ("working" | "partial" | "pla
 
 /* â”€â”€ the keynote â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-export default function InvestorKeynote() {
+export default function InvestorKeynote({
+  restricted,
+}: {
+  restricted: RestrictedKeynoteContent;
+}) {
   return (
     <>
       <Backdrop />
@@ -227,9 +266,9 @@ export default function InvestorKeynote() {
       <main className="relative z-10">
         {/* â”€â”€ 01 · open â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Stage no="01">
-          <Eyebrow>{HERO.kicker}</Eyebrow>
-          <Headline size="xl">{HERO.title}</Headline>
-          <Lead>{HERO.lead}</Lead>
+          <Eyebrow>{restricted.copy.heroKicker}</Eyebrow>
+          <Headline size="xl">{restricted.copy.heroTitle}</Headline>
+          <Lead>{restricted.copy.heroLead}</Lead>
           <Build>
             <p className="mt-10 font-mono text-[11px] tracking-[0.16em] text-mist uppercase">
               Scroll
@@ -378,10 +417,7 @@ export default function InvestorKeynote() {
             We refuse to build seven
             <br className="hidden sm:block" /> of these ten things.
           </Headline>
-          <Lead>
-            A pre-seed team that rebuilds a Merkle log, a policy engine and a
-            workflow engine ships nothing.
-          </Lead>
+          <Lead>{restricted.copy.buyBuildLead}</Lead>
 
           <div className="mt-7 grid gap-3 sm:grid-cols-2">
             {(["buy", "build"] as const).map((verdict) => (
@@ -463,7 +499,7 @@ export default function InvestorKeynote() {
           </Lead>
           <Build>
             <div className="mt-7">
-              <TestimonialRail quotes={VOICES} />
+              <TestimonialRail quotes={restricted.voices} />
             </div>
           </Build>
           <Build>
@@ -474,8 +510,8 @@ export default function InvestorKeynote() {
           </Build>
         </Stage>
 
-        <Stage no="14">          <Eyebrow>Use of funds</Eyebrow>
-          <Headline>What ₹1 Cr becomes, in eight weeks.</Headline>
+        <Stage no="14">          <Eyebrow>{restricted.copy.fundsEyebrow}</Eyebrow>
+          <Headline>{restricted.copy.fundsHeadline}</Headline>
           <Lead>
             Not the full architecture — one thin vertical slice of it, shaped so
             nothing has to be thrown away later.
@@ -499,7 +535,7 @@ export default function InvestorKeynote() {
           {/* the twelve months around that slice */}
           <Build>
             <div className="mt-7 grid gap-x-6 gap-y-2 sm:grid-cols-2">
-              {PHASES.map(([window, goal]) => (
+              {restricted.phases.map(([window, goal]) => (
                 <div key={window} className="flex items-baseline gap-3">
                   <span className="w-24 shrink-0 font-mono text-[11px] text-verify">
                     {window}
@@ -517,7 +553,7 @@ export default function InvestorKeynote() {
           <Build>
             <div className="mt-7">
               <div className="flex h-2.5 w-full overflow-hidden rounded-full">
-                {FUNDS.map((f) => (
+                {restricted.funds.map((f) => (
                   <span
                     key={f.label}
                     className="h-full"
@@ -527,7 +563,7 @@ export default function InvestorKeynote() {
                 ))}
               </div>
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
-                {FUNDS.map((f) => (
+                {restricted.funds.map((f) => (
                   <span key={f.label} className="flex items-center gap-1.5">
                     <span
                       className="size-2 shrink-0 rounded-full"
@@ -544,10 +580,10 @@ export default function InvestorKeynote() {
           <Build>
             <div className="mt-7 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               {[
-                [TERMS.amount, "Raising"],
-                [TERMS.instrument, "Instrument"],
-                [TERMS.cap, "Valuation"],
-                [TERMS.runway, "Runway"],
+                [restricted.terms.amount, "Raising"],
+                [restricted.terms.instrument, "Instrument"],
+                [restricted.terms.cap, "Valuation"],
+                [restricted.terms.runway, "Runway"],
               ].map(([big, small]) => (
                 <div
                   key={small}
@@ -581,7 +617,7 @@ export default function InvestorKeynote() {
           <Build>
             <div className="mt-9 flex flex-wrap gap-2.5">
               <a
-                href={MEETING_URL}
+                href={CONTACT.booking}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-verify-deep px-5 py-3 font-mono text-[12.5px] text-white shadow-[0_0_24px_rgba(9,105,218,0.45)] transition-shadow hover:shadow-[0_0_36px_rgba(9,105,218,0.8)]"
@@ -589,7 +625,7 @@ export default function InvestorKeynote() {
                 Book a meeting <ArrowUpRight className="size-3.5" />
               </a>
               <a
-                href={INVEST_MAILTO}
+                href={restricted.copy.investMailto}
                 className="inline-flex items-center gap-2 rounded-full border border-verify/45 bg-verify/10 px-5 py-3 font-mono text-[12.5px] text-ink transition-colors hover:bg-verify/20"
               >
                 Email the founders
@@ -605,7 +641,8 @@ export default function InvestorKeynote() {
           </Build>
           <Build>
             <p className="mt-8 font-mono text-[11px] leading-relaxed text-mist">
-              {TERMS.entity} · Pranauv Shrinaath S, CEO · Kailosh Kalimuthu, CTO
+              {restricted.terms.entity} · Pranauv Shrinaath S, CEO · Kailosh
+              Kalimuthu, CTO
             </p>
           </Build>
         </Stage>

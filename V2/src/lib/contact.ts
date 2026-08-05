@@ -55,7 +55,22 @@ export const MAILTO = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
   "CooL — enquiry",
 )}`;
 
-/** The investor-specific mail, kept distinct so the two intents stay separate. */
-export const INVESTOR_MAILTO = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
-  "CooL — Pre-seed investment (₹1 Cr iSAFE)",
-)}`;
+/*
+ * REMOVED: `INVESTOR_MAILTO`, whose subject line was
+ * "CooL — Pre-seed investment (₹1 Cr iSAFE)".
+ *
+ * Nothing imported it. It was dead code — and dead code that named the round,
+ * exported from a module that the public essay, the nav and half the site
+ * import for a phone number. Webpack kept the expression rather than shaking it
+ * out, so the raise terms were compiled into client chunks on routes that had
+ * no business carrying them.
+ *
+ * Two things made it invisible for a long time. It is URL-encoded in the built
+ * output ("%E2%82%B91%20Cr"), and the source spells it "Pre-seed" with a
+ * capital P — so a case-sensitive grep for "pre-seed", which is what the first
+ * audit ran, sailed straight past it.
+ *
+ * If an investor-specific mailto is ever needed again, it belongs in
+ * content/investors-restricted.ts and reaches the client as a prop from a
+ * server component that has verified access. Not here.
+ */

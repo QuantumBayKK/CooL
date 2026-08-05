@@ -5,8 +5,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Magnetic from "@/components/Magnetic";
 
-export const INVEST_MAILTO =
-  "mailto:northwindcipher@gmail.com?subject=CooL%20%E2%80%94%20Pre-seed%20investment%20(%E2%82%B91%20Cr%20iSAFE)";
+/*
+ * REMOVED: `INVEST_MAILTO`, a second copy of the same investor mailto whose
+ * subject named the round. Nothing imported it once the keynote stopped doing
+ * so, but it still shipped: Nav is a client component, so the literal sat in
+ * the shared chunk that /deck loads. The gated keynote now takes this string
+ * from content/investors-restricted.ts, as a prop, on an authorised request.
+ * See the matching note in lib/contact.ts.
+ */
 /* booking goes to Cal.com — one tap from a phone, no email app dance */
 export const MEETING_URL = "https://cal.com/coolnwc";
 export const MEETING_MAILTO = MEETING_URL;

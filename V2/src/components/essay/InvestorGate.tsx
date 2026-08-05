@@ -1,68 +1,38 @@
 "use client";
 
 /**
- * The gate.
+ * The gate, as the reader sees it. Enforcement lives elsewhere, on purpose.
  *
- * Honest about what it is: this keeps raise terms off the public web and out of
- * search results, and it stops a buyer stumbling into fundraising material. It
- * is not a security boundary, and the code does not pretend otherwise — the
- * passcode is compared in the browser, so anyone determined enough to read the
- * bundle can get past it.
+ * This component is now ONLY a form. It takes no children and it knows no
+ * secret. That is the whole change: the previous version received the protected
+ * sections as `children` and decided in the browser whether to render them,
+ * which meant React serialised every one of them into the RSC payload of the
+ * HTML regardless — the raise terms and the five named validators were in the
+ * response body of an ungated request. Hiding a thing in the browser is not
+ * withholding it.
  *
- * That trade is deliberate. The alternative is a server, a session and a user
- * table for a page five people will read, and the material behind it is a
- * pitch, not a secret. What actually protects it is `noindex` on the route:
- * the realistic risk was never a determined attacker, it was Google indexing
- * the SAFE terms and a customer finding them.
+ * The passcode is compared in `app/investors/gate-action.ts` against
+ * `INVESTOR_PASSCODE`, on the server, and the material is rendered by the page
+ * only after `hasInvestorAccess()` says so. So there is nothing here to defeat:
+ * reading this file, or the bundle it compiles into, tells you nothing you
+ * could not have learned by looking at the door.
  *
- * The other path is the one most people will use — request access by email,
- * which opens their mail client with the subject filled in and tells us who is
- * asking. That is worth more than the passcode.
+ * The UX is deliberately unchanged from the version this replaces — same
+ * heading, same sentence, same passcode field, same "Request access" mailto.
+ * Only enforcement moved. The email path is still the one most readers use, and
+ * it is still worth more than the passcode: it tells us who is asking.
  */
-import { useEffect, useState } from "react";
+import { useActionState } from "react";
 import { CONTACT } from "@/lib/contact";
+import { unlockInvestorAccess } from "@/app/investors/gate-action";
+import { GATE_INITIAL } from "@/app/investors/gate-state";
 
-/** Shared on a call. Not a secret; see the note above. */
-const PASSCODE = "provable";
-const STORAGE_KEY = "cool.investors.unlocked";
-
-export function InvestorGate({ children }: { children: React.ReactNode }) {
-  const [unlocked, setUnlocked] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [value, setValue] = useState("");
-  const [wrong, setWrong] = useState(false);
-
-  // Remember across reloads so a reader who came back does not re-enter it
-  // mid-conversation. Read in an effect, not during render, or the server HTML
-  // and the first client render disagree and React discards the tree.
-  useEffect(() => {
-    try {
-      if (window.sessionStorage.getItem(STORAGE_KEY) === "1") setUnlocked(true);
-    } catch {
-      /* storage disabled — the gate simply asks again */
-    }
-    setReady(true);
-  }, []);
-
-  const submit = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (value.trim().toLowerCase() === PASSCODE) {
-      setUnlocked(true);
-      setWrong(false);
-      try {
-        window.sessionStorage.setItem(STORAGE_KEY, "1");
-      } catch {
-        /* nothing to do; they stay unlocked for this render */
-      }
-      return;
-    }
-    setWrong(true);
-  };
-
-  // Render nothing until the stored answer is known. Flashing the gate at
-  // someone who already unlocked it reads as broken.
-  if (!ready) return null;
-  if (unlocked) return <>{children}</>;
+export function InvestorGate({ next = "/investors" }: { next?: string }) {
+  const [state, formAction, pending] = useActionState(
+    unlockInvestorAccess,
+    GATE_INITIAL,
+  );
+  const wrong = state.error !== "";
 
   return (
     <section id="gate">
@@ -74,18 +44,15 @@ export function InvestorGate({ children }: { children: React.ReactNode }) {
           we&rsquo;ll come back to you.
         </p>
 
-        <form onSubmit={submit} style={{ marginTop: "var(--s4)" }}>
+        <form action={formAction} style={{ marginTop: "var(--s4)" }}>
+          <input type="hidden" name="next" value={next} />
           <label htmlFor="passcode" className="tiny" style={{ display: "block", marginBottom: "6px" }}>
             Passcode
           </label>
           <input
             id="passcode"
+            name="passcode"
             type="password"
-            value={value}
-            onChange={(event) => {
-              setValue(event.target.value);
-              setWrong(false);
-            }}
             autoComplete="off"
             style={{
               width: "100%",
@@ -100,12 +67,17 @@ export function InvestorGate({ children }: { children: React.ReactNode }) {
             }}
           />
           {wrong && (
-            <p className="tiny" style={{ color: "#f85149" }}>
-              That is not it. Ask us on the call.
+            <p className="tiny" style={{ color: "#f85149" }} role="alert">
+              {state.error}
             </p>
           )}
-          <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "var(--s2)" }}>
-            Enter
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={pending}
+            style={{ width: "100%", marginTop: "var(--s2)" }}
+          >
+            {pending ? "Checking…" : "Enter"}
           </button>
         </form>
 

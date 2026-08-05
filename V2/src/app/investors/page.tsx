@@ -2,19 +2,41 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { InvestorGate } from "@/components/essay/InvestorGate";
 import { CONTACT } from "@/lib/contact";
+import { hasInvestorAccess } from "@/lib/investor-access";
 
 /**
- * The investor page, gated.
+ * The investor page, gated on the server.
  *
- * `noindex` is the part that actually does the work. The gate stops a customer
- * wandering into fundraising material; this stops Google indexing the SAFE
- * terms, which was always the realistic risk — a crawler that never sees the
- * page cannot surface the raise next to the product.
+ * This page used to be prerendered static HTML wrapped in a client-side gate.
+ * That combination did the opposite of what it looked like: everything below —
+ * the ask, the use of funds, the five named validators — was rendered at build
+ * time and serialised into the RSC payload embedded in the HTML, so it arrived
+ * in the response of every ungated request. The gate hid it from eyes, not from
+ * `curl`.
+ *
+ * Now the access decision happens during the server render. `hasInvestorAccess`
+ * reads a cookie, which makes this route dynamic — deliberately. A statically
+ * prerendered page cannot make a per-request decision, and building the answer
+ * once at build time is exactly how the material ended up in a static file.
+ * Rendering per request is the correct cost for a page five people read.
+ *
+ * `noindex` stays, and is now defence in depth rather than the only defence.
  *
  * The long keynote-style technical diligence still exists, at
- * /investors/diligence. This page is the short one, and it is the one carrying
- * the ask.
+ * /investors/diligence, and is gated the same way.
  */
+/**
+ * Never prerender this route.
+ *
+ * An access decision baked at build time is not an access decision. Worse, it
+ * is silently wrong in one direction: a build that runs without
+ * INVESTOR_PASSCODE would emit the locked page as a static HTML file, and that
+ * file would then be served to every request forever — including after the
+ * variable is supplied at runtime, leaving a page nobody can open. Rendering
+ * per request costs nothing here and removes the whole class of problem.
+ */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Investors",
   description:
@@ -73,10 +95,22 @@ const VALIDATION = [
   },
 ];
 
-export default function InvestorsPage() {
+export default async function InvestorsPage() {
+  // The one branch that matters. Everything protected sits inside the `true`
+  // arm, so an unauthorised render produces the form and literally nothing
+  // else — there is no hidden subtree to serialise, because it was never
+  // constructed. Verified by grepping the ungated response; see QA_REPORT.md.
+  if (!(await hasInvestorAccess())) {
+    return (
+      <div className="essay">
+        <InvestorGate next="/investors" />
+      </div>
+    );
+  }
+
   return (
     <div className="essay">
-      <InvestorGate>
+      <>
         {/* 7a · the ask */}
         <section id="ask">
           <div className="wrap">
@@ -210,7 +244,7 @@ export default function InvestorsPage() {
             </p>
           </div>
         </section>
-      </InvestorGate>
+      </>
     </div>
   );
 }
