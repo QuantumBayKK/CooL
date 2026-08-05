@@ -25,6 +25,7 @@ import { openWorkspace, type Workspace } from "../workspace";
 import { c, g, out } from "../tty";
 import { committedContents, gitContext, trackedFiles } from "./git";
 import { shouldWatch, watchProject, type Watcher } from "./watch";
+import { unsafeRoot } from "./scope";
 import { Console } from "./server";
 
 const DEFAULT_PORT = 4319;
@@ -35,6 +36,8 @@ interface Args {
   readonly host: string;
   readonly environment: string;
   readonly open: boolean;
+  /** Directories, relative to the root, that may be watched. */
+  readonly scope: readonly string[];
 }
 
 function parse(argv: string[]): Args {
@@ -43,6 +46,7 @@ function parse(argv: string[]): Args {
   let host = "127.0.0.1";
   let environment = process.env["COOL_ENV"] ?? "dev";
   let open = true;
+  const scope: string[] = [];
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]!;
@@ -50,10 +54,43 @@ function parse(argv: string[]): Args {
     else if (arg === "--host") host = argv[++i] ?? host;
     else if (arg === "--env") environment = argv[++i] ?? environment;
     else if (arg === "--no-open") open = false;
-    else if (!arg.startsWith("-")) root = resolve(arg);
+    else if (arg === "--scope") {
+      const entry = argv[++i];
+      if (entry !== undefined) scope.push(entry);
+    } else if (!arg.startsWith("-")) root = resolve(arg);
   }
 
-  return { root, port, host, environment, open };
+  return { root, port, host, environment, open, scope };
+}
+
+/**
+ * The scope, from the command line or from the project.
+ *
+ * `.coolscope` is the per-directory opt-in: a project that wants only part of
+ * itself watched writes the directories it does want, one per line, and gets
+ * exactly those. Absent both, the scope is the whole project — which is safe
+ * here and only here, because the root has already had to survive `unsafeRoot`.
+ */
+function scopeFor(root: string, fromArgs: readonly string[]): {
+  entries: readonly string[];
+  source: string;
+} {
+  if (fromArgs.length > 0) return { entries: fromArgs, source: "--scope" };
+
+  const file = join(root, ".coolscope");
+  if (existsSync(file)) {
+    try {
+      const entries = readFileSync(file, "utf8")
+        .split(/\r?\n/)
+        .map((line) => line.replace(/#.*$/, "").trim())
+        .filter((line) => line.length > 0);
+      return { entries, source: ".coolscope" };
+    } catch {
+      /* unreadable: fall through to the whole project */
+    }
+  }
+
+  return { entries: ["."], source: "the whole project" };
 }
 
 /** Open the default browser, and never fail the command if it cannot. */
@@ -137,6 +174,31 @@ export async function ui(workspace: Workspace | null, argv: string[]): Promise<n
 
   const args: Args = { ...parsed, root: canonical(parsed.root) };
 
+  /*
+   * The refusal that the incident earned.
+   *
+   * `cool ui` typed in a home directory used to take that as its scope, walk
+   * the whole user profile and seal other applications' internal files. The
+   * fix is not a longer deny-list — it is that a home directory, a drive root,
+   * a system directory and another application's data directory are not
+   * projects, and being pointed at one is an error rather than an instruction.
+   *
+   * Printed before anything is opened, watched or written, because by the time
+   * a receipt exists the mistake is already in an append-only log.
+   */
+  const refusal = unsafeRoot(args.root);
+  if (refusal !== null) {
+    out(`  ${c.red(g.fail)} refusing to watch ${refusal}`);
+    out(`    ${c.faint("resolved from")} ${c.dim(parsed.root)}`);
+    out(
+      `    ${c.faint("point")} ${c.brand("cool ui")} ${c.faint(
+        "at a project folder, or name one:",
+      )} ${c.dim("cool ui ./my-agent")}`,
+    );
+    out();
+    return 1;
+  }
+
   // The console must run against the folder being watched, not the folder the
   // command happened to be typed in — otherwise `.cool/` and the log would land
   // somewhere else entirely.
@@ -169,12 +231,14 @@ export async function ui(workspace: Workspace | null, argv: string[]): Promise<n
     return 1;
   }
 
+  const scope = scopeFor(args.root, args.scope);
   const { baseline, seeded } = baselineFor(args.root);
 
   let watcher: Watcher | null = null;
   watcher = watchProject({
     root: args.root,
     baseline,
+    scope: scope.entries,
     onChange: (change) => {
       void console_.sealChange(change);
     },
@@ -206,6 +270,11 @@ export async function ui(workspace: Workspace | null, argv: string[]): Promise<n
   out(
     `  ${c.faint("evidence")}  ${existing} existing · log ${active.cool.plane.logSize} · ${c.dim(
       join(args.root, ".cool"),
+    )}`,
+  );
+  out(
+    `  ${c.faint("scope")}     ${scope.entries.join(" · ") || c.red("nothing")} ${c.faint(
+      `(${scope.source})`,
     )}`,
   );
   out(`  ${c.faint("watching")}  ${seeded} files`);

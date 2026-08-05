@@ -23,29 +23,17 @@
  * be a genuine feedback loop: sealing a record writes a receipt, which fires a
  * watch event, which seals a record.
  */
-import { readFileSync, readdirSync, statSync, watch, type FSWatcher } from "node:fs";
+import {
+  readFileSync,
+  readdirSync,
+  statSync,
+  watch,
+  type Dirent,
+  type FSWatcher,
+} from "node:fs";
 import { join, relative } from "node:path";
 import type { ChangeKind } from "../../phala/types";
-
-/** Directories never worth watching, matched on any path segment. */
-const SKIP_DIRS = new Set([
-  ".cool",
-  ".git",
-  "node_modules",
-  "dist",
-  "build",
-  "out",
-  ".next",
-  ".turbo",
-  ".cache",
-  "coverage",
-  "vendor",
-  "__pycache__",
-  ".venv",
-  "venv",
-  ".idea",
-  ".vscode",
-]);
+import { Scope, deniedBy, directoryDeniedBy } from "./scope";
 
 /** Extensions worth treating as governable text. */
 const TEXT_EXT = new Set([
@@ -59,18 +47,33 @@ const TEXT_EXT = new Set([
 /** Anything larger is not a prompt or a config, and hashing it helps nobody. */
 const MAX_BYTES = 512 * 1024;
 
-export function shouldWatch(relPath: string): boolean {
-  const parts = relPath.split(/[\\/]/);
-  if (parts.some((part) => SKIP_DIRS.has(part))) return false;
-  if (parts.some((part) => part.startsWith("."))) {
-    // Dotfiles are usually configuration, and configuration is exactly what a
-    // governance tool should notice. Only dot-DIRECTORIES are skipped, above.
-    if (parts.slice(0, -1).some((part) => part.startsWith("."))) return false;
+/**
+ * Why a path is not watched, or null when it is.
+ *
+ * The reason is carried rather than discarded because "your file did not seal"
+ * is a question an operator will ask, and "it is in a set somewhere" is not an
+ * answer. The deny rules themselves live in `scope.ts`.
+ */
+export function watchRefusal(relPath: string): string | null {
+  const denied = deniedBy(relPath);
+  if (denied) return denied;
+
+  const parts = relPath.split(/[\\/]/).filter((part) => part.length > 0 && part !== ".");
+  // Dot-directories are skipped; dotfiles are not. Configuration is exactly
+  // what a governance tool should notice, and most of it is a dotfile.
+  if (parts.slice(0, -1).some((part) => part.startsWith("."))) {
+    return "a hidden directory";
   }
+
   const name = parts.at(-1) ?? "";
   const dot = name.lastIndexOf(".");
   const ext = dot > 0 ? name.slice(dot).toLowerCase() : "";
-  return TEXT_EXT.has(ext);
+  if (!TEXT_EXT.has(ext)) return "not a governable text file";
+  return null;
+}
+
+export function shouldWatch(relPath: string): boolean {
+  return watchRefusal(relPath) === null;
 }
 
 /**
@@ -127,6 +130,16 @@ export interface WatchOptions {
   /** Quiet period after the last event before a file is read. */
   readonly debounceMs?: number;
   readonly onError?: (message: string) => void;
+  /**
+   * Directories, relative to the root, that may be watched.
+   *
+   * Defaults to `["."]` — the whole project — which is only reached after the
+   * caller has established that the root is a project at all. An empty array
+   * watches nothing, deliberately: an operator who configured no scope asked
+   * for no coverage, and substituting "everything" for "nothing" is precisely
+   * the mistake that sealed another application's telemetry.
+   */
+  readonly scope?: readonly string[];
 }
 
 /** Read a file as text, or null if it is gone, huge, or binary. */
@@ -153,6 +166,7 @@ export function watchProject(options: WatchOptions): Watcher {
   const { root, baseline, onChange } = options;
   const debounceMs = options.debounceMs ?? 180;
   const pending = new Map<string, NodeJS.Timeout>();
+  const scope = new Scope(options.scope ?? ["."]);
 
   const settle = (relPath: string, absolute: string) => {
     const after = readText(absolute);
@@ -171,6 +185,7 @@ export function watchProject(options: WatchOptions): Watcher {
   };
 
   const queue = (relPath: string) => {
+    if (!scope.allowsFile(relPath)) return;
     if (!shouldWatch(relPath)) return;
     const absolute = join(root, relPath);
     const existing = pending.get(relPath);
@@ -204,8 +219,17 @@ export function watchProject(options: WatchOptions): Watcher {
    */
   const watchers = new Map<string, FSWatcher>();
 
+  /** Whether a directory, by absolute path, may be entered at all. */
+  const mayEnter = (dir: string): boolean => {
+    const rel = relative(root, dir);
+    if (rel.startsWith("..")) return false;
+    if (directoryDeniedBy(rel) !== null) return false;
+    return scope.allowsDirectory(rel);
+  };
+
   const watchDir = (dir: string, depth: number): void => {
     if (watchers.has(dir) || depth > 12) return;
+    if (!mayEnter(dir)) return;
     let handle: FSWatcher;
     try {
       handle = watch(dir, (_event, filename) => {
@@ -219,9 +243,7 @@ export function watchProject(options: WatchOptions): Watcher {
         // inside it afterwards is invisible.
         try {
           if (statSync(childAbs).isDirectory()) {
-            if (!rel.split(/[\\/]/).some((part) => SKIP_DIRS.has(part))) {
-              watchDir(childAbs, depth + 1);
-            }
+            watchDir(childAbs, depth + 1);
             return;
           }
         } catch {
@@ -247,23 +269,46 @@ export function watchProject(options: WatchOptions): Watcher {
     });
     watchers.set(dir, handle);
 
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    // A directory can be watchable and still not be listable — Windows grants
+    // those rights separately, and `Temp\WinSAT` is the everyday example. An
+    // unlistable directory must cost us that directory, not the recursion:
+    // letting this throw would abandon every sibling that had not been reached
+    // yet, which is a silent coverage gap in a tool whose whole claim is that
+    // gaps are visible.
+    let entries: Dirent[];
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch (error) {
+      options.onError?.(
+        `cannot list ${relative(root, dir) || "."}: ${(error as Error).message}`,
+      );
+      return;
+    }
+
+    for (const entry of entries) {
       if (!entry.isDirectory()) continue;
-      if (SKIP_DIRS.has(entry.name)) continue;
       watchDir(join(dir, entry.name), depth + 1);
     }
   };
 
-  try {
-    watchDir(root, 0);
-  } catch (error) {
-    options.onError?.(
-      `live watching unavailable on this filesystem (${(error as Error).message})`,
-    );
-  }
+  if (scope.empty) {
+    // Not an error and not a warning to be talked out of: an empty scope is a
+    // configured refusal to watch anything, and it is honoured exactly.
+    options.onError?.("no scope configured — watching nothing");
+  } else {
+    try {
+      for (const entry of scope.entries) {
+        watchDir(entry === "." ? root : join(root, entry), 0);
+      }
+    } catch (error) {
+      options.onError?.(
+        `live watching unavailable on this filesystem (${(error as Error).message})`,
+      );
+    }
 
-  if (watchers.size === 0) {
-    options.onError?.("no directories could be watched — the console will not update by itself");
+    if (watchers.size === 0) {
+      options.onError?.("no directories could be watched — the console will not update by itself");
+    }
   }
 
   return {
