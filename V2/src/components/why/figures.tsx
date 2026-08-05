@@ -75,11 +75,18 @@ export function ThirtySeconds() {
   return (
     <Figure caption="The change itself is the thin blue mark at the left — drawn far wider than true, because at real scale you could not see it. Everything to its right is a person, doing it by hand, once per change.">
       <svg viewBox="0 0 720 150" width="100%" role="img" aria-label="A timeline: a thirty-second change followed by about four hours of manual work" className="overflow-visible">
+        {/* Elapsed time, not clock time.
+            These ticks read 09:14 and 13:34 — the last of the wall-clock framing
+            the story used to open on, and the build document retires the
+            timestamp everywhere. The span is unchanged: 13:34 − 09:14 is four
+            hours and twenty minutes, which is exactly what 0:00 → +4:20 says.
+            No figure was invented and the axis measures the same thing; it just
+            no longer claims to know what time of day any of this happened. */}
         <text x="0" y="12" fontSize="11" fill={MIST}>
-          09:14
+          0:00
         </text>
         <text x="720" y="12" fontSize="11" fill={MIST} textAnchor="end">
-          13:34
+          +4:20
         </text>
 
         {/* the change */}
