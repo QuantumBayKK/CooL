@@ -287,13 +287,41 @@ export function Market() {
 
 /* ── 7 · competitors ──────────────────────────────────────────────────── */
 
+/**
+ * The five capabilities, once, feeding both the table and the stacked list.
+ *
+ * `mobileCap` exists for exactly one row. The build document gives the wide
+ * table "Works across every provider (neutral)" and the phone list "Neutral
+ * across every provider" — the parenthetical earns its place in a six-column
+ * header row and costs a line wrap on a 390px screen. Both strings are final
+ * copy, so the fix is to carry both rather than to pick one.
+ *
+ * Everything else stays shared. One array is what guarantees the two views can
+ * never drift into claiming different things.
+ */
 const CAPABILITIES = [
   { cap: "Auto-captures every AI change", obs: "~", grc: "✗", comp: "✗", diy: "manual", others: "Others mostly ✗" },
   { cap: "Tamper-proof, provable evidence", obs: "✗", grc: "✗", comp: "✗", diy: "✗", others: "Others ✗" },
-  { cap: "Works across every provider (neutral)", obs: "✗", grc: "~", comp: "~", diy: "—", others: "Others partial" },
+  {
+    cap: "Works across every provider (neutral)",
+    mobileCap: "Neutral across every provider",
+    obs: "✗",
+    grc: "~",
+    comp: "~",
+    diy: "—",
+    others: "Others partial",
+  },
   { cap: "Proves which model actually ran", obs: "✗", grc: "✗", comp: "✗", diy: "✗", others: "Others ✗" },
   { cap: "Zero manual effort", obs: "✗", grc: "✗", comp: "~", diy: "✗", others: "Others ✗" },
-];
+] satisfies readonly {
+  cap: string;
+  mobileCap?: string;
+  obs: string;
+  grc: string;
+  comp: string;
+  diy: string;
+  others: string;
+}[];
 
 export function Competitors() {
   return (
@@ -347,7 +375,9 @@ export function Competitors() {
         <div className="cmp-mobile">
           {CAPABILITIES.map((row) => (
             <div key={row.cap} className="cmp-row">
-              <strong style={{ fontSize: "clamp(15px,4vw,17px)" }}>{row.cap}</strong>
+              <strong style={{ fontSize: "clamp(15px,4vw,17px)" }}>
+                {"mobileCap" in row ? row.mobileCap : row.cap}
+              </strong>
               <span style={{ fontSize: "clamp(13px,3.4vw,15px)", color: "var(--muted)" }}>
                 <span className="grn" style={{ fontWeight: 700 }}>
                   CooL ✓
