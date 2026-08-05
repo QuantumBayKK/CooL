@@ -64,8 +64,31 @@
 }
 
 /* ---- the scroll roots ----
-   These four lines are the ones that trap a phone, so they are stated
-   explicitly rather than left to a framework default:
+   Exactly one element in this document is a scroll container: `html`. Every
+   line below exists to keep it that way, because the last version of this rule
+   accidentally made `body` a second one and killed touch scrolling outright.
+
+   What happened, and why it is not obvious: `overflow-x: hidden` does not
+   simply clip. Per spec, when one axis is not `visible` the other axis's
+   `visible` computes to `auto` — so `overflow-x: hidden` on BOTH html and body
+   quietly turned `body` into its own scroll container. Body has nothing to
+   scroll (its height is its content), the finger lands inside it, and
+   `overscroll-behavior-y: contain` on that same box then forbids the gesture
+   from chaining out to the viewport. The finger moves and the page does not.
+   Measured on a Pixel-class emulation: 16 full swipes, scrollY never left 0,
+   while `scrollTo()` and in-page anchors kept working — which is exactly the
+   reported "it jumps to one screen and gets stuck".
+
+   Each ingredient alone is harmless; it is the pair that traps. So:
+
+   `overflow-x: hidden` lives on `html` only — html is the viewport scroller,
+   clipping it there kills sideways drag for the whole document, and `body`
+   stays `visible` and never becomes a scroller.
+
+   `overflow-x: clip` on `body` is the belt to that braces. `clip` is the one
+   value that clips WITHOUT creating a scroll container, so it cannot bring the
+   trap back. Browsers too old to know it fall back to `visible`, where html is
+   already doing the job.
 
    `overflow-y` is never `hidden` here. Hiding it on html or body is what makes
    a page dead-stop mid-swipe with content still below the fold.
@@ -73,26 +96,29 @@
    `height` is never `100vh` here. A fixed height on a scroll root turns every
    section past the first into unreachable overflow.
 
-   `overscroll-behavior-y: contain` rather than `none`. `none` also kills the
-   rubber-band at the document ends, which on iOS reads as the page having
-   jammed — the finger moves and nothing does. `contain` keeps the bounce
-   (so the page feels alive and pull-to-refresh still works) while stopping
-   the gesture chaining to a parent scroller. */
+   `overscroll-behavior-y: contain` — on `html` only, for the same reason —
+   rather than `none`. `none` also kills the rubber-band at the document ends,
+   which on iOS reads as the page having jammed. `contain` keeps the bounce
+   while stopping the gesture chaining to a parent scroller. */
 html,
 body {
   margin: 0;
   padding: 0;
   height: auto;
-  overflow-x: hidden;
-  overflow-y: visible;
-  overscroll-behavior-y: contain;
 }
 
 html {
+  overflow-x: hidden;
+  overflow-y: visible;
+  overscroll-behavior-y: contain;
   background: var(--color-void);
   color-scheme: dark;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: clip;
 }
 
 /* Snapping belongs to the deck, not to the document.
@@ -180,7 +206,9 @@ body {
   background: var(--color-void);
   color: var(--color-fog);
   font-family: var(--font-sans);
-  overflow-x: hidden;
+  /* NOT `overflow-x: hidden` — see the scroll-roots block above. This one
+     line, repeated here, is what re-created the trap the last time. Sideways
+     clipping is `clip` there and `hidden` on html; both are already set. */
   min-height: 100svh;
 }
 
