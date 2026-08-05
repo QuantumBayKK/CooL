@@ -39,28 +39,9 @@ import { CONTACT, PHONES } from "@/lib/contact";
  */
 function PhoneLinks({ align = "center" }: { align?: "center" | "left" }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "var(--s2)",
-        justifyContent: align === "center" ? "center" : "flex-start",
-      }}
-    >
+    <div className={align === "center" ? "phones" : "phones phones-left"}>
       {PHONES.map((phone) => (
-        <a
-          key={phone.e164}
-          href={`tel:${phone.e164}`}
-          style={{
-            color: "var(--accent)",
-            textDecoration: "none",
-            display: "inline-flex",
-            alignItems: "center",
-            minHeight: "48px",
-            fontSize: "clamp(15px,4vw,17px)",
-            fontWeight: 600,
-          }}
-        >
+        <a key={phone.e164} href={`tel:${phone.e164}`} className="tap-link tap-link-strong">
           {phone.display}
         </a>
       ))}
@@ -74,20 +55,15 @@ export function Cover() {
   return (
     <section id="cover">
       <div className="wrap">
-        <h1
-          className="opener"
-          style={{ fontSize: "clamp(44px,14vw,86px)", letterSpacing: "-0.04em", marginBottom: "var(--s2)" }}
-        >
-          CooL
-        </h1>
-        <p className="opener" style={{ marginBottom: "var(--s3)" }}>
+        <h1 className="opener wordmark">CooL</h1>
+        <p className="opener promise">
           The black box for AI.
         </p>
         <p className="body">
           Every change your AI makes — documented, governed, and provable.
           Automatically.
         </p>
-        <div style={{ marginTop: "var(--s4)" }}>
+        <div className="actions-loose">
           <Link href="/demo" className="btn btn-primary">
             See it
           </Link>
@@ -98,7 +74,7 @@ export function Cover() {
 
         {/* Contact on the first screen, as asked. Quiet enough not to compete
             with the two buttons, and dialable in one tap. */}
-        <div style={{ marginTop: "var(--s3)" }}>
+        <div className="actions">
           <PhoneLinks />
         </div>
       </div>
@@ -234,7 +210,7 @@ function MarketRings() {
       role="img"
       aria-label="Market sizing: total addressable 12–15 billion dollars, serviceable 2–4 billion, obtainable 100–300 million. Circles are scaled by area."
       className="rings"
-      style={{ height: "auto", margin: "var(--s2) auto 0", display: "block" }}
+
     >
       {rings.map((ring) => {
         const r = R * Math.sqrt(ring.value / max);
@@ -332,7 +308,7 @@ const CAPABILITIES = [
 export function Competitors() {
   return (
     <section id="competitors">
-      <div className="wrap" style={{ maxWidth: "900px" }}>
+      <div className="wrap wrap-wide">
         <h2 className="opener">Everyone tracks AI. No one proves it.</h2>
 
         {/* ≥720px — the full comparison */}
@@ -341,21 +317,21 @@ export function Competitors() {
             <table>
               <thead>
                 <tr>
-                  <th style={{ textAlign: "left" }}>Capability</th>
+                  <th className="th-cap">Capability</th>
                   <th>
                     AI Observability
                     <br />
-                    <span style={{ fontWeight: 400, opacity: 0.7 }}>Langfuse, Datadog</span>
+                    <span className="th-sub">Langfuse, Datadog</span>
                   </th>
                   <th>
                     Governance / GRC
                     <br />
-                    <span style={{ fontWeight: 400, opacity: 0.7 }}>Credo AI, OneTrust</span>
+                    <span className="th-sub">Credo AI, OneTrust</span>
                   </th>
                   <th>
                     Compliance Automation
                     <br />
-                    <span style={{ fontWeight: 400, opacity: 0.7 }}>Vanta, Drata</span>
+                    <span className="th-sub">Vanta, Drata</span>
                   </th>
                   <th>Build in-house</th>
                   <th className="cool-col">CooL</th>
@@ -381,20 +357,17 @@ export function Competitors() {
         <div className="cmp-mobile">
           {CAPABILITIES.map((row) => (
             <div key={row.cap} className="cmp-row">
-              <strong style={{ fontSize: "clamp(15px,4vw,17px)" }}>
+              <strong className="cmp-cap">
                 {"mobileCap" in row ? row.mobileCap : row.cap}
               </strong>
-              <span style={{ fontSize: "clamp(13px,3.4vw,15px)", color: "var(--muted)" }}>
-                <span className="grn" style={{ fontWeight: 700 }}>
-                  CooL ✓
-                </span>{" "}
-                · {row.others}
+              <span className="cmp-verdict">
+                <span className="grn">CooL ✓</span> · {row.others}
               </span>
             </div>
           ))}
         </div>
 
-        <p className="body" style={{ marginTop: "var(--s3)" }}>
+        <p className="body actions">
           They watch, or they store policy, or they cover the company — none of
           them prove what the AI itself did. CooL does, across any stack, and the
           proof compounds with every change.
@@ -444,7 +417,7 @@ const FOUNDERS = [
 export function Founders() {
   return (
     <section id="team" className="tall">
-      <div className="wrap" style={{ maxWidth: "900px" }}>
+      <div className="wrap wrap-wide">
         <h2 className="opener">
           The rare intersection: applied post-quantum cryptography and
           confidential-compute inference.
@@ -452,7 +425,7 @@ export function Founders() {
 
         <div className="founders">
           {FOUNDERS.map((f) => (
-            <div key={f.name} style={{ textAlign: "center" }}>
+            <div key={f.name} className="founder">
               {/* Intrinsic size is declared so the block never reflows as the
                   photo arrives — the jump is worst on exactly the connection
                   where it is most annoying. */}
@@ -462,36 +435,19 @@ export function Founders() {
                 width={280}
                 height={280}
                 className="avatar"
-                style={{ margin: "0 auto var(--s2)" }}
                 sizes="(max-width: 720px) 28vw, 140px"
               />
-              <div style={{ fontSize: "clamp(17px,4.6vw,20px)", fontWeight: 700 }}>
-                {f.name}
-              </div>
-              <div className="accent" style={{ fontSize: "clamp(14px,3.6vw,16px)", fontWeight: 600 }}>
-                {f.role}
-              </div>
-              <div className="tiny" style={{ marginTop: "4px", fontStyle: "italic" }}>
-                {f.field}
-              </div>
-              <div style={{ marginTop: "var(--s2)" }}>
+              <div className="founder-name">{f.name}</div>
+              <div className="founder-role">{f.role}</div>
+              <div className="tiny founder-field">{f.field}</div>
+              <div className="founder-lines">
                 {f.lines.map((line, i) => (
-                  <p
-                    key={i}
-                    className="body"
-                    style={{ fontSize: "clamp(14px,3.6vw,16px)", marginBottom: "var(--s1)" }}
-                  >
+                  <p key={i} className="body">
                     {line}
                   </p>
                 ))}
               </div>
-              <a
-                href={f.github}
-                target="_blank"
-                rel="noreferrer"
-                className="tiny"
-                style={{ display: "inline-flex", minHeight: "48px", alignItems: "center", color: "var(--accent)" }}
-              >
+              <a href={f.github} target="_blank" rel="noreferrer" className="tap-link tap-link-quiet">
                 {f.handle}
               </a>
             </div>
@@ -532,7 +488,7 @@ export function Explore() {
     <section id="explore">
       <div className="wrap">
         <h2 className="opener">See it for yourself.</h2>
-        <div style={{ marginTop: "var(--s3)" }}>
+        <div className="actions">
           <Link href="/studio" className="btn btn-ghost">
             See the Studio
           </Link>
@@ -546,7 +502,7 @@ export function Explore() {
             Investors
           </Link>
         </div>
-        <div style={{ marginTop: "var(--s4)" }}>
+        <div className="actions-loose">
           <PhoneLinks />
         </div>
         <p className="tiny" style={{ marginTop: "var(--s1)" }}>
@@ -555,16 +511,7 @@ export function Explore() {
         {/* Its own line, not inline in the paragraph above: an inline link
             inherits the line-height of 12–14px type, which is a 15px tap
             target and a mis-tap every time on a thumb. */}
-        <a
-          href={`mailto:${CONTACT.email}`}
-          style={{
-            color: "var(--accent)",
-            display: "inline-flex",
-            alignItems: "center",
-            minHeight: "48px",
-            fontSize: "clamp(13px,3.4vw,15px)",
-          }}
-        >
+        <a href={`mailto:${CONTACT.email}`} className="tap-link tap-link-small">
           {CONTACT.email}
         </a>
       </div>

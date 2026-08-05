@@ -1098,6 +1098,16 @@ html:has([data-app-shell]) {
    which is why the last screen of a `100vh` site always looks cut off. And
    `min-height` rather than `height` means a section that outgrows its screen
    simply gets taller instead of hiding its overflow. */
+/* ---- the tokens ----
+   Spacing, measure and palette are the build document's, verbatim, and are not
+   ours to retune. What is added here is the rest of the vocabulary the page was
+   already using informally — type sizes, the tap-target floor, the two accent
+   surfaces — so that the same decision is not respelled in forty inline style
+   objects where forty of them can drift apart.
+
+   The rule for this scope: a value that appears twice becomes a token. A value
+   that appears once stays where it is used. Tokenising a one-off buys nothing
+   and costs a lookup. */
 .essay {
   --s1: 0.5rem;
   --s2: 1rem;
@@ -1105,13 +1115,47 @@ html:has([data-app-shell]) {
   --s4: 2rem;
   --s5: 3rem;
   --measure: 640px;
+  --measure-wide: 900px;
   --paper: #e9edf5;
   --quiet: #c7cfdd;
   --muted: #8a94a8;
   --accent: #5b8cff;
+  --accent-ink: #06122e;
+  --line: rgba(240, 246, 252, 0.1);
+  --edge: #33436f;
   --grn: #3ecf9a;
+
+  /* Type. Every ramp the page uses, named once.
+     `--t-opener` and `--t-body` are the document's clamps unchanged. */
+  --t-opener: clamp(27px, 7.4vw, 50px);
+  --t-body: clamp(16px, 4.3vw, 20px);
+  --t-lead: clamp(15px, 4vw, 17px);
+  --t-small: clamp(14px, 3.6vw, 16px);
+  --t-tiny: clamp(12px, 3vw, 14px);
+  --t-name: clamp(17px, 4.6vw, 20px);
+  --t-cell: clamp(12px, 3.4vw, 15px);
+
+  /* The tap-target floor, in one place.
+     It was 44 on nine links and 48 on every .btn — two minimums on one page is
+     how a row ends up looking aligned and tapping unevenly. One token means the
+     next person to add a link cannot pick the wrong one by accident. */
+  --tap: 48px;
+
   background: var(--color-void);
   color: var(--paper);
+}
+
+/* ---- focus ----
+   The essay had no focus style of its own and fell back to the UA ring, which
+   on this near-black canvas is a thin dark outline on a dark background. Every
+   interactive element here is a link or a button; a keyboard reader gets the
+   same accent the page already uses for interactivity, at a size that survives
+   the dark surface. `:focus-visible`, not `:focus`, so a mouse click never
+   draws it. */
+.essay :where(a, button, input):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
 .essay .wrap {
@@ -1164,8 +1208,13 @@ html:has([data-app-shell]) {
   padding-bottom: max(10vh, 3rem);
 }
 
+/* A section that needs the wider measure — the table and the founders grid.
+   Was `style={{maxWidth:"900px"}}` on two elements; a second measure is a
+   system decision, not a local one. */
+.essay .wrap-wide { max-width: var(--measure-wide); }
+
 .essay .opener {
-  font-size: clamp(27px, 7.4vw, 50px);
+  font-size: var(--t-opener);
   font-weight: 800;
   line-height: 1.12;
   letter-spacing: -0.02em;
@@ -1174,7 +1223,7 @@ html:has([data-app-shell]) {
 }
 
 .essay p.body {
-  font-size: clamp(16px, 4.3vw, 20px);
+  font-size: var(--t-body);
   line-height: 1.55;
   margin: 0 0 var(--s2);
   color: var(--quiet);
@@ -1186,11 +1235,29 @@ html:has([data-app-shell]) {
 }
 
 .essay .tiny {
-  font-size: clamp(12px, 3vw, 14px);
+  font-size: var(--t-tiny);
   color: var(--muted);
   margin-top: var(--s2);
   line-height: 1.5;
 }
+
+/* The cover. Two sizes that exist nowhere else on the page, so they are
+   classes rather than tokens — a one-off in a token file is a lookup that
+   buys nothing. */
+.essay .wordmark {
+  font-size: clamp(44px, 14vw, 86px);
+  letter-spacing: -0.04em;
+  margin-bottom: var(--s2);
+}
+.essay .promise { margin-bottom: var(--s3); }
+
+/* The market rings sit centred under the prose. `width` is set in the
+   short-viewport block below, against viewport HEIGHT as well as width. */
+.essay .rings { height: auto; margin: var(--s2) auto 0; display: block; }
+
+/* Table header furniture. */
+.essay th.th-cap { text-align: left; }
+.essay .th-sub { font-weight: 400; opacity: 0.7; }
 
 .essay .accent { color: var(--accent); }
 .essay .grn { color: var(--grn); }
@@ -1199,7 +1266,7 @@ html:has([data-app-shell]) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
+  min-height: var(--tap);
   padding: 0 22px;
   border-radius: 12px;
   font-weight: 700;
@@ -1207,9 +1274,67 @@ html:has([data-app-shell]) {
   text-decoration: none;
   margin: var(--s1);
 }
-.essay .btn-primary { background: var(--accent); color: #06122e; }
-.essay .btn-ghost { border: 1px solid #33436f; color: var(--paper); }
+.essay .btn-primary { background: var(--accent); color: var(--accent-ink); }
+.essay .btn-ghost { border: 1px solid var(--edge); color: var(--paper); }
 .essay .btn:active { transform: translateY(1px); }
+
+/* ---- the rows of actions ----
+   `.btn` carries `margin: var(--s1)` on all four sides, so a row of them is
+   already spaced; these wrappers only set the distance from the paragraph
+   above, which was three different inline values for what is one decision. */
+.essay .actions { margin-top: var(--s3); }
+.essay .actions-loose { margin-top: var(--s4); }
+
+/* ---- a link that must be a tap target ----
+   Phone numbers, the email, the GitHub handles. Each is its own full-height row
+   rather than an inline run, because an inline link inherits 13px line-height
+   and becomes a 15px target — a mis-tap every time on a thumb. */
+.essay .tap-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--accent);
+  text-decoration: none;
+}
+.essay .tap-link-strong { font-size: var(--t-lead); font-weight: 600; }
+.essay .tap-link-quiet { font-size: var(--t-tiny); }
+/* The email sits a step above the GitHub handles, as it did before: its own
+   clamp, not the tiny one. Measured — mapping it to --t-tiny shrank it from
+   13.3px to 12px and the link from 180px wide to 163px. */
+.essay .tap-link-small { font-size: var(--t-cell); }
+
+/* The row of phone numbers. `justify-content` is the only thing that varies
+   between its two uses, so that stays a modifier rather than a second class. */
+.essay .phones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  justify-content: center;
+}
+.essay .phones-left { justify-content: flex-start; }
+
+/* ---- founders ----
+   Was six inline style objects per founder, duplicated across two of them. */
+.essay .founder { text-align: center; }
+.essay .founder .avatar { margin: 0 auto var(--s2); }
+.essay .founder-name { font-size: var(--t-name); font-weight: 700; }
+.essay .founder-role {
+  font-size: var(--t-small);
+  font-weight: 600;
+  color: var(--accent);
+}
+.essay .founder-field { margin-top: 4px; font-style: italic; }
+.essay .founder-lines { margin-top: var(--s2); }
+/* The GitHub handle used to be class="tiny", which brought
+   `margin-top: var(--s2)` with it. Dropping that class dropped 16px per
+   founder — 32px off the stacked phone layout — so the gap is stated here
+   rather than inherited by accident. */
+.essay .founder > .tap-link { margin-top: var(--s2); }
+
+.essay .founder-lines p.body {
+  font-size: var(--t-small);
+  margin-bottom: var(--s1);
+}
 
 .essay .avatar {
   width: clamp(96px, 28vw, 140px);
@@ -1230,9 +1355,9 @@ html:has([data-app-shell]) {
 .essay th,
 .essay td {
   padding: 10px 12px;
-  font-size: clamp(12px, 3.4vw, 15px);
+  font-size: var(--t-cell);
   text-align: center;
-  border-bottom: 1px solid rgba(240, 246, 252, 0.1);
+  border-bottom: 1px solid var(--line);
 }
 .essay th { color: var(--muted); font-weight: 600; }
 .essay td.cap { text-align: left; color: var(--paper); }
@@ -1252,9 +1377,15 @@ html:has([data-app-shell]) {
   flex-direction: column;
   gap: 4px;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(240, 246, 252, 0.1);
+  border-bottom: 1px solid var(--line);
   text-align: left;
 }
+
+/* The stacked row: capability, then the verdict. Was two inline style
+   objects per row, five rows. */
+.essay .cmp-cap { font-size: var(--t-lead); }
+.essay .cmp-verdict { font-size: var(--t-cell); color: var(--muted); }
+.essay .cmp-verdict .grn { font-weight: 700; }
 .essay .cmp-row:last-child { border-bottom: 0; }
 
 /* ---- short viewports ----
@@ -1272,8 +1403,61 @@ html:has([data-app-shell]) {
    only respects width is exactly what pushes a short screen over. */
 .essay .rings { width: min(300px, 74vw, 34vh); }
 
+/* ---- the nav ----
+   A sticky bar, five items, no hamburger and no JavaScript. It was eight
+   inline style objects; the shape has not changed, only where it is written.
+   The row scrolls sideways inside its own bar rather than wrapping, which
+   costs nothing and hides nothing — a menu button that puts four links behind
+   a tap is worse than four links that scroll. */
+.essay-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(13, 17, 23, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line, rgba(240, 246, 252, 0.1));
+  padding-top: env(safe-area-inset-top);
+}
+.essay-nav__bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
+  height: 52px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.essay-nav__bar::-webkit-scrollbar { display: none; }
+/* Deliberately NO `display` here. `.essay-nav a` is (0,1,1) and the rule that
+   hides the section links on phones is `.essay-navlink`, (0,1,0) — putting
+   `display:inline-flex` in this block silently out-specifies it and puts four
+   links back on a 390px screen, which is the exact layout the nav comment says
+   pushed the CTA half off the edge. Display is set per element, below. */
+.essay-nav a {
+  align-items: center;
+  min-height: var(--tap, 48px);
+  flex: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.essay-nav__brand,
+.essay-nav__cta { display: inline-flex; }
+.essay-nav__brand { font-weight: 800; font-size: 17px; color: #e9edf5; }
+.essay-nav__cta {
+  margin-left: auto;
+  background: #5b8cff;
+  color: #06122e;
+  font-weight: 700;
+  font-size: 14.5px;
+  padding: 0 14px;
+  border-radius: 10px;
+}
+
 /* Nav section links: pointer devices only. See EssayNav for why. */
-.essay-navlink { display: none; }
+.essay-navlink { display: none; font-size: 14.5px; color: #8a94a8; }
 @media (min-width: 640px) {
   .essay-navlink { display: inline-flex; }
 }
