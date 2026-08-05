@@ -27,9 +27,15 @@ import { CONTACT, PHONES } from "@/lib/contact";
  * The numbers, as tap targets.
  *
  * A phone number on a phone is a `tel:` link or it is a screenshot someone has
- * to retype. Each one is its own 44px row rather than an inline run inside a
+ * to retype. Each one is its own 48px row rather than an inline run inside a
  * paragraph, because an inline link inherits 13px line-height and becomes a
  * 15px target — a mis-tap every time.
+ *
+ * 48px, not 44. 44 is Apple's floor and it is what these used to be; the build
+ * document's QA checklist asks for 48, which is also the Material and WCAG 2.2
+ * AAA figure, and it is what every `.btn` on the page already used. Two
+ * different minimums on one page is how a row of links ends up looking aligned
+ * and tapping unevenly.
  */
 function PhoneLinks({ align = "center" }: { align?: "center" | "left" }) {
   return (
@@ -50,7 +56,7 @@ function PhoneLinks({ align = "center" }: { align?: "center" | "left" }) {
             textDecoration: "none",
             display: "inline-flex",
             alignItems: "center",
-            minHeight: "44px",
+            minHeight: "48px",
             fontSize: "clamp(15px,4vw,17px)",
             fontWeight: 600,
           }}
@@ -484,7 +490,7 @@ export function Founders() {
                 target="_blank"
                 rel="noreferrer"
                 className="tiny"
-                style={{ display: "inline-flex", minHeight: "44px", alignItems: "center", color: "var(--accent)" }}
+                style={{ display: "inline-flex", minHeight: "48px", alignItems: "center", color: "var(--accent)" }}
               >
                 {f.handle}
               </a>
@@ -555,7 +561,7 @@ export function Explore() {
             color: "var(--accent)",
             display: "inline-flex",
             alignItems: "center",
-            minHeight: "44px",
+            minHeight: "48px",
             fontSize: "clamp(13px,3.4vw,15px)",
           }}
         >

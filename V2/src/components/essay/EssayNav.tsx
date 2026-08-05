@@ -57,7 +57,7 @@ export function EssayNav() {
             flex: "none",
             display: "inline-flex",
             alignItems: "center",
-            minHeight: "44px",
+            minHeight: "48px",
           }}
         >
           CooL
@@ -79,7 +79,7 @@ export function EssayNav() {
               whiteSpace: "nowrap",
               flex: "none",
               alignItems: "center",
-              minHeight: "44px",
+              minHeight: "48px",
             }}
           >
             {link.label}
@@ -103,7 +103,7 @@ export function EssayNav() {
             flex: "none",
             display: "inline-flex",
             alignItems: "center",
-            minHeight: "44px",
+            minHeight: "48px",
           }}
         >
           Book a call
