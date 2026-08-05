@@ -21,7 +21,46 @@
  */
 import Image from "next/image";
 import Link from "next/link";
-import { CONTACT } from "@/lib/contact";
+import { CONTACT, PHONES } from "@/lib/contact";
+
+/**
+ * The numbers, as tap targets.
+ *
+ * A phone number on a phone is a `tel:` link or it is a screenshot someone has
+ * to retype. Each one is its own 44px row rather than an inline run inside a
+ * paragraph, because an inline link inherits 13px line-height and becomes a
+ * 15px target — a mis-tap every time.
+ */
+function PhoneLinks({ align = "center" }: { align?: "center" | "left" }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "var(--s2)",
+        justifyContent: align === "center" ? "center" : "flex-start",
+      }}
+    >
+      {PHONES.map((phone) => (
+        <a
+          key={phone.e164}
+          href={`tel:${phone.e164}`}
+          style={{
+            color: "var(--accent)",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            minHeight: "44px",
+            fontSize: "clamp(15px,4vw,17px)",
+            fontWeight: 600,
+          }}
+        >
+          {phone.display}
+        </a>
+      ))}
+    </div>
+  );
+}
 
 /* ── 1 · cover ────────────────────────────────────────────────────────── */
 
@@ -49,6 +88,12 @@ export function Cover() {
           <a href={CONTACT.booking} target="_blank" rel="noreferrer" className="btn btn-ghost">
             Book a call
           </a>
+        </div>
+
+        {/* Contact on the first screen, as asked. Quiet enough not to compete
+            with the two buttons, and dialable in one tap. */}
+        <div style={{ marginTop: "var(--s3)" }}>
+          <PhoneLinks />
         </div>
       </div>
     </section>
@@ -465,7 +510,10 @@ export function Explore() {
             Investors
           </Link>
         </div>
-        <p className="tiny" style={{ marginTop: "var(--s4)" }}>
+        <div style={{ marginTop: "var(--s4)" }}>
+          <PhoneLinks />
+        </div>
+        <p className="tiny" style={{ marginTop: "var(--s1)" }}>
           {CONTACT.company} · {CONTACT.city}, India
         </p>
         {/* Its own line, not inline in the paragraph above: an inline link

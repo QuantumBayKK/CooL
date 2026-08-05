@@ -118,6 +118,7 @@ export class Console {
 
   constructor(private readonly options: UiOptions) {
     this.git = gitContext(options.root);
+
   }
 
   /** Note something the operator should see in the UI rather than only in stdout. */
@@ -472,17 +473,54 @@ export class Console {
     json(res, 404, { error: "not found" });
   }
 
-  listen(): Promise<string> {
+  /**
+   * Bind, walking forward if the port is taken.
+   *
+   * A previous run that did not shut down cleanly, another project's console,
+   * or anything else on 4319 used to end the command with "already in use, try
+   * --port" — which asks the operator to solve a problem the tool is perfectly
+   * capable of solving. Nothing depends on the number: the URL is printed and
+   * the browser is opened with it.
+   *
+   * It walks rather than picking port 0 so the address stays predictable and
+   * bookmarkable across restarts, and it gives up after a short run rather than
+   * scanning the machine — sixteen consecutive busy ports means something is
+   * wrong that a seventeenth will not fix.
+   */
+  async listen(): Promise<{ url: string; port: number; movedFrom: number | null }> {
+    const first = this.options.port;
+    for (let port = first; port < first + 16; port++) {
+      try {
+        const url = await this.bind(port);
+
+        return { url, port, movedFrom: port === first ? null : first };
+      } catch (error) {
+        const code = (error as NodeJS.ErrnoException).code;
+        if (code === "EADDRINUSE" || code === "EACCES") continue;
+        throw error;
+      }
+    }
+    throw new Error(
+      `ports ${first}–${first + 15} are all in use — pass --port to choose another`,
+    );
+  }
+
+  private bind(port: number): Promise<string> {
     return new Promise((resolve, reject) => {
       const server = createServer((req, res) => {
         void this.route(req, res).catch((error: unknown) => {
           json(res, 500, { error: (error as Error).message });
         });
       });
-      server.on("error", reject);
-      server.listen(this.options.port, this.options.host, () => {
+      const onError = (error: Error) => {
+        server.close();
+        reject(error);
+      };
+      server.once("error", onError);
+      server.listen(port, this.options.host, () => {
+        server.removeListener("error", onError);
         this.server = server;
-        resolve(`http://${this.options.host}:${this.options.port}`);
+        resolve(`http://${this.options.host}:${port}`);
       });
     });
   }

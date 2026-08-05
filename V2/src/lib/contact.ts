@@ -15,18 +15,26 @@
  * bar on phones, and in the structured data at the same moment.
  */
 
-/** E.164, e.g. `+919876543210`. Empty until a real line is answered. */
-const PHONE_E164 = "";
-
-/** How it should read on screen, e.g. `+91 98765 43210`. */
-const PHONE_DISPLAY = "";
+/**
+ * The lines that are answered.
+ *
+ * `tel:` needs E.164 — `+91` and no spaces — or a share sheet on iOS will
+ * sometimes dial the wrong thing; the display string is grouped the way an
+ * Indian number is read. Both forms are kept rather than derived, because
+ * deriving one from the other means encoding grouping rules per country.
+ */
+export const PHONES = [
+  { e164: "+919942867200", display: "+91 99428 67200" },
+  { e164: "+919791288350", display: "+91 97912 88350" },
+] as const;
 
 export const CONTACT = {
   email: "northwindcipher@gmail.com",
   /** Cal.com — one tap from a phone, no email-app detour. */
   booking: "https://cal.com/coolnwc",
-  phone: PHONE_E164,
-  phoneDisplay: PHONE_DISPLAY || PHONE_E164,
+  /** The first line is the one structured data advertises. */
+  phone: PHONES[0].e164,
+  phoneDisplay: PHONES[0].display,
   /** Registered entity, for the footer and the structured data. */
   company: "Northwind Cipher Pvt. Ltd.",
   city: "Coimbatore",
@@ -38,9 +46,9 @@ export const CONTACT = {
 } as const;
 
 /** True when a real number is configured. Nothing renders a fake one. */
-export const HAS_PHONE = CONTACT.phone.length > 0;
+export const HAS_PHONE = PHONES.length > 0;
 
-/** `tel:` href, or null when there is no number to call. */
+/** `tel:` href for the primary line, or null when there is none. */
 export const TEL_HREF = HAS_PHONE ? `tel:${CONTACT.phone}` : null;
 
 export const MAILTO = `mailto:${CONTACT.email}?subject=${encodeURIComponent(

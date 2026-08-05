@@ -8,6 +8,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/lib/site";
+import { CONTACT, HAS_PHONE, PHONES } from "@/lib/contact";
 
 const anton = Anton({
   weight: "400",
@@ -162,6 +163,23 @@ function StructuredData() {
           "https://github.com/KenidoesCode/cool-verifier",
           "https://github.com/KenidoesCode/cool-spec",
         ],
+        // Emitted from the same constant the page renders, so the markup and
+        // the visible number can never disagree — a mismatch between them is a
+        // reliable way to lose the rich result entirely.
+        ...(HAS_PHONE
+          ? {
+              telephone: CONTACT.phone,
+              email: CONTACT.email,
+              contactPoint: PHONES.map((phone) => ({
+                "@type": "ContactPoint",
+                contactType: "sales",
+                telephone: phone.e164,
+                email: CONTACT.email,
+                areaServed: "Worldwide",
+                availableLanguage: ["en"],
+              })),
+            }
+          : {}),
       },
       {
         "@type": "WebSite",

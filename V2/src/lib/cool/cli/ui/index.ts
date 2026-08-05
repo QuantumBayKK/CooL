@@ -159,15 +159,13 @@ export async function ui(workspace: Workspace | null, argv: string[]): Promise<n
   const existing = await console_.loadExisting();
 
   let url: string;
+  let movedFrom: number | null = null;
   try {
-    url = await console_.listen();
+    const bound = await console_.listen();
+    url = bound.url;
+    movedFrom = bound.movedFrom;
   } catch (error) {
-    const message = (error as Error).message;
-    out(
-      `  ${c.red(g.fail)} could not listen on ${args.host}:${args.port}${
-        message.includes("EADDRINUSE") ? " — already in use, try --port" : ` — ${message}`
-      }`,
-    );
+    out(`  ${c.red(g.fail)} could not listen on ${args.host} — ${(error as Error).message}`);
     return 1;
   }
 
@@ -230,6 +228,12 @@ export async function ui(workspace: Workspace | null, argv: string[]): Promise<n
       `  ${c.yellow(g.warn)} ${c.bold("simulated")} — no confidential VM. Every receipt says so in its own body.`,
     );
     out(`    ${c.faint("to reach a real quote:")} ${c.dim("cool help deploy")}`);
+  }
+
+  if (movedFrom !== null) {
+    out(
+      `  ${c.faint(`port ${movedFrom} was busy — using ${url.split(":").pop()} instead`)}`,
+    );
   }
 
   out();
