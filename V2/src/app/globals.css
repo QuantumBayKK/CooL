@@ -1276,7 +1276,8 @@ html:has([data-app-shell]) {
 }
 .essay .btn-primary { background: var(--accent); color: var(--accent-ink); }
 .essay .btn-ghost { border: 1px solid var(--edge); color: var(--paper); }
-.essay .btn:active { transform: translateY(1px); }
+/* :active moved to the micro-interaction block below, where it gets a
+   transition. Same 1px, but it now travels instead of jumping. */
 
 /* ---- the rows of actions ----
    `.btn` carries `margin: var(--s1)` on all four sides, so a row of them is
@@ -1334,6 +1335,89 @@ html:has([data-app-shell]) {
 .essay .founder-lines p.body {
   font-size: var(--t-small);
   margin-bottom: var(--s1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LAYER 3 — MICRO-INTERACTIONS
+   ═══════════════════════════════════════════════════════════════════════
+   Feedback on touch and hover, and nothing else. No entrances live here —
+   those are Reveals.tsx — and no new dependency: every line below is a CSS
+   transition, so the page costs exactly the same JavaScript it did before.
+
+   WHAT IS ANIMATED, AND WHY ONLY THESE
+
+   Transform, opacity, and the paint-only colour properties (color,
+   background-color, border-color). Transform and opacity are composited, so
+   they never touch layout. The colour properties do cause a repaint but
+   cannot move a single box, so they cannot cause layout shift either. Nothing
+   here animates width, height, margin, padding, or font-size — those are the
+   properties that turn a hover state into CLS.
+
+   TIMINGS
+
+   140-180ms, ease-out, no overshoot. A press has to feel like it landed
+   before the finger lifts; anything past ~200ms reads as lag rather than as
+   response, and anything with a bounce reads as a toy. This is an essay a
+   regulated-industry buyer reads. The restraint is the effect.
+
+   HOVER IS GUARDED
+
+   Every hover rule sits inside @media (hover: hover) and (pointer: fine).
+   On a touch screen an unguarded :hover sticks after the tap — the button
+   stays lit while the reader has moved on, which reads as a stuck UI. Touch
+   gets :active only, which is what a finger actually produces.
+
+   ALL OF IT IS OFF UNDER prefers-reduced-motion, at the bottom of this file.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.essay .btn {
+  transition:
+    transform 140ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    background-color 160ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    border-color 160ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    color 160ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* The press. Already existed as an untransitioned jump; it now travels, which
+   is the difference between "the page glitched" and "the button took it". */
+.essay .btn:active { transform: translateY(1px); }
+
+/* Links that are their own tap target — the phone numbers, the email, the
+   GitHub handles. An underline on hover rather than a colour change: these are
+   already the accent colour, so brightening them says less than confirming
+   they are links. `text-underline-offset` is animatable and moves no boxes. */
+.essay .tap-link {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 160ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    color 160ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.essay-navlink,
+.essay-nav__brand,
+.essay-nav__cta {
+  transition:
+    color 160ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    background-color 160ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    transform 140ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.essay-nav__cta:active { transform: translateY(1px); }
+
+/* ---- hover: pointing devices only ---- */
+@media (hover: hover) and (pointer: fine) {
+  /* -1px, not -3px. The lift only has to say "this is live"; a button that
+     jumps on approach is a button that moves away from the cursor. */
+  .essay .btn:hover { transform: translateY(-1px); }
+  .essay .btn-primary:hover { background: #7aa2ff; }
+  .essay .btn-ghost:hover { border-color: var(--accent); }
+  .essay .btn:active { transform: translateY(1px); }
+
+  .essay .tap-link:hover { text-decoration-color: currentColor; }
+
+  .essay-navlink:hover { color: var(--paper); }
+  .essay-nav__cta:hover { background: #7aa2ff; }
 }
 
 .essay .avatar {
@@ -1499,6 +1583,23 @@ html:has([data-app-shell]) {
 }
 @media (min-width: 720px) {
   .essay .founders { grid-template-columns: 1fr 1fr; gap: var(--s4); align-items: start; }
+}
+
+/* ---- reduced motion: every Layer 3 transition off ----
+   Not "shorter" — off. Someone who has asked their OS for reduced motion has
+   usually asked because motion makes them ill, and a 60ms version of the thing
+   that makes them ill is still the thing. The states themselves stay: hover
+   still lights the button, :active still presses it, focus still rings. They
+   simply arrive instantly, which is exactly how the page behaved before this
+   layer existed. */
+@media (prefers-reduced-motion: reduce) {
+  .essay .btn,
+  .essay .tap-link,
+  .essay-navlink,
+  .essay-nav__brand,
+  .essay-nav__cta {
+    transition: none !important;
+  }
 }
 
 /* ---- the demo ----
