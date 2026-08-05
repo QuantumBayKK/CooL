@@ -315,16 +315,30 @@ export async function ui(workspace: Workspace | null, argv: string[]): Promise<n
 
   /* ── hold the process open until interrupted ── */
 
+  /*
+   * Shutdown, exactly once, with both handlers removed.
+   *
+   * `process.once` removes only the listener that fired. The other one stays
+   * registered for the life of the process, and `cool ui` can be run more than
+   * once from the interactive session — so without this, listeners accumulate
+   * until Node warns about a leak, and a later Ctrl-C is answered by a stopped
+   * console that still thinks it owns the signal.
+   */
   await new Promise<void>((resolveWait) => {
+    let stopped = false;
     const stop = () => {
+      process.off("SIGINT", stop);
+      process.off("SIGTERM", stop);
+      if (stopped) return;
+      stopped = true;
       out();
       out(`  ${c.faint("stopped. receipts stay in")} ${c.dim(join(args.root, ".cool/receipts"))}`);
       watcher?.close();
       console_.close();
       resolveWait();
     };
-    process.once("SIGINT", stop);
-    process.once("SIGTERM", stop);
+    process.on("SIGINT", stop);
+    process.on("SIGTERM", stop);
   });
 
   return 0;

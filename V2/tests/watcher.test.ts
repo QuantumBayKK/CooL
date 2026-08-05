@@ -297,6 +297,114 @@ test("D4: cool ui refuses a home directory and says so, with the resolved path",
   assert.equal(run.stdout.includes("resolved from"), true, "the resolved path must be printed");
 });
 
+/* ── D6 — clean exit on interrupt ─────────────────────────────────────── */
+
+test("D6: closing the interface while a command runs ends the session cleanly", async () => {
+  // The Ctrl-C sequence, without a terminal: readline closes underneath the
+  // loop while an awaited command is in flight, and the loop then reaches the
+  // `rl.prompt()` that used to throw ERR_USE_AFTER_CLOSE "readline was closed".
+  const { session } = await import("../src/lib/cool/cli/index");
+  const { createInterface } = await import("node:readline");
+  const { PassThrough } = await import("node:stream");
+
+  const input = new PassThrough();
+  const output = new PassThrough();
+  output.resume();
+  const rl = createInterface({ input, output, prompt: "> " });
+
+  /*
+   * The close is triggered from inside the awaited command, not from a timer.
+   * That removes the race entirely: `seal` awaits `cool.change`, so the
+   * interface is guaranteed to be closed while the loop is still inside the
+   * command body, and the loop is guaranteed to reach the `rl.prompt()` that
+   * follows it. Without the guard this rejects with
+   * ERR_USE_AFTER_CLOSE "readline was closed" — verified by reverting the fix.
+   */
+  const workspace = {
+    root: process.cwd(),
+    cool: {
+      close: async () => {},
+      change: async () => {
+        rl.close();
+        throw new Error("stopped");
+      },
+    },
+  } as never;
+
+  const finished = session(rl, workspace);
+  input.write("/seal prompt demo hello\n");
+
+  await assert.doesNotReject(finished, "the session must not throw on a closed interface");
+});
+
+test("D6: an interrupt is passed to a command that is waiting for it", async () => {
+  const { session } = await import("../src/lib/cool/cli/index");
+  const { createInterface } = await import("node:readline");
+  const { PassThrough } = await import("node:stream");
+
+  const input = new PassThrough();
+  const output = new PassThrough();
+  output.resume();
+  const rl = createInterface({ input, output, prompt: "> " });
+  const workspace = { cool: { close: async () => {} } } as never;
+  const finished = session(rl, workspace);
+
+  // Stand in for `cool ui`, which holds the session open until SIGINT.
+  let received = false;
+  const waiting = () => {
+    received = true;
+  };
+  process.on("SIGINT", waiting);
+  try {
+    rl.emit("SIGINT");
+    await settle(60);
+    assert.equal(received, true, "a command waiting on SIGINT must still receive it");
+  } finally {
+    process.off("SIGINT", waiting);
+  }
+
+  rl.close();
+  input.end();
+  await assert.doesNotReject(finished);
+});
+
+test("D6: an interrupt with nothing waiting simply leaves", async () => {
+  const { session } = await import("../src/lib/cool/cli/index");
+  const { createInterface } = await import("node:readline");
+  const { PassThrough } = await import("node:stream");
+
+  const input = new PassThrough();
+  const output = new PassThrough();
+  let printed = "";
+  output.on("data", (chunk) => (printed += String(chunk)));
+  const rl = createInterface({ input, output, prompt: "> " });
+  const workspace = { cool: { close: async () => {} } } as never;
+
+  const before = process.listeners("SIGINT").slice();
+  for (const listener of before) process.off("SIGINT", listener as never);
+  try {
+    const finished = session(rl, workspace);
+    await settle(40);
+    rl.emit("SIGINT");
+    await finished;
+  } finally {
+    for (const listener of before) process.on("SIGINT", listener as never);
+  }
+
+  assert.equal(printed.includes("readline was closed"), false);
+});
+
+test("D6: the CLI never prints readline's internal error", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cool-d6-"));
+  try {
+    // Every command, run in the session, then the interface torn down by EOF.
+    const run = cool(["repl"], dir);
+    assert.equal(run.stdout.includes("readline was closed"), false);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("D4: cool ui prints the resolved absolute scope before watching", (t) => {
   const root = scratch(t);
   write(root, "refund-agent.prompt.md", "system prompt v1\n");

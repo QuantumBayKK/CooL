@@ -15,7 +15,7 @@
  * Everything is built on `node:readline` and raw ANSI: no dependency in this CLI
  * that is not already required to compute a signature.
  */
-import { createInterface } from "node:readline";
+import { createInterface, type Interface } from "node:readline";
 import { openWorkspace, type Workspace } from "./workspace";
 import {
   VERSION,
@@ -163,6 +163,101 @@ const SLASH = [
   "/exit",
 ];
 
+/**
+ * The session loop, over an interface the caller owns.
+ *
+ * Separated from `interactive()` so that the interrupt path can be driven by a
+ * test. It cannot be driven by a test through the real one: Ctrl-C needs a
+ * terminal, and Node cannot deliver SIGINT to a child process on Windows at
+ * all. What a test can do is close the interface underneath the loop at the
+ * exact moment Ctrl-C closes it, which is the whole of the bug.
+ *
+ * The bug: readline's own Ctrl-C handling calls `close()` and re-raises the
+ * signal. `rl.prompt()` on a closed interface throws
+ * `ERR_USE_AFTER_CLOSE: readline was closed` — and the loop calls `prompt()`
+ * immediately after every awaited command. A long-running command like
+ * `cool ui` installs a process-level SIGINT handler, so the re-raised signal
+ * stopped killing the process; control came back to `prompt()` on a corpse and
+ * the throw escaped all the way to the top-level catch, where the operator read
+ * `cool: readline was closed` instead of a goodbye.
+ */
+export async function session(rl: Interface, workspace: Workspace): Promise<void> {
+  let closed = false;
+  rl.once("close", () => {
+    closed = true;
+  });
+
+  /** Draw the prompt, unless the interface is gone. Never throws. */
+  const prompt = (): void => {
+    if (closed) return;
+    try {
+      rl.prompt();
+    } catch {
+      // Lost a race with close(). There is nothing to draw on and nothing to
+      // report: the session is ending, which is what the operator asked for.
+      closed = true;
+    }
+  };
+
+  /*
+   * Owning the interrupt.
+   *
+   * With a listener attached, readline stops closing itself and re-raising, so
+   * the decision is ours. A command may be holding the session open and waiting
+   * for exactly this signal — `cool ui` blocks on `process.once("SIGINT")` —
+   * and swallowing it there would wedge the session instead of ending it. So
+   * the signal is passed on when something is waiting for it, and taken as
+   * "leave" when nothing is.
+   */
+  rl.on("SIGINT", () => {
+    if (process.listenerCount("SIGINT") > 0) {
+      process.emit("SIGINT");
+      return;
+    }
+    closed = true;
+    rl.close();
+  });
+
+  prompt();
+
+  for await (const line of rl) {
+    const input = line.trim();
+    if (input.length === 0) {
+      prompt();
+      continue;
+    }
+    if (input === "/exit" || input === "exit" || input === "quit" || input === "/quit") break;
+    if (input === "/clear" || input === "clear") {
+      clear();
+      banner(workspace);
+      prompt();
+      continue;
+    }
+
+    const [word, ...args] = input.replace(/^\//, "").split(/\s+/);
+    out();
+    try {
+      await run(word ?? "help", args, workspace);
+    } catch (error) {
+      out(`  ${c.red(g.fail)} ${(error as Error).message}`);
+      out();
+    }
+    // An interrupt during the command above closes the interface. Reading the
+    // next line from it would throw; so would prompting on it.
+    if (closed) break;
+    prompt();
+  }
+
+  if (!closed) rl.close();
+  out();
+  out(
+    `  ${c.faint("Receipts stay in")} ${c.dim(".cool/receipts/")}${c.faint(
+      ". Anyone can verify them with",
+    )} ${c.brand("cool verify all")}${c.faint(".")}`,
+  );
+  out();
+}
+
 async function interactive(): Promise<void> {
   clear();
   const workspace = await boot();
@@ -188,41 +283,7 @@ async function interactive(): Promise<void> {
     },
   });
 
-  rl.prompt();
-
-  for await (const line of rl) {
-    const input = line.trim();
-    if (input.length === 0) {
-      rl.prompt();
-      continue;
-    }
-    if (input === "/exit" || input === "exit" || input === "quit" || input === "/quit") break;
-    if (input === "/clear" || input === "clear") {
-      clear();
-      banner(workspace);
-      rl.prompt();
-      continue;
-    }
-
-    const [word, ...args] = input.replace(/^\//, "").split(/\s+/);
-    out();
-    try {
-      await run(word ?? "help", args, workspace);
-    } catch (error) {
-      out(`  ${c.red(g.fail)} ${(error as Error).message}`);
-      out();
-    }
-    rl.prompt();
-  }
-
-  rl.close();
-  out();
-  out(
-    `  ${c.faint("Receipts stay in")} ${c.dim(".cool/receipts/")}${c.faint(
-      ". Anyone can verify them with",
-    )} ${c.brand("cool verify all")}${c.faint(".")}`,
-  );
-  out();
+  await session(rl, workspace);
   await workspace.cool.close();
 }
 
