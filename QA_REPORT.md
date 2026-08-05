@@ -505,3 +505,207 @@ Open questions for you, both one-liners:
    to per-reader links at some point? The current model is documented honestly
    in `lib/investor-access.ts`; it stops the material being served without a
    credential, and does not make it secret from someone who was given one.
+
+---
+
+# ADDENDUM — fail-closed proof, and Layers 1–3
+
+## 9 · Fail-closed proof (run before any visual work)
+
+A gate that fails **open** when a deploy forgets an environment variable is
+worse than no gate, because it looks protected. Verified at runtime against a
+live `next start`, twice: once with `INVESTOR_PASSCODE` absent from the
+environment, once with it set to the empty string.
+
+Ten unauthorised paths per run — no cookie; a random 64-hex cookie; the cookie
+that *would* be correct if the empty string were the passcode; the cookie
+derived from the old hardcoded passcode; and a present-but-empty cookie —
+across both routes.
+
+```
+====================================================================================
+  INVESTOR_PASSCODE is UNSET in this server's environment
+====================================================================================
+
+/investors
+  no cookie at all                        HTTP 200   21178B  GATE   0/22 terms
+  a random 64-hex cookie                  HTTP 200   21178B  GATE   0/22 terms
+  cookie derived from the EMPTY passcode  HTTP 200   21178B  GATE   0/22 terms
+  cookie from the OLD hardcoded passcode  HTTP 200   21178B  GATE   0/22 terms
+  cookie present but empty                HTTP 200   21178B  GATE   0/22 terms
+
+/investors/diligence
+  ... identical, 20067B, GATE, 0/22 terms on all five
+
+====================================================================================
+  VERDICT: FAILS CLOSED. 10 unauthorised paths tried, 0 returned any protected term.
+====================================================================================
+```
+
+Identical verdict with the variable set to an empty string.
+
+The form was also exercised in a browser against a server with no secret set.
+Four guesses — the old passcode, empty, "password", "admin" — all refused:
+
+```
+gateShown: true    askInDom: false    rawHtmlHasRaise: false
+old passcode -> "That is not it. Ask us on the call."
+empty        -> "Enter the passcode, or request access below."
+password     -> "That is not it. Ask us on the call."
+admin        -> "That is not it. Ask us on the call."
+stillGatedAfterAll: true
+```
+
+### DEPLOYMENT NOTE — required
+
+**`INVESTOR_PASSCODE` must be set in the hosting environment.** Vercel: Project
+→ Settings → Environment Variables, Production and Preview. It is read per
+request, so it can be set or rotated without a rebuild.
+
+If it is missing, `/investors` and `/investors/diligence` render the gate and
+accept nothing — a lockout, never a leak. Rotating it invalidates every cookie
+already issued, because the cookie holds a keyed digest of the passcode rather
+than a flag. `.env.example` documents it; the real value is never committed.
+
+## 10 · The per-layer gate
+
+Run in full after each layer. All three layers passed all of it.
+
+| Check | Layer 1 | Layer 2 | Layer 3 |
+|---|---|---|---|
+| build — `/` route | 5.36 kB | 5.94 kB | 5.94 kB |
+| build — `/` First Load JS | **111 kB** | **112 kB** | **112 kB** |
+| Delta vs the 5.36 kB / 111 kB baseline | **none** | +0.58 kB / +1 kB | +0.58 kB / +1 kB |
+| `npm run typecheck` | clean | clean | clean |
+| reduced-motion: final states, 0 running animations | PASS | PASS | PASS |
+| JS disabled: 10 sections, 50 elements, 0 hidden | PASS | PASS | PASS |
+| Scroll 390×844: 0 → 8060 → 0, monotonic, exact doc max | PASS | PASS | PASS |
+| Nothing rolled back | — | — | — |
+
+Scroll invariant, re-measured after every layer, unchanged throughout:
+`scrollingElement = html`, `html{overflow:hidden auto}`, `body{overflow-x:clip;
+overflow-y:visible}`, `scroll-snap-type: none`, no horizontal overflow, last
+section fully visible.
+
+## 11 · Layer 1 — design system
+
+Forty-odd inline style objects became classes and tokens in the `.essay` scope.
+The build document's spacing, measure and palette are unchanged.
+
+**Proven, not asserted:** a geometry fingerprint was captured before the
+refactor and compared after — at 390×844, 1440×900 and 2560×1440, covering
+every section top and height, every text run's width, height, font-size,
+line-height, weight, colour and indent, every tap target's box and colours and
+radius, the nav, the founders grid, the avatar, the comparison breakpoint, and
+per-section word counts.
+
+```
+GEOMETRY IDENTICAL — 0 differences across phone/laptop/wide
+html chars: 56,971 -> 48,726  (-8,245, -14.5%)
+```
+
+That diff caught **three regressions**, all fixed before commit:
+
+1. `.essay-nav a { display: inline-flex }` is (0,1,1) and silently
+   out-specified `.essay-navlink { display: none }` at (0,1,0), putting all
+   four section links back on a 390px screen.
+2. The GitHub handle lost `margin-top: var(--s2)` when it stopped being
+   `class="tiny"` — 16px per founder, 32px off the stacked phone layout.
+3. The email was mapped to the wrong type token, shrinking it from 13.3px to
+   12px and the link from 180px to 163px wide.
+
+None would have been obvious by eye.
+
+One deliberate addition: `:focus-visible`. The essay had none and fell back to
+the UA ring, a dark outline on a near-black canvas. Verified by tabbing:
+2px accent ring at 3px offset.
+
+## 12 · Layer 2 — GSAP reveals
+
+Three rules keep the page's defining property intact.
+
+**No start state in CSS.** The zero-opacity is written by JS at runtime. With JS
+disabled: 10 sections, 50 elements, **0 hidden**, docHeight 8904.
+
+**Only off-screen elements are ever hidden.** GSAP is imported dynamically and
+lands after first paint; hiding what the reader is already looking at is a
+flash, not an entrance. The cover therefore has no entrance, deliberately.
+Verified: every element in the cover sits at opacity 1 throughout.
+
+**Lazy.** The three GSAP chunks (42 + 6 + 51 kB raw) are *not* referenced by the
+initial HTML. The +1 kB First Load JS is the driver component, not the library.
+
+Motion: 450ms, `power2.out`, 60ms stagger, 16px rise, opacity and transform
+only, `once: true`. No pin, no scrub, no snap; `normalizeScroll` never called.
+Confirmed after a full journey: **0 pin-spacers, 0 markers**, `html` still the
+only scroll container, `touch-action` still `auto`.
+
+Watched one reveal fire rather than trusting the build — the market opener:
+opacity 0, then 0.21 mid-tween, then 1 settled, and `clearProps` left the
+inline style empty.
+
+Two failsafes for the one real risk, content stranded at zero opacity: setup
+runs in try/catch and reverts on any throw, and an `@media print` rule forces
+opacity and transform back for the whole essay, because printing does not
+scroll. That rule can only reveal; it can never hide.
+
+**The first gate check failed this layer, and the check was wrong, not the
+layer** — it measured at scroll-top, where below-fold sections are legitimately
+in their start state. It now scrolls the whole page first and asserts
+everything resolves, and separately asserts the cover is never hidden.
+
+## 13 · Layer 3 — micro-interactions
+
+CSS transitions only. **No new dependency, and `/` did not move: 5.94 kB /
+112 kB, identical to Layer 2.**
+
+Animated: transform, opacity, and the paint-only colour properties. Nothing
+animates width, height, margin, padding or font-size. Asserted at runtime
+across every element in `.essay`: **0 transitions name a layout-affecting
+property**.
+
+140–180ms, ease-out, no overshoot. Every hover rule sits inside
+`@media (hover: hover) and (pointer: fine)` — an unguarded `:hover` sticks after
+a tap on touch. Confirmed the query is `false` under phone emulation.
+
+Exercised in a real browser:
+
+```
+rest      bg rgb(91,140,255)    transform none      transitions 0.14/0.16s
+hover     bg rgb(122,162,255)   translateY(-1px)
+active                          translateY(+1px)
+tap-link  underline transparent -> rgb(91,140,255)
+phone     (hover:hover and pointer:fine) = false
+reduced   transition-duration 0s, hover STILL reaches rgb(122,162,255)
+```
+
+Reduced motion turns the transitions **off**, not shorter. The states remain and
+arrive instantly — how the page behaved before this layer.
+
+## 14 · What was NOT changed, for the record
+
+Concern was raised that the UI modules and background effects had been
+rewritten. They were not, and this is checkable:
+
+- **Every background/effects module is untouched**, verified against the audit
+  commit: `Backdrop.tsx`, `ConceptStage.tsx`, `Spotlight.tsx`, `Cursor.tsx`,
+  `IntroSequence.tsx`, `Slide.tsx`, `ui.tsx`, `landing/Sections.tsx`.
+- **Every `globals.css` change is at line 1098 or later** — inside the `.essay`
+  block. The theme colour tokens, `.glass`, `.frost`, `.grain`, the `.hud`
+  console scope, the ambient-motion block and both studio skins are untouched.
+- `/deck` still renders its cipher field, 3D cube, grain and nav; `/demo`,
+  `/studio`, `/dashboard` and `/why` all still report their canvases, grain and
+  background colour.
+- Layer 1 was proven pixel-identical, section 11.
+
+The one genuine visual change to the public page is Layer 2's scroll reveals,
+which is a single commit and revertible on its own.
+
+## 15 · Standing rule, from this project's own findings
+
+**A green build is not proof that a thing works.** `tsc --noEmit` was clean,
+`next build` was clean, and the ungated-leak proof passed — over a gate that did
+not open, because a `"use server"` module exported a constant and that only
+fails at runtime. Anything interactive gets clicked, submitted or navigated in a
+real browser before it is called done. Every interactive change in Layers 1–3
+was exercised that way.
