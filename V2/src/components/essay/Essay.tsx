@@ -78,6 +78,9 @@ export function Cover() {
           <PhoneLinks />
         </div>
       </div>
+      <span className="scroll-cue" aria-hidden="true">
+        Scroll
+      </span>
     </section>
   );
 }
@@ -197,44 +200,64 @@ export function Model() {
  * flattered.
  */
 function MarketRings() {
+  // value is $B. Order matters: largest first, so the smaller rings paint on top.
   const rings = [
-    { label: "TAM", value: 13.5, colour: "rgba(91,140,255,0.16)", stroke: "rgba(91,140,255,0.55)" },
-    { label: "SAM", value: 3, colour: "rgba(91,140,255,0.22)", stroke: "rgba(91,140,255,0.75)" },
-    { label: "SOM", value: 0.2, colour: "rgba(62,207,154,0.28)", stroke: "rgba(62,207,154,0.9)" },
+    { key: "TAM", label: "TAM", figure: "$12–15B", value: 13.5, fill: "rgba(91,140,255,0.10)", stroke: "rgba(91,140,255,0.45)", ink: "#8a94a8" },
+    { key: "SAM", label: "SAM", figure: "$2–4B", value: 3, fill: "rgba(91,140,255,0.16)", stroke: "rgba(91,140,255,0.7)", ink: "#c7cfdd" },
+    { key: "SOM", label: "SOM", figure: "$100–300M", value: 0.2, fill: "rgba(62,207,154,0.35)", stroke: "rgba(62,207,154,0.95)", ink: "#3ecf9a" },
   ];
   const max = rings[0]!.value;
-  const R = 76;
+  const R = 74;
+  const cx = 92;
+  const cy = 92;
+  // Labels sit OUTSIDE the circles on a shared left rail, each joined to its
+  // ring by a leader line. They used to be stacked at the centre, where the
+  // SAM and SOM captions printed straight across the SOM disc and each other —
+  // the graphic that is supposed to demonstrate honest scaling was the one
+  // piece of the page you could not read.
+  const labelX = 196;
+  const rowY: readonly [number, number, number] = [40, 92, 144];
   return (
     <svg
-      viewBox="0 0 200 170"
+      viewBox="0 0 340 184"
       role="img"
-      aria-label="Market sizing: total addressable 12–15 billion dollars, serviceable 2–4 billion, obtainable 100–300 million. Circles are scaled by area."
+      aria-label="Market sizing: total addressable 12 to 15 billion dollars, serviceable 2 to 4 billion, obtainable 100 to 300 million. Circles are scaled by area, not by radius."
       className="rings"
-
     >
-      {rings.map((ring) => {
+      {rings.map((ring) => (
+        <circle
+          key={ring.key}
+          cx={cx}
+          cy={cy}
+          r={R * Math.sqrt(ring.value / max)}
+          fill={ring.fill}
+          stroke={ring.stroke}
+          strokeWidth={1}
+        />
+      ))}
+
+      {rings.map((ring, i) => {
         const r = R * Math.sqrt(ring.value / max);
         return (
-          <circle
-            key={ring.label}
-            cx={100}
-            cy={86}
-            r={r}
-            fill={ring.colour}
-            stroke={ring.stroke}
-            strokeWidth={1}
-          />
+          <g key={ring.key}>
+            {/* leader: from the ring edge out to the label rail */}
+            <path
+              d={`M ${cx + r} ${cy} L ${labelX - 12} ${rowY[i]!}`}
+              stroke={ring.stroke}
+              strokeWidth={0.75}
+              fill="none"
+              opacity={0.55}
+            />
+            <circle cx={cx + r} cy={cy} r={2} fill={ring.stroke} />
+            <text x={labelX} y={rowY[i]! - 3} fill={ring.ink} fontSize={11} fontFamily="monospace" letterSpacing="0.12em">
+              {ring.label}
+            </text>
+            <text x={labelX} y={rowY[i]! + 12} fill={ring.ink} fontSize={13} fontFamily="monospace" fontWeight={600}>
+              {ring.figure}
+            </text>
+          </g>
         );
       })}
-      <text x={100} y={22} textAnchor="middle" fill="#8a94a8" fontSize={9} fontFamily="monospace">
-        TAM $12–15B
-      </text>
-      <text x={100} y={78} textAnchor="middle" fill="#c7cfdd" fontSize={9} fontFamily="monospace">
-        SAM $2–4B
-      </text>
-      <text x={100} y={95} textAnchor="middle" fill="#3ecf9a" fontSize={9} fontFamily="monospace">
-        SOM $100–300M
-      </text>
     </svg>
   );
 }
@@ -281,20 +304,28 @@ export function Market() {
  * Everything else stays shared. One array is what guarantees the two views can
  * never drift into claiming different things.
  */
+/** The mark cells, styled by meaning rather than by column. */
+function markClass(v: string): string {
+  if (v === "×") return "mark mark-no";
+  if (v === "~") return "mark mark-partial";
+  if (v === "manual") return "mark-manual";
+  return "mark";
+}
+
 const CAPABILITIES = [
-  { cap: "Auto-captures every AI change", obs: "~", grc: "✗", comp: "✗", diy: "manual", others: "Others mostly ✗" },
-  { cap: "Tamper-proof, provable evidence", obs: "✗", grc: "✗", comp: "✗", diy: "✗", others: "Others ✗" },
+  { cap: "Auto-captures every AI change", obs: "~", grc: "×", comp: "×", diy: "manual", others: "Others mostly ×" },
+  { cap: "Tamper-proof, provable evidence", obs: "×", grc: "×", comp: "×", diy: "×", others: "Others ×" },
   {
     cap: "Works across every provider (neutral)",
     mobileCap: "Neutral across every provider",
-    obs: "✗",
+    obs: "×",
     grc: "~",
     comp: "~",
     diy: "—",
     others: "Others partial",
   },
-  { cap: "Proves which model actually ran", obs: "✗", grc: "✗", comp: "✗", diy: "✗", others: "Others ✗" },
-  { cap: "Zero manual effort", obs: "✗", grc: "✗", comp: "~", diy: "✗", others: "Others ✗" },
+  { cap: "Proves which model actually ran", obs: "×", grc: "×", comp: "×", diy: "×", others: "Others ×" },
+  { cap: "Zero manual effort", obs: "×", grc: "×", comp: "~", diy: "×", others: "Others ×" },
 ] satisfies readonly {
   cap: string;
   mobileCap?: string;
@@ -313,7 +344,7 @@ export function Competitors() {
 
         {/* ≥720px — the full comparison */}
         <div className="cmp-desktop">
-          <div className="tablewrap">
+          <div className="tablewrap panel">
             <table>
               <thead>
                 <tr>
@@ -341,11 +372,11 @@ export function Competitors() {
                 {CAPABILITIES.map((row) => (
                   <tr key={row.cap}>
                     <td className="cap">{row.cap}</td>
-                    <td>{row.obs}</td>
-                    <td>{row.grc}</td>
-                    <td>{row.comp}</td>
-                    <td>{row.diy}</td>
-                    <td className="cool-col">✓</td>
+                    <td className={markClass(row.obs)}>{row.obs}</td>
+                    <td className={markClass(row.grc)}>{row.grc}</td>
+                    <td className={markClass(row.comp)}>{row.comp}</td>
+                    <td className={markClass(row.diy)}>{row.diy}</td>
+                    <td className="cool-col mark mark-yes">✓</td>
                   </tr>
                 ))}
               </tbody>
@@ -354,7 +385,7 @@ export function Competitors() {
         </div>
 
         {/* <720px — the same five capabilities, two columns */}
-        <div className="cmp-mobile">
+        <div className="cmp-mobile panel">
           {CAPABILITIES.map((row) => (
             <div key={row.cap} className="cmp-row">
               <strong className="cmp-cap">
@@ -425,7 +456,7 @@ export function Founders() {
 
         <div className="founders">
           {FOUNDERS.map((f) => (
-            <div key={f.name} className="founder">
+            <div key={f.name} className="founder panel">
               {/* Intrinsic size is declared so the block never reflows as the
                   photo arrives — the jump is worst on exactly the connection
                   where it is most annoying. */}

@@ -1485,7 +1485,7 @@ html:has([data-app-shell]) {
 /* The market rings are the single tallest element on the page, so they are
    sized against the viewport's HEIGHT as well as its width — a graphic that
    only respects width is exactly what pushes a short screen over. */
-.essay .rings { width: min(300px, 74vw, 34vh); }
+.essay .rings { width: min(430px, 86vw, 46vh); }
 
 /* ---- the nav ----
    A sticky bar, five items, no hamburger and no JavaScript. It was eight
@@ -1601,6 +1601,377 @@ html:has([data-app-shell]) {
     transition: none !important;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 4 — THE VISUAL PASS
+   ═══════════════════════════════════════════════════════════════════════════
+   Layer 1 moved the presentation into a system without changing a pixel, which
+   was the right first move and left the page looking exactly as plain as it
+   started: flat #0d1117, system sans, ten identical centred stacks. Correct,
+   and a wireframe.
+
+   Nothing below touches a word of copy, the section order, the word counts, or
+   the scroll invariant. It is atmosphere, type and surface — the three things
+   that were missing.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ---- 1 · atmosphere ----
+   The page had no depth at all: one flat fill behind ten screens. This is a
+   fixed backdrop of three very low-alpha radial washes plus a vignette — blue
+   at the top where the cover sits, a cooler blue at mid-page, and the green
+   that means "live" elsewhere in the product, low and to the right.
+
+   `fixed` and `pointer-events: none`, so it costs no layout and cannot become
+   a scroll container or intercept a tap. No animation: a gradient that breathes
+   is a battery cost on a page someone reads for ninety seconds, and it would be
+   one more thing to switch off under reduced motion. */
+.essay {
+  position: relative;
+  isolation: isolate;
+}
+
+.essay::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 50% -20%, rgba(91, 140, 255, 0.16), transparent 60%),
+    radial-gradient(90% 60% at 85% 25%, rgba(62, 207, 154, 0.05), transparent 55%),
+    radial-gradient(100% 70% at 10% 80%, rgba(91, 140, 255, 0.07), transparent 60%),
+    var(--color-void);
+}
+
+/* The grain. Sits over the washes so the gradients never band on a cheap panel
+   — banding is the giveaway that a dark gradient was applied without one. */
+.essay::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---- 2 · type ----
+   The essay was rendering in the same Inter as the body, at 800 weight, for
+   both the wordmark and every opener. Inter Tight is the family this project
+   already loads for its keynote voice, and at display sizes it is the right
+   one: narrower apertures, tighter default fit, and it survives -0.03em
+   tracking where Inter starts to collide.
+
+   The size ramp is the build document's clamp, unchanged. Only the face,
+   tracking and leading move. */
+.essay .opener {
+  font-family: var(--font-inter-tight), var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+  color: var(--color-ink);
+}
+
+/* The wordmark gets the extra step: optical tracking at 86px is not the same
+   decision as at 27px, and a glow that reads as a light source behind it
+   rather than as a text-shadow. */
+.essay .wordmark {
+  letter-spacing: -0.05em;
+  text-shadow: 0 0 80px rgba(91, 140, 255, 0.45);
+}
+
+.essay .promise {
+  color: var(--paper);
+}
+
+/* Body copy: a hair more leading, and a measure that stops the longest lines
+   running past comfortable. 640px of centred 20px text is ~72 characters,
+   which is at the top of what reads well; 60ch caps it properly. */
+.essay p.body {
+  line-height: 1.6;
+  max-width: 60ch;
+  margin-inline: auto;
+}
+
+/* The footnotes — the estimate note, the under-the-hood line. Mono, because
+   everywhere else in this product a mono line means "this is the technical
+   caveat", and the honesty markers are exactly that. */
+.essay .tiny {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: clamp(11px, 2.7vw, 12.5px);
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+}
+
+/* ---- 3 · orientation ----
+   Ten full-screen sections with no marker is a scroll with no sense of
+   position. A section index, set in mono at the top of each screen, says how
+   far in you are without adding a word to the page — it is a CSS counter on a
+   pseudo-element, so it is not in the HTML, not in the word count, and not
+   read as content.
+
+   Hidden below 640px: on a phone the screen is short enough that a marker in
+   the corner is clutter competing with the copy. */
+.essay main {
+  counter-reset: essay-section;
+}
+
+.essay main section {
+  counter-increment: essay-section;
+}
+
+@media (min-width: 640px) {
+  .essay main section::before {
+    content: counter(essay-section, decimal-leading-zero);
+    position: absolute;
+    /* clears the 52px sticky bar; it was printing behind it */
+    top: max(9vh, 4.5rem);
+    left: 7vw;
+    font-family: var(--font-jetbrains), ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    opacity: 0.45;
+  }
+  .essay main section { position: relative; }
+}
+
+/* ---- 4 · the cover ----
+   It had a screen and a half of dead air. The content is still vertically
+   centred — that is the build document's rule — but the stack itself is
+   tightened so it reads as one object rather than four things drifting apart,
+   and a scroll cue tells the reader there are nine more screens. */
+
+.essay .scroll-cue {
+  position: absolute;
+  bottom: max(4vh, 1.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ---- 5 · surfaces ----
+   The comparison and the founders were bare text on the page fill. Both are
+   the moments where a reader stops skimming and starts checking, so both get a
+   surface to sit on: a hairline, a barely-there panel, and a radius that
+   matches the buttons. Frosted, so the backdrop's washes read through. */
+.essay .panel {
+  background: rgba(22, 27, 34, 0.5);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* The comparison table. The CooL column is the answer to the whole section, so
+   it gets a tinted channel down the table rather than only a green tick. */
+.essay .tablewrap { padding: 4px; }
+.essay table { width: 100%; }
+.essay th,
+.essay td {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.essay thead th {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: clamp(10px, 2.4vw, 11.5px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  vertical-align: bottom;
+  padding-bottom: 14px;
+}
+.essay .th-sub {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.55;
+}
+.essay tbody tr:last-child td { border-bottom: 0; }
+.essay td.cap {
+  font-size: clamp(13px, 3.2vw, 14.5px);
+  line-height: 1.4;
+}
+
+/* The marks. `✗` (U+2717) is in almost no UI font, so it was falling through to
+   a maths-italic fallback and rendering as a slanted serif X — it read as a
+   glitch rather than as "no". `×` is in every font on every platform, sits on
+   the same optical centre as `✓`, and says the same thing. The vocabulary of
+   the table is unchanged: tick, cross, tilde. */
+.essay .mark {
+  font-size: clamp(14px, 3.6vw, 16px);
+  line-height: 1;
+}
+.essay .mark-no { color: var(--muted); opacity: 0.75; }
+.essay .mark-partial { color: #d29922; }
+.essay .mark-yes { color: var(--grn); }
+.essay .mark-manual {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: clamp(10px, 2.6vw, 11.5px);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The CooL channel: a tinted column, a brighter left edge, and the header in
+   the accent rather than the muted grey every other header uses. */
+.essay .cool-col {
+  background: linear-gradient(rgba(62, 207, 154, 0.07), rgba(62, 207, 154, 0.07));
+  border-left: 1px solid rgba(62, 207, 154, 0.22);
+  border-right: 1px solid rgba(62, 207, 154, 0.22);
+}
+.essay thead th.cool-col {
+  color: var(--grn);
+  border-top: 1px solid rgba(62, 207, 154, 0.22);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.essay tbody tr:last-child td.cool-col {
+  border-bottom: 1px solid rgba(62, 207, 154, 0.22);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* The phone comparison: same idea, as rows. */
+.essay .cmp-row {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.essay .cmp-row:first-child { border-top-left-radius: 15px; border-top-right-radius: 15px; }
+.essay .cmp-row:last-child { border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; }
+.essay .cmp-verdict { font-family: var(--font-jetbrains), ui-monospace, monospace; font-size: 11.5px; }
+
+/* ---- 6 · founders ----
+   The two photographs were shot in different places under different light, and
+   nothing was reconciling them. A common frame does it: same panel, same
+   radius, a hairline on the image itself and a slight desaturation so neither
+   one shouts louder than the other. */
+.essay .founder {
+  padding: var(--s4) var(--s3);
+}
+.essay .founder .avatar {
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  filter: saturate(0.9) contrast(1.02);
+}
+.essay .founder-name {
+  font-family: var(--font-inter-tight), var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+.essay .founder-role {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: clamp(10.5px, 2.6vw, 12px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.essay .founder-field {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: clamp(12px, 3vw, 13.5px);
+}
+.essay .founder-lines p.body { max-width: none; }
+.essay .founder code {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 0.92em;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: rgba(240, 246, 252, 0.06);
+}
+
+/* ---- 7 · buttons ----
+   The primary was a flat blue rectangle. A light source behind it and a
+   gradient across it is the difference between a button and a div. */
+.essay .btn-primary {
+  background: linear-gradient(180deg, #6d99ff, #4f7ff5);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 8px 24px rgba(79, 127, 245, 0.32);
+}
+.essay .btn-ghost {
+  background: rgba(240, 246, 252, 0.02);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .essay .btn-primary:hover {
+    background: linear-gradient(180deg, #86abff, #5f8bf8);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.28) inset,
+      0 10px 30px rgba(79, 127, 245, 0.45);
+  }
+  .essay .btn-ghost:hover { background: rgba(240, 246, 252, 0.05); }
+}
+
+/* ---- 8 · the nav ----
+   It was a flat bar with a hard bottom edge. A softer wash and a hairline that
+   fades at the ends reads as part of the page rather than as a strip laid on
+   top of it. */
+.essay-nav {
+  background: rgba(13, 17, 23, 0.72);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-bottom: 0;
+}
+.essay-nav::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 15%, var(--line) 85%, transparent);
+}
+.essay-nav__brand {
+  font-family: var(--font-inter-tight), var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+.essay-navlink {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.essay-nav__cta {
+  background: linear-gradient(180deg, #6d99ff, #4f7ff5);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 4px 14px rgba(79, 127, 245, 0.3);
+}
+
+/* ---- 9 · the phone numbers ----
+   They were three near-identical blue runs in a row with nothing separating
+   them from the buttons above. Mono, and a quiet chip each, so they read as
+   data you can dial rather than as more links. */
+.essay .tap-link-strong {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: clamp(13px, 3.4vw, 15px);
+  letter-spacing: 0.02em;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(240, 246, 252, 0.02);
+}
+@media (hover: hover) and (pointer: fine) {
+  .essay .tap-link-strong:hover {
+    border-color: rgba(91, 140, 255, 0.4);
+    background: rgba(91, 140, 255, 0.07);
+    text-decoration-color: transparent;
+  }
+}
+.essay .tap-link-quiet,
+.essay .tap-link-small {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  letter-spacing: 0.02em;
+}
+
 
 /* ---- the demo ----
    Four motions, and no more. Everything in the demo arrives without being
