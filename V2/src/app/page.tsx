@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EssayNav } from "@/components/essay/EssayNav";
+import { Reveals } from "@/components/essay/Reveals";
 import {
   Competitors,
   Cover,
@@ -64,6 +65,11 @@ export default function Page() {
         <Roadmap />
         <Explore />
       </main>
+      {/* Renders nothing. Every section above is server HTML at full opacity;
+          this only adds motion once GSAP has loaded, and only to elements that
+          are still below the fold when it does. Delete this line and the page
+          is unchanged apart from the entrances. */}
+      <Reveals />
     </div>
   );
 }

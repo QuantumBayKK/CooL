@@ -1478,6 +1478,20 @@ html:has([data-app-shell]) {
   .essay .tiny { margin-top: var(--s1); }
 }
 
+/* ---- print, and the reveal failsafe ----
+   The scroll reveals write `opacity:0` onto elements that are below the fold
+   when GSAP loads. Printing does not scroll, so without this a PDF of the page
+   would come out with most of its sections blank.
+
+   This rule only ever REVEALS. It cannot hide anything, so it can never become
+   the "start state in CSS" that the whole reveal design exists to avoid. */
+@media print {
+  .essay main section .wrap > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 .essay .founders {
   display: grid;
   gap: var(--s5);
