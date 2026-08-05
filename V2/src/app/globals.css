@@ -1120,9 +1120,27 @@ html:has([data-app-shell]) {
   width: 100%;
 }
 
+/* NO `scroll-snap-align` here, and that absence is deliberate.
+
+   It used to be `scroll-snap-align: start`, which did nothing: the essay has no
+   snap container, so there is no axis for a snap point to sit on. `html` gets
+   `scroll-snap-type` only under `[data-deck]`, which the deck sets and this
+   page never does.
+
+   Inert, but not harmless. It left ten full-height snap points pre-laid on the
+   public page, one line away from becoming live — anyone adding a snap axis to
+   `html`, copying `data-deck` across, or trying "let's see how proximity
+   feels", would activate all of them at once. And `#team` is `.tall`: measured
+   at 1247px against an 844px viewport, it is exactly the taller-than-the-screen
+   case the note at the top of this file warns produces a trap you cannot scroll
+   out of.
+
+   The public page must scroll the way every other page of prose does. Nothing
+   here should suggest otherwise, even in a property that is currently doing
+   nothing. If snapping is ever wanted, it needs the whole argument again —
+   proximity only, and the `.is-tall` escape hatch — not a leftover. */
 .essay section {
   min-height: 100svh;
-  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1136,12 +1154,14 @@ html:has([data-app-shell]) {
 
 /* The founders section is the one allowed to run past a single screen, because
    two whole people do not fit in one. `auto` height keeps both blocks intact
-   rather than splitting one across the fold. */
+   rather than splitting one across the fold.
+
+   The `scroll-snap-align: none` that used to be here went with the `start` on
+   the base rule: it was the opt-out from a snap point that no longer exists. */
 .essay section.tall {
   min-height: auto;
   padding-top: max(10vh, 3rem);
   padding-bottom: max(10vh, 3rem);
-  scroll-snap-align: none;
 }
 
 .essay .opener {
