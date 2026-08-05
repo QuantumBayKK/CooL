@@ -249,6 +249,32 @@ export function EditorScene({
             ))}
           </div>
 
+          {/* The phone's way in.
+              The explorer is hidden below `sm`, and it was the only thing
+              holding "Make the change" — so on a phone the demo rendered
+              perfectly and could not be started at all. This is the same
+              control, in the one place a phone can reach it. */}
+          {open === PROMPT_PATH && (
+            <div
+              className="flex shrink-0 items-center gap-2 border-b px-3 py-2 sm:hidden"
+              style={{ borderColor: "var(--vsc-border)", background: "var(--vsc-chrome)" }}
+            >
+              <Button
+                tone={saved ? "ghost" : "primary"}
+                size="sm"
+                onClick={autoEdit}
+                disabled={typing || saved || body !== PROMPT_BEFORE}
+              >
+                {saved ? "Change committed" : typing ? "Typing…" : "Make the change"}
+              </Button>
+              {dirty && (
+                <Button tone="primary" size="sm" onClick={save}>
+                  Save
+                </Button>
+              )}
+            </div>
+          )}
+
           {file.editable ? (
             <Editor
               path={file.path}

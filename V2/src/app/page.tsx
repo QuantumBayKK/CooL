@@ -1,132 +1,69 @@
 import type { Metadata } from "next";
-import { LandingNav } from "@/components/landing/LandingNav";
-import { StickyCta } from "@/components/landing/StickyCta";
+import { EssayNav } from "@/components/essay/EssayNav";
 import {
-  Contact,
-  FAQ,
-  Faq,
-  Footer,
-  Hero,
-  How,
-  Pricing,
+  Competitors,
+  Cover,
+  Explore,
+  Founders,
+  Market,
+  Model,
   Problem,
-  Proof,
-} from "@/components/landing/Sections";
-import { CONTACT, HAS_PHONE } from "@/lib/contact";
+  Roadmap,
+  Solution,
+  Technology,
+} from "@/components/essay/Essay";
 import { SITE } from "@/lib/site";
 
 /**
- * The homepage.
+ * The public site.
  *
- * Rebuilt phone-first, and rebuilt as a page rather than a deck. The eleven
- * snap-scrolled slides moved to `/deck`, where they are still exactly right for
- * presenting; they were the wrong shape for the job this URL has to do, for
- * three reasons that all point the same way.
+ * Ten sections, one screen each, read as prose. No client boundary, no
+ * scroll-triggered reveals, no 3D — the whole route is static HTML and CSS, so
+ * what a crawler receives and what a phone on a slow connection receives are
+ * the same thing the reader sees.
  *
- * Snap scrolling fights a thumb. A phone reader flicks and expects to land
- * where physics says; a page that yanks each gesture to a slide boundary feels
- * broken rather than designed, and the fix the deck already carries is to
- * disable snapping on coarse pointers — which is an admission that the format
- * was not built for the device most people arrive on.
- *
- * Content that animates in from `opacity: 0` is content a crawler does not see.
- * Every word here is server-rendered with no client boundary, so the HTML that
- * arrives is the HTML that gets read and indexed. The only JavaScript on the
- * route is the thumb bar.
- *
- * And the deck cost 255 kB of Three.js on first load to draw an object nobody
- * came for. Removing it from this route is the single largest thing that could
- * be done for a phone on a slow connection, which is the visitor this page is
- * now written for.
+ * Scroll snapping is deliberately NOT enabled here. The brief allows
+ * `proximity`, and the deck uses it; this page declines even that. Snapping is
+ * a nice-to-have and not-trapping is a must, and a page of prose with sections
+ * that can grow when someone edits the copy is exactly where the two collide.
+ * Full-height centred sections read as a deck without a snap axis at all.
  */
 export const metadata: Metadata = {
-  title: `${SITE.name} — ${SITE.tagline}`,
+  title: `${SITE.name} — The black box for AI`,
   description:
-    "CooL documents, approves and cryptographically seals every change your teams make to their AI — prompts, models, agent permissions — automatically. Audit evidence that is provable years later, with no manual work.",
+    "Every change your AI makes — documented, governed, and provable. Automatically. CooL seals every prompt, model and permission change as tamper-proof evidence anyone can verify offline.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Every AI change, documented and provable — without anyone writing it up",
+    title: "CooL — The black box for AI",
     description:
-      "Your teams change AI every day. Each change is supposed to be written up, approved and filed. CooL does all of it automatically, and seals it so it can be proved later.",
+      "Every change your AI makes — documented, governed, and provable. Automatically.",
     url: "/",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Every AI change, documented and provable",
+    title: "CooL — The black box for AI",
     description:
-      "Automatic AI governance evidence, sealed in a TEE and verifiable offline by anyone.",
+      "Every change your AI makes — documented, governed, and provable. Automatically.",
   },
 };
 
-/**
- * Page-level structured data.
- *
- * The FAQ entries come from the same constant the page renders, so the markup
- * and the visible text cannot drift — Google penalises FAQ structured data that
- * does not appear on the page, and the usual cause is exactly that drift.
- *
- * `ContactPoint` is emitted only when a real number is configured. Advertising
- * a telephone in structured data that nobody answers is worse than omitting it.
- */
-function PageSchema() {
-  const graph = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "FAQPage",
-        "@id": `${SITE.url}/#faq`,
-        mainEntity: FAQ.map((item) => ({
-          "@type": "Question",
-          name: item.q,
-          acceptedAnswer: { "@type": "Answer", text: item.a },
-        })),
-      },
-      ...(HAS_PHONE
-        ? [
-            {
-              "@type": "ContactPoint",
-              "@id": `${SITE.url}/#sales`,
-              contactType: "sales",
-              telephone: CONTACT.phone,
-              email: CONTACT.email,
-              areaServed: "Worldwide",
-              availableLanguage: ["en"],
-            },
-          ]
-        : []),
-    ],
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      // Static, developer-authored JSON — no user input reaches this string.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
-    />
-  );
-}
-
 export default function Page() {
   return (
-    <>
-      <PageSchema />
-      <LandingNav />
-
-      {/* Bottom padding clears the thumb bar so the last line of the footer is
-          never sitting underneath it on a phone. */}
-      <main className="relative pb-24 md:pb-0">
-        <Hero />
+    <div className="essay">
+      <EssayNav />
+      <main>
+        <Cover />
         <Problem />
-        <How />
-        <Proof />
-        <Pricing />
-        <Faq />
-        <Contact />
+        <Solution />
+        <Technology />
+        <Model />
+        <Market />
+        <Competitors />
+        <Founders />
+        <Roadmap />
+        <Explore />
       </main>
-
-      <Footer />
-      <StickyCta />
-    </>
+    </div>
   );
 }

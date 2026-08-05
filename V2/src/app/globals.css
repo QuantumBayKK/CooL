@@ -63,15 +63,36 @@
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
+/* ---- the scroll roots ----
+   These four lines are the ones that trap a phone, so they are stated
+   explicitly rather than left to a framework default:
+
+   `overflow-y` is never `hidden` here. Hiding it on html or body is what makes
+   a page dead-stop mid-swipe with content still below the fold.
+
+   `height` is never `100vh` here. A fixed height on a scroll root turns every
+   section past the first into unreachable overflow.
+
+   `overscroll-behavior-y: contain` rather than `none`. `none` also kills the
+   rubber-band at the document ends, which on iOS reads as the page having
+   jammed — the finger moves and nothing does. `contain` keeps the bounce
+   (so the page feels alive and pull-to-refresh still works) while stopping
+   the gesture chaining to a parent scroller. */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: visible;
+  overscroll-behavior-y: contain;
+}
+
 html {
   background: var(--color-void);
   color-scheme: dark;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
-  /* Kill the elastic overscroll at the document ends. On a deck the bounce
-     reads as the page coming loose, and it also stops a downward flick at the
-     last slide from triggering pull-to-refresh. */
-  overscroll-behavior-y: none;
 }
 
 /* Snapping belongs to the deck, not to the document.
@@ -84,8 +105,20 @@ html {
 
    `SlideRail` sets `data-deck` on the html element while it is mounted, so the
    deck keeps exactly the behaviour it had and nothing else inherits it. */
+/* PROXIMITY, never MANDATORY.
+
+   `mandatory` promises the browser that a snap point is always reachable, and
+   when a section grows taller than the viewport that promise becomes a trap:
+   the scroller drags you back to the snap line and the content above or below
+   it cannot be reached at all. It is the single most common cause of "the page
+   is stuck on my phone", and it is a trap that only appears once content grows
+   — which is to say, on the day someone edits copy, not on the day it is
+   built.
+
+   `proximity` assists the same gesture and gives up the moment the user is
+   trying to go somewhere else. The deck feel survives; the trap cannot occur. */
 html[data-deck] {
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
 }
 
 /* On a mouse, SnapScroll drives the deck itself (one wheel gesture = exactly
@@ -98,8 +131,11 @@ html.snap-js {
 
 [data-slide] {
   scroll-snap-align: start;
-  /* never let a fast flick skip a slide */
-  scroll-snap-stop: always;
+  /* `always` forbids a flick from passing a snap point. Paired with a section
+     that outgrows the screen that is another way to be held in place, so the
+     deck settles for `normal`: fast gestures may pass more than one slide,
+     which is a far smaller cost than a reader who cannot move at all. */
+  scroll-snap-stop: normal;
 }
 
 /* taller than the viewport → no snap point, so it can be read at leisure */
@@ -1021,6 +1057,202 @@ html:has([data-app-shell]) {
   .studio-flash {
     animation: none;
   }
+}
+
+/* ---- the essay site ----
+   Scoped under `.essay` so it cannot leak into the deck, the console or the
+   demo, all of which have their own systems. Values are the brief's, verbatim.
+
+   The load-bearing choice is `min-height: 100svh` rather than `height: 100vh`.
+   `svh` is the SMALL viewport height — the visible area when the mobile browser
+   chrome is expanded — so a section always fits what the reader can actually
+   see. `vh` on a phone is the LARGE viewport, taller than the visible area,
+   which is why the last screen of a `100vh` site always looks cut off. And
+   `min-height` rather than `height` means a section that outgrows its screen
+   simply gets taller instead of hiding its overflow. */
+.essay {
+  --s1: 0.5rem;
+  --s2: 1rem;
+  --s3: 1.5rem;
+  --s4: 2rem;
+  --s5: 3rem;
+  --measure: 640px;
+  --paper: #e9edf5;
+  --quiet: #c7cfdd;
+  --muted: #8a94a8;
+  --accent: #5b8cff;
+  --grn: #3ecf9a;
+  background: var(--color-void);
+  color: var(--paper);
+}
+
+.essay .wrap {
+  max-width: var(--measure);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.essay section {
+  min-height: 100svh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: max(7vh, 2rem) 7vw;
+  padding-top: max(7vh, env(safe-area-inset-top));
+  padding-bottom: max(7vh, env(safe-area-inset-bottom));
+}
+
+/* The founders section is the one allowed to run past a single screen, because
+   two whole people do not fit in one. `auto` height keeps both blocks intact
+   rather than splitting one across the fold. */
+.essay section.tall {
+  min-height: auto;
+  padding-top: max(10vh, 3rem);
+  padding-bottom: max(10vh, 3rem);
+  scroll-snap-align: none;
+}
+
+.essay .opener {
+  font-size: clamp(27px, 7.4vw, 50px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--s3);
+  text-wrap: balance;
+}
+
+.essay p.body {
+  font-size: clamp(16px, 4.3vw, 20px);
+  line-height: 1.55;
+  margin: 0 0 var(--s2);
+  color: var(--quiet);
+  text-wrap: pretty;
+}
+
+.essay p.body:last-of-type {
+  margin-bottom: 0;
+}
+
+.essay .tiny {
+  font-size: clamp(12px, 3vw, 14px);
+  color: var(--muted);
+  margin-top: var(--s2);
+  line-height: 1.5;
+}
+
+.essay .accent { color: var(--accent); }
+.essay .grn { color: var(--grn); }
+
+.essay .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 17px;
+  text-decoration: none;
+  margin: var(--s1);
+}
+.essay .btn-primary { background: var(--accent); color: #06122e; }
+.essay .btn-ghost { border: 1px solid #33436f; color: var(--paper); }
+.essay .btn:active { transform: translateY(1px); }
+
+.essay .avatar {
+  width: clamp(96px, 28vw, 140px);
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+/* The wide comparison table scrolls inside its own box rather than making the
+   PAGE scroll sideways — a horizontally scrolling document on a phone is the
+   other way to lose a reader. */
+.essay .tablewrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.essay table { border-collapse: collapse; min-width: 520px; margin: 0 auto; }
+.essay th,
+.essay td {
+  padding: 10px 12px;
+  font-size: clamp(12px, 3.4vw, 15px);
+  text-align: center;
+  border-bottom: 1px solid rgba(240, 246, 252, 0.1);
+}
+.essay th { color: var(--muted); font-weight: 600; }
+.essay td.cap { text-align: left; color: var(--paper); }
+.essay .cool-col { color: var(--grn); font-weight: 700; }
+
+/* Below 720px the six-column table is unreadable however it is scaled, so the
+   same five capabilities render as a stacked two-column comparison instead. */
+.essay .cmp-mobile { display: block; }
+.essay .cmp-desktop { display: none; }
+@media (min-width: 720px) {
+  .essay .cmp-mobile { display: none; }
+  .essay .cmp-desktop { display: block; }
+}
+
+.essay .cmp-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(240, 246, 252, 0.1);
+  text-align: left;
+}
+.essay .cmp-row:last-child { border-bottom: 0; }
+
+/* ---- short viewports ----
+   "One section, one screen" is a promise about the reader's screen, not about
+   a nominal size. A 375×667 phone in landscape-ish proportions, or a laptop
+   with a browser toolbar, leaves far less vertical room than the design was
+   drawn against — and the two densest sections (the market rings, the
+   five-row comparison) are the ones that spill first.
+
+   Rather than exempt them, the scale tightens: less padding, tighter leading,
+   a smaller graphic. Type sizes are untouched, because type that shrinks to
+   fit is type nobody reads. */
+/* The market rings are the single tallest element on the page, so they are
+   sized against the viewport's HEIGHT as well as its width — a graphic that
+   only respects width is exactly what pushes a short screen over. */
+.essay .rings { width: min(300px, 74vw, 34vh); }
+
+/* Nav section links: pointer devices only. See EssayNav for why. */
+.essay-navlink { display: none; }
+@media (min-width: 640px) {
+  .essay-navlink { display: inline-flex; }
+}
+
+@media (max-height: 900px) {
+  .essay section {
+    padding-top: max(4vh, 1.25rem);
+    padding-bottom: max(4vh, 1.25rem);
+  }
+  .essay .opener { margin-bottom: var(--s2); }
+  .essay p.body { margin-bottom: 0.7rem; }
+  .essay .cmp-row { padding: 9px 0; }
+}
+
+@media (max-height: 720px) {
+  .essay .opener { font-size: clamp(24px, 6.4vw, 40px); }
+  .essay .cmp-row { padding: 7px 0; }
+  .essay .tiny { margin-top: var(--s1); }
+}
+
+.essay .founders {
+  display: grid;
+  gap: var(--s5);
+  width: 100%;
+}
+@media (min-width: 720px) {
+  .essay .founders { grid-template-columns: 1fr 1fr; gap: var(--s4); align-items: start; }
 }
 
 /* ---- the demo ----

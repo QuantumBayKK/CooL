@@ -35,6 +35,10 @@ export const ROUTES = [
   { path: "/studio", priority: 0.9, changeFrequency: "monthly" as const },
   // Install instructions and the published artefacts. The developer entry point.
   { path: "/sdk", priority: 0.9, changeFrequency: "monthly" as const },
-  { path: "/investors", priority: 0.8, changeFrequency: "monthly" as const },
+  // /investors and /investors/diligence are deliberately absent. Both are
+  // `noindex`, and submitting a noindex URL in a sitemap asks a crawler to
+  // index the one page carrying the raise terms while the page itself refuses
+  // — a contradiction that at best wastes crawl budget and at worst gets the
+  // SAFE terms surfaced next to the product.
   { path: "/billboard", priority: 0.6, changeFrequency: "monthly" as const },
 ] as const;
