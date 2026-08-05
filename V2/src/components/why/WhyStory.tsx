@@ -3,7 +3,7 @@
 /**
  * The story.
  *
- * Ten chapters, read top to bottom, one column. It opens on a specific Monday
+ * Ten chapters, read top to bottom, one column. It opens on an ordinary morning
  * rather than on a market, because "AI governance is a $12bn opportunity" is a
  * sentence nobody has ever felt anything about, and "someone changed one line
  * of a prompt" is a sentence half the people reading this did last week.
@@ -65,7 +65,7 @@ export function WhyStory() {
           Why CooL exists
         </p>
         <h1 className="mt-5 max-w-[16ch] text-[clamp(2.6rem,10vw,5rem)] leading-[0.98] font-semibold tracking-[-0.045em] text-ink text-balance">
-          It is Monday, 09:14.
+          It is one ordinary morning.
         </h1>
         <p className="mt-7 max-w-[54ch] text-[clamp(1.05rem,2.6vw,1.35rem)] leading-[1.55] text-fog">
           Someone changes one line of a prompt. That part is over in thirty

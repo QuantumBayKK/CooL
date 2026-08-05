@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "One line of a prompt changes in thirty seconds. What follows is the rest of somebody's afternoon — and, by the end of the year, three to four weeks of a team. This is the story of the work nobody chose, the question nobody can answer, and the deadline that cannot be backfilled.",
   alternates: { canonical: "/why" },
   openGraph: {
-    title: "It is Monday, 09:14.",
+    title: "It is one ordinary morning.",
     description:
       "Someone changes one line of a prompt. That part is over in thirty seconds. What follows is the rest of somebody's afternoon — and the reason CooL exists.",
     url: "/why",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "It is Monday, 09:14.",
+    title: "It is one ordinary morning.",
     description:
       "The thirty seconds, the afternoon, the question nobody can answer, and the deadline you cannot backfill.",
   },
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
  * question that matters — why does this need to exist at all?
  *
  * That question is not answered by a feature list. It is answered by a story
- * about a Monday, and it takes as many words as it takes.
+ * about an ordinary morning, and it takes as many words as it takes.
  */
 export default function WhyPage() {
   const articleLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: "It is Monday, 09:14.",
+    headline: "It is one ordinary morning.",
     description: metadata.description,
     url: `${SITE.url}/why`,
     author: { "@type": "Organization", name: SITE.company },
