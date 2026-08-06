@@ -3,7 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Play, GitBranch, Plug, Brain, Binary } from "lucide-react";
 import LiveDemo from "./LiveDemo";
 

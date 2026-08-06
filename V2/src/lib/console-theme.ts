@@ -7,46 +7,63 @@
  * a palette change is one edit and cannot drift between two charts that are
  * supposed to agree.
  *
+ * ## Nothing here is a literal any more
+ *
+ * Every value below is a CSS custom property rather than a hex string. That is
+ * what lets these charts render in both themes from one set of markup: the
+ * theme flip re-resolves `var(--s2)` and the SVG repaints, with no second
+ * palette, no JS colour-mode branch, and no chance of the two drifting.
+ *
+ * The literals live in `app/globals.css`, which is also where the measurements
+ * that justify them are recorded.
+ *
  * ## The palette was computed, not chosen
  *
- * Every value below was validated against this app's actual chart surface
- * (`#161b22`) in dark mode, on five checks: OKLCH lightness band, chroma floor,
- * contrast against the surface, colour-vision-deficiency separation under
- * simulated protanopia and deuteranopia, and a normal-vision separation floor.
+ * Both theme sets were validated against the real chart surface — `#FFFFFF`
+ * light, `#101012` dark — on five checks: OKLCH lightness band, chroma floor,
+ * contrast against the surface, CVD separation under simulated protanopia,
+ * deuteranopia and tritanopia, and a normal-vision separation floor.
  *
- *   categorical, worst adjacent pair : ΔE 13.0 (CVD) · 15.8 (normal vision)
- *   sequential ramp                  : monotone L, ≥0.06 per step, low end 2.68:1
+ *   light, worst adjacent pair : ΔE 13.8 (CVD) · 26.4 (normal vision)
+ *   dark,  worst adjacent pair : ΔE 12.5 (CVD) · 19.2 (normal vision)
  *
  * ## The three-slot cap
  *
  * Bars, stacked bars and lines only ever place *adjacent* slots beside each
  * other, so the five-slot order is safe there. Scatter plots and heatmaps can
- * put any two marks side by side, and past three slots the violet/blue pair
- * collapses under protanopia (ΔE 3.3). Those forms therefore cap at three
- * series and fold the rest into "Other" — see {@link ALL_PAIRS_SERIES_CAP}.
- * That is a real constraint on the charts, not a note.
+ * put any two marks side by side; those forms validate on all-pairs rather than
+ * adjacent pairs, and past three slots the pairs collapse. They therefore cap
+ * at three series and fold the rest into "Other" — see
+ * {@link ALL_PAIRS_SERIES_CAP}. That is a real constraint on the charts, not a
+ * note.
  */
 
 /* ── surfaces and ink ─────────────────────────────────────────────────── */
 
 export const SURFACE = {
-  page: "#101317",
-  panel: "#16191e",
-  raised: "#1c2027",
-  line: "rgba(223,228,234,0.10)",
-  lineStrong: "rgba(223,228,234,0.20)",
+  page: "var(--canvas)",
+  panel: "var(--surface)",
+  raised: "var(--raised)",
+  line: "var(--line)",
+  lineStrong: "var(--line-strong)",
 } as const;
 
 export const INK = {
-  primary: "#dfe4ea",
-  secondary: "#a9b2bd",
-  muted: "#848e9b",
+  primary: "var(--ink)",
+  secondary: "var(--ink-muted)",
+  muted: "var(--ink-subtle)",
 } as const;
 
 /* ── categorical series ───────────────────────────────────────────────── */
 
 /** Fixed order. Assigned in sequence, never cycled. */
-export const SERIES = ["#388bfd", "#db6d28", "#0aa08d", "#a371f7", "#db61a2"] as const;
+export const SERIES = [
+  "var(--s1)",
+  "var(--s2)",
+  "var(--s3)",
+  "var(--s4)",
+  "var(--s5)",
+] as const;
 
 /** Human names, for legends and the table view. */
 export const SERIES_NAME = ["blue", "orange", "teal", "violet", "magenta"] as const;
@@ -65,7 +82,13 @@ export function seriesColor(index: number): string {
 /* ── sequential ramp (magnitude) ──────────────────────────────────────── */
 
 /** One hue, low → high. */
-export const SEQUENTIAL = ["#265ea8", "#2f81f7", "#58a6ff", "#8fcaff", "#c9e2ff"] as const;
+export const SEQUENTIAL = [
+  "var(--seq-1)",
+  "var(--seq-2)",
+  "var(--seq-3)",
+  "var(--seq-4)",
+  "var(--seq-5)",
+] as const;
 
 /**
  * Map a 0…1 magnitude onto the ramp.
@@ -100,7 +123,7 @@ export interface StatusToken {
 
 export const STATUS: Record<StatusRole, StatusToken> = {
   good: {
-    hex: "#4cc26a",
+    hex: "var(--ok)",
     glyph: "✓",
     text: "text-live",
     border: "border-live/40",
@@ -108,7 +131,7 @@ export const STATUS: Record<StatusRole, StatusToken> = {
     dot: "bg-live",
   },
   info: {
-    hex: "#6cb0ff",
+    hex: "var(--accent)",
     glyph: "•",
     text: "text-verify",
     border: "border-verify/40",
@@ -116,7 +139,7 @@ export const STATUS: Record<StatusRole, StatusToken> = {
     dot: "bg-verify",
   },
   serious: {
-    hex: "#d8a530",
+    hex: "var(--warn)",
     glyph: "▲",
     text: "text-warn",
     border: "border-warn/45",
@@ -124,7 +147,7 @@ export const STATUS: Record<StatusRole, StatusToken> = {
     dot: "bg-warn",
   },
   critical: {
-    hex: "#f2726b",
+    hex: "var(--fail)",
     glyph: "✕",
     text: "text-fail",
     border: "border-fail/50",
@@ -132,7 +155,7 @@ export const STATUS: Record<StatusRole, StatusToken> = {
     dot: "bg-fail",
   },
   absent: {
-    hex: "#848e9b",
+    hex: "var(--ink-subtle)",
     glyph: "·",
     text: "text-mist",
     border: "border-line-strong",

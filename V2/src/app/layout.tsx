@@ -1,57 +1,38 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Anton,
-  Bebas_Neue,
-  Inter,
-  Inter_Tight,
-  JetBrains_Mono,
-} from "next/font/google";
+import { IBM_Plex_Sans, Inter } from "next/font/google";
+import { GeistMono } from "geist/font/mono";
+
 import "./globals.css";
+import { Providers } from "@/app/providers";
+import { THEME_SCRIPT } from "@/components/shell/ThemeToggle";
 import { SITE } from "@/lib/site";
-import { CONTACT, HAS_PHONE, PHONES } from "@/lib/contact";
 
-const anton = Anton({
-  weight: "400",
+/**
+ * Typefaces — three families, three jobs, loaded once.
+ *
+ * Weights are enumerated rather than left variable-wide. Plex ships nine
+ * weights and this design uses two; requesting all of them costs roughly 200 kB
+ * of font data for glyphs that are never drawn, and font bytes are on the
+ * critical path for Largest Contentful Paint.
+ *
+ * `display: "swap"` on all three: a fallback face is strictly better than
+ * invisible text, and with `adjustFontFallback` (Next's default) the metric
+ * mismatch is small enough that the swap does not shift layout.
+ */
+const plex = IBM_Plex_Sans({
   subsets: ["latin"],
-  variable: "--font-anton",
-  display: "swap",
-});
-
-const bebas = Bebas_Neue({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-bebas",
+  weight: ["500", "600"],
+  variable: "--font-plex",
   display: "swap",
 });
 
 const inter = Inter({
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-inter",
   display: "swap",
 });
 
-/* keynote voice for the investors page — SF-Pro-Display-adjacent */
-const interTight = Inter_Tight({
-  subsets: ["latin"],
-  variable: "--font-inter-tight",
-  display: "swap",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
-  display: "swap",
-});
-
-/**
- * Site-wide metadata.
- *
- * `metadataBase` is what lets every other route declare relative OG images and
- * canonicals and still emit absolute URLs — without it Next silently ships
- * relative OG tags, which most crawlers and every social unfurler ignore.
- *
- * The title template is `%s — CooL`, so each route sets only its own subject.
- */
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
@@ -60,40 +41,13 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   applicationName: SITE.name,
-  authors: [
-    { name: "Pranauv Shrinaath S" },
-    { name: "Kailosh Kalimuthu" },
-  ],
-  creator: SITE.company,
-  publisher: SITE.company,
-  keywords: [
-    "AI governance",
-    "AI change management",
-    "AI audit trail",
-    "AI compliance automation",
-    "EU AI Act Article 12",
-    "DPDP Rules 2025",
-    "tamper-evident log",
-    "transparency log",
-    "post-quantum cryptography",
-    "ML-DSA",
-    "AI observability",
-    "AI system of record",
-    "verifiable AI evidence",
-    "CooL",
-    "Northwind Cipher",
-  ],
-  category: "technology",
-  alternates: {
-    canonical: "/",
-  },
+  authors: [{ name: SITE.company }],
   openGraph: {
     type: "website",
     siteName: SITE.name,
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
-    url: SITE.url,
-    locale: "en_US",
+    url: "/",
   },
   twitter: {
     card: "summary_large_image",
@@ -103,148 +57,52 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
-  },
-  formatDetection: {
-    telephone: false,
-    address: false,
-    email: false,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d1117",
+  // Both entries are required for the browser UI to match the canvas in each
+  // theme; a single colour leaves one theme with a mismatched status bar on iOS.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0b" },
+  ],
   width: "device-width",
   initialScale: 1,
-  colorScheme: "dark",
+  // Not `maximumScale: 1`. Blocking pinch-zoom is a WCAG 1.4.4 failure, and on
+  // a site whose content includes 64-character digests it is a cruel one.
+  viewportFit: "cover",
 };
-
-/**
- * Structured data.
- *
- * Three linked nodes rather than one blob: the company, the product, and the
- * site itself. Search engines resolve the `@id` references between them, which
- * is what earns a knowledge-panel style result rather than a plain blue link.
- */
-function StructuredData() {
-  const graph = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        "@id": `${SITE.url}/#organization`,
-        name: SITE.company,
-        alternateName: SITE.name,
-        url: SITE.url,
-        description: SITE.description,
-        foundingDate: "2026",
-        founder: [
-          {
-            "@type": "Person",
-            name: "Pranauv Shrinaath S",
-            jobTitle: "Founder & CEO",
-            sameAs: ["https://github.com/KenidoesCode"],
-          },
-          {
-            "@type": "Person",
-            name: "Kailosh Kalimuthu",
-            jobTitle: "Co-Founder & CTO",
-            sameAs: ["https://github.com/Sk1zmo"],
-          },
-        ],
-        sameAs: [
-          "https://github.com/KenidoesCode/cool-sdk",
-          "https://github.com/KenidoesCode/cool-verifier",
-          "https://github.com/KenidoesCode/cool-spec",
-        ],
-        // Emitted from the same constant the page renders, so the markup and
-        // the visible number can never disagree — a mismatch between them is a
-        // reliable way to lose the rich result entirely.
-        ...(HAS_PHONE
-          ? {
-              telephone: CONTACT.phone,
-              email: CONTACT.email,
-              contactPoint: PHONES.map((phone) => ({
-                "@type": "ContactPoint",
-                contactType: "sales",
-                telephone: phone.e164,
-                email: CONTACT.email,
-                areaServed: "Worldwide",
-                availableLanguage: ["en"],
-              })),
-            }
-          : {}),
-      },
-      {
-        "@type": "WebSite",
-        "@id": `${SITE.url}/#website`,
-        url: SITE.url,
-        name: SITE.name,
-        description: SITE.description,
-        publisher: { "@id": `${SITE.url}/#organization` },
-        inLanguage: "en",
-      },
-      {
-        "@type": "SoftwareApplication",
-        "@id": `${SITE.url}/#software`,
-        name: SITE.name,
-        applicationCategory: "BusinessApplication",
-        applicationSubCategory: "AI governance and compliance automation",
-        operatingSystem: "Web, Linux, Kubernetes",
-        url: SITE.url,
-        description:
-          "CooL automatically documents, governs and cryptographically seals every change an enterprise makes to its AI — prompts, models, parameters and agent permissions — producing tamper-proof, offline-verifiable audit evidence with zero manual work.",
-        publisher: { "@id": `${SITE.url}/#organization` },
-        featureList: [
-          "Automatic capture of every AI change",
-          "Tamper-evident RFC 6962 transparency log",
-          "Hybrid post-quantum signatures (ML-DSA-65 + Ed25519)",
-          "Offline-verifiable audit evidence",
-          "Predictive change-risk scoring with recommended resolutions",
-          "One-click audit export mapped to EU AI Act and DPDP",
-        ],
-        offers: {
-          "@type": "Offer",
-          price: "0",
-          priceCurrency: "USD",
-          description: "Free SDK; paid SaaS and enterprise platform licence.",
-        },
-      },
-    ],
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      // Static, developer-authored JSON — no user input reaches this string.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
-    />
-  );
-}
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
-      className={`${anton.variable} ${bebas.variable} ${inter.variable} ${interTight.variable} ${jetbrains.variable}`}
+      suppressHydrationWarning
+      className={`${plex.variable} ${inter.variable} ${GeistMono.variable}`}
     >
       <head>
-        <StructuredData />
-        {/* Entrances ship as opacity:0 and are animated in on the client. If JS
-            never arrives, this makes sure the page is still readable. */}
-        <noscript>
-          <style>{`[data-reveal],[data-word]{opacity:1!important;filter:none!important;transform:none!important}`}</style>
-        </noscript>
+        {/* Before first paint, so a dark-mode reader never sees a white flash.
+            This must stay inline and must stay in <head>. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body>{children}</body>
+      <body className="min-h-dvh bg-canvas text-ink antialiased">
+        {/* Skip link — the first tab stop on every page. Visually hidden until
+            focused, which is the only way it helps the people who need it
+            without becoming clutter for everyone else. */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:border focus:border-line focus:bg-canvas focus:px-4 focus:py-2 focus:text-sm"
+        >
+          Skip to content
+        </a>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

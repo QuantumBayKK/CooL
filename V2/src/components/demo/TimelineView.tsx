@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import clsx from "clsx";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { ChevronRight, Zap, User } from "lucide-react";
 import {
   buildTimeline,

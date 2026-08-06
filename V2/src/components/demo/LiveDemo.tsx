@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { Play, RotateCcw, Download, ShieldAlert, Check } from "lucide-react";
 import {
   GOVERNANCE_ACTIONS,

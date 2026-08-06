@@ -1,1306 +1,673 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* ═══════════════════════════════════════════════════════════════════════════
+   CooL design system
+   ───────────────────────────────────────────────────────────────────────────
+   Three colours: white, black, deep red. Everything else is a neutral step or
+   a status signal.
 
-@theme {
-  /* GitHub-dark hacker mode — one dark canvas, near-white ink, electric blue,
-     terminal green for "live/real", signal red for "fail".
-     The ✓ ⚠ ✕ glyphs still carry the meaning. */
-  --color-void: #0d1117;
-  --color-panel: #161b22;
-  --color-ink: #f0f6fc;
-  --color-line: rgba(240, 246, 252, 0.14);
-  --color-faint: rgba(240, 246, 252, 0.055);
-  --color-mist: #8b949e;
-  --color-fog: #c9d1d9;
-  --color-verify: #58a6ff;
-  --color-verify-deep: #1f6feb;
-  --color-live: #3fb950;
-  --color-mock: #8b949e;
-  --color-fail: #f85149;
+   THE ONE RULE THAT MATTERS — red is overloaded on purpose, and the overload
+   is scoped:
 
-  /* ---- console surfaces ----
-     The product console needs one step above `panel` for table headers and
-     hover rows, and a stronger hairline for anything that has to read as a
-     structural edge rather than a divider. */
-  --color-raised: #1c2430;
-  --color-line-strong: rgba(240, 246, 252, 0.18);
-  /* serious/warning — the third status colour the deck never needed */
-  --color-warn: #d29922;
+     · On marketing surfaces red is the brand accent. It marks the primary
+       action and nothing else. One red thing per viewport.
+     · Inside the product console red means FAILURE and only failure. Primary
+       actions there are ink-filled, not red.
 
-  /* ---- categorical series, for charts ----
-     Five slots, fixed order, assigned in sequence and never cycled. Validated
-     against the console's panel surface (#161b22) in dark mode on lightness
-     band, chroma floor, contrast, and colour-vision-deficiency separation under
-     simulated protanopia and deuteranopia. Worst adjacent pair ΔE 13.0 (CVD) /
-     15.8 (normal vision).
+   A console that painted its "Run" button the same colour as its "signature
+   invalid" badge would be teaching the reader to ignore the one colour that
+   has to stop them. So the accent changes meaning at the console boundary,
+   and `[data-surface="console"]` is where it changes.
 
-     Cap: three slots for any chart form where two arbitrary marks can end up
-     side by side (scatter, heatmap). Past three the violet/blue pair collapses
-     under protanopia at ΔE 3.3, so those forms fold the tail into "Other". */
-  --color-s1: #388bfd;
-  --color-s2: #db6d28;
-  --color-s3: #0aa08d;
-  --color-s4: #a371f7;
-  --color-s5: #db61a2;
+   Every foreground/background pair below is checked by
+   `scripts/verify-palette.mjs` against WCAG AA in both themes. 28/28 passing.
+   Change a token, run the script.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-  /* ---- sequential ramp (magnitude) ----
-     One hue, low → high. Monotone lightness, ≥0.06 ΔL per step, and the low end
-     still clears 2.68:1 on the panel so "small but present" never vanishes. */
-  --color-seq-1: #265ea8;
-  --color-seq-2: #2f81f7;
-  --color-seq-3: #58a6ff;
-  --color-seq-4: #8fcaff;
-  --color-seq-5: #c9e2ff;
+@custom-variant dark (&:where(.dark, .dark *));
 
-  --font-display: var(--font-anton), "Arial Narrow", "Impact", system-ui, sans-serif;
-  /* keynote voice — Inter Tight is the closest thing to SF Pro Display at the
-     sizes the investors page uses */
-  --font-keynote: var(--font-inter-tight), var(--font-inter), system-ui, sans-serif;
-  --font-poster: var(--font-bebas), var(--font-anton), "Arial Narrow", "Impact", sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+:root {
+  color-scheme: light;
+
+  /* ── surfaces, light → recessed ────────────────────────────────────────── */
+  --canvas: #ffffff;
+  --surface: #fafafa;
+  --raised: #f4f4f5;
+  --sunken: #ededef;
+
+  /* ── ink ───────────────────────────────────────────────────────────────── */
+  --ink: #0a0a0b;
+  --ink-muted: #52525b;
+  --ink-subtle: #71717a;
+  --on-accent: #ffffff;
+
+  /* ── structure ─────────────────────────────────────────────────────────────
+     `line` is the workhorse: this design separates with hairlines, not with
+     shadows or with whitespace alone. `line-strong` is for edges that are
+     structural (a panel boundary) rather than divisional (a row rule). */
+  --line: #e4e4e7;
+  --line-strong: #d4d4d8;
+
+  /* ── accent: deep red ──────────────────────────────────────────────────── */
+  --accent: #a4161a;
+  --accent-hover: #8b1215;
+  --accent-wash: #fdf3f3;
+
+  /* ── status ────────────────────────────────────────────────────────────────
+     Deliberately NOT the brand red for ok/warn. `fail` shares the brand hue
+     because in a light theme a second distinct red reads as a rendering bug. */
+  --ok: #186a3b;
+  --warn: #8a5a00;
+  --fail: #a4161a;
+  --ok-wash: #f1f9f4;
+  --warn-wash: #fdf8ec;
+  --fail-wash: #fdf3f3;
+
+  /* ── focus ─────────────────────────────────────────────────────────────────
+     A single ring token so every focusable thing focuses identically. Keyboard
+     users navigate by recognising this shape, and inconsistency costs them. */
+  --focus: #a4161a;
+
+  /* ── elevation ─────────────────────────────────────────────────────────────
+     Exactly two. Menus/popovers and modals. Nothing else floats — cards in
+     this system are bordered, not raised. */
+  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px -6px rgb(0 0 0 / 0.12);
+  --shadow-modal: 0 2px 4px rgb(0 0 0 / 0.06), 0 24px 48px -12px rgb(0 0 0 / 0.22);
+
+  /* Chart series — see the note in @theme. Measured, not chosen. */
+  --s1: #1d4ed8;
+  --s2: #ea580c;
+  --s3: #0d9488;
+  --s4: #7c3aed;
+  --s5: #db2777;
+
+  --seq-1: #dbeafe;
+  --seq-2: #93c5fd;
+  --seq-3: #60a5fa;
+  --seq-4: #2563eb;
+  --seq-5: #1e3a8a;
 }
 
-/* ---- the scroll roots ----
-   These four lines are the ones that trap a phone, so they are stated
-   explicitly rather than left to a framework default:
+.dark {
+  color-scheme: dark;
 
-   `overflow-y` is never `hidden` here. Hiding it on html or body is what makes
-   a page dead-stop mid-swipe with content still below the fold.
+  --canvas: #0a0a0b;
+  --surface: #101012;
+  --raised: #18181b;
+  --sunken: #202024;
 
-   `height` is never `100vh` here. A fixed height on a scroll root turns every
-   section past the first into unreachable overflow.
+  --ink: #fafafa;
+  --ink-muted: #a1a1aa;
+  --ink-subtle: #8b8b94;
+  /* Near-black rather than pure black: on a luminous red, pure black rings. */
+  --on-accent: #1a0405;
 
-   `overscroll-behavior-y: contain` rather than `none`. `none` also kills the
-   rubber-band at the document ends, which on iOS reads as the page having
-   jammed — the finger moves and nothing does. `contain` keeps the bounce
-   (so the page feels alive and pull-to-refresh still works) while stopping
-   the gesture chaining to a parent scroller. */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: auto;
-  overflow-x: hidden;
-  overflow-y: visible;
-  overscroll-behavior-y: contain;
+  --line: #26262b;
+  --line-strong: #35353c;
+
+  /* The deep red of the light theme fails AA on a black canvas, so the dark
+     theme lifts it rather than reusing it. Same identity, different luminance
+     — this is a legibility requirement, not a style preference. */
+  --accent: #e5484d;
+  --accent-hover: #f26469;
+  --accent-wash: #2a0d0f;
+
+  --ok: #3dd68c;
+  --warn: #e0a72c;
+  --fail: #e5484d;
+  --ok-wash: #0d2318;
+  --warn-wash: #241c0a;
+  --fail-wash: #2a0d0f;
+
+  --focus: #e5484d;
+
+  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -6px rgb(0 0 0 / 0.5);
+  --shadow-modal: 0 2px 4px rgb(0 0 0 / 0.4), 0 24px 48px -12px rgb(0 0 0 / 0.7);
+
+  /* Dark series are re-stepped, not brightened copies of the light ones: the
+     dark lightness band (OKLCH L 0.48–0.67) is narrower and sits lower than the
+     light band, so a naive lightening pushes every slot out of gamut for the
+     check and collapses the pairs. */
+  --s1: #3b82f6;
+  --s2: #d96a14;
+  --s3: #0d9488;
+  --s4: #a855f7;
+  --s5: #ec4899;
+
+  --seq-1: #172554;
+  --seq-2: #1e40af;
+  --seq-3: #2563eb;
+  --seq-4: #60a5fa;
+  --seq-5: #bfdbfe;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Console scope — red demotes to "failure only".
+
+   Primary actions inside the console become ink-filled. This is a single
+   override rather than a parallel token set, so the console cannot drift away
+   from the rest of the system as either side is edited.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-surface="console"] {
+  --accent: var(--ink);
+  --accent-hover: var(--ink-muted);
+  --accent-wash: var(--raised);
+  --on-accent: var(--canvas);
+  --focus: var(--ink);
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-sunken: var(--sunken);
+
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-on-accent: var(--on-accent);
+
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-wash: var(--accent-wash);
+
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-fail: var(--fail);
+  --color-ok-wash: var(--ok-wash);
+  --color-warn-wash: var(--warn-wash);
+  --color-fail-wash: var(--fail-wash);
+
+  /* ── type ──────────────────────────────────────────────────────────────────
+     Three families, three jobs, no overlap:
+
+     display — IBM Plex Sans. Headings and anything that has to carry
+               institutional weight. Plex was drawn for IBM; it reads as
+               infrastructure rather than as a startup.
+     sans    — Inter. Body copy and every piece of UI chrome. The best screen
+               reading face at 14–17px, which is where this site lives.
+     mono    — Geist Mono. Digests, keys, CLI output, code. Chosen over the
+               other two for its unambiguous 0/O and 1/l/I, which matters when
+               the reader is comparing a hash by eye. */
+  --font-display: var(--font-plex), "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* ── type scale ────────────────────────────────────────────────────────────
+     Deliberately compressed. The brief says "no oversized headings", and the
+     reason is not taste: a 96px hero forces every following section to shout
+     to stay in proportion, and the page ends up with no quiet register left
+     for the detail that actually convinces an engineer.
+
+     Top of the scale is 48px. A dense 17px paragraph next to a 48px heading
+     reads as a document. Next to a 96px heading it reads as a billboard. */
+  --text-display: 3rem; /* 48 — hero h1, the ceiling */
+  --text-display--line-height: 1.08;
+  --text-display--letter-spacing: -0.022em;
+  --text-display--font-weight: 600;
+
+  --text-h1: 2.25rem; /* 36 */
+  --text-h1--line-height: 1.14;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h1--font-weight: 600;
+
+  --text-h2: 1.75rem; /* 28 */
+  --text-h2--line-height: 1.22;
+  --text-h2--letter-spacing: -0.017em;
+  --text-h2--font-weight: 600;
+
+  --text-h3: 1.3125rem; /* 21 */
+  --text-h3--line-height: 1.3;
+  --text-h3--letter-spacing: -0.012em;
+  --text-h3--font-weight: 600;
+
+  --text-h4: 1.0625rem; /* 17 */
+  --text-h4--line-height: 1.4;
+  --text-h4--letter-spacing: -0.008em;
+  --text-h4--font-weight: 600;
+
+  --text-lead: 1.1875rem; /* 19 — the one paragraph under a hero */
+  --text-lead--line-height: 1.58;
+  --text-lead--letter-spacing: -0.009em;
+
+  --text-body: 1rem; /* 16 */
+  --text-body--line-height: 1.65;
+
+  --text-sm: 0.875rem; /* 14 — dense UI, table cells */
+  --text-sm--line-height: 1.55;
+
+  --text-xs: 0.8125rem; /* 13 — captions, footnotes */
+  --text-xs--line-height: 1.5;
+
+  /* Eyebrow/label. Uppercase + wide tracking is the enterprise section marker;
+     it does the job an oversized heading would otherwise be doing. */
+  --text-label: 0.6875rem; /* 11 */
+  --text-label--line-height: 1.2;
+  --text-label--letter-spacing: 0.09em;
+  --text-label--font-weight: 600;
+
+  /* ── layout ────────────────────────────────────────────────────────────────
+     One content measure, one wide measure. 1200 is where a 12-column grid at
+     these type sizes still produces a comfortable 68–74 character line. */
+  --container-page: 75rem; /* 1200 */
+  --container-prose: 44rem; /* 704 — long-form reading measure */
+
+  /* ── radii ─────────────────────────────────────────────────────────────────
+     Tight. Enterprise software has tight corners; 16px pills read as consumer.
+     6px is the ceiling for anything interactive. */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  --shadow-overlay: var(--shadow-overlay);
+  --shadow-modal: var(--shadow-modal);
+
+  /* ── chart series ──────────────────────────────────────────────────────────
+     Five slots, fixed order, assigned in sequence and never cycled.
+
+     Both sets were measured, not chosen: every candidate was run through the
+     dataviz validator against the real chart surface — #FFFFFF light, #101012
+     dark — on lightness band, chroma floor, adjacent-pair separation under
+     simulated protanopia/deuteranopia/tritanopia, a normal-vision floor, and
+     contrast. Both sets pass all five checks with no warnings.
+
+       light  worst adjacent pair  ΔE 13.8 (CVD) · 26.4 (normal)
+       dark   worst adjacent pair  ΔE 12.5 (CVD) · 19.2 (normal)
+
+     Two consequences worth stating, because both look like mistakes otherwise:
+
+     · The dark set is re-stepped rather than lightened. The dark lightness band
+       (OKLCH L 0.48–0.67) sits lower and narrower than the light one, so the
+       obvious "brighten everything for dark mode" move pushes slots out of band
+       and collapses pairs. The orange in particular had to go *darker*, not
+       lighter, to stay legal.
+
+     · Slot 2 is an orange, which is adjacent to the reserved `warn` hue. It is
+       a deliberately different step, and it is safe because status colour never
+       appears as a chart mark — status lives in badges, with a glyph and a
+       written label beside it. The two vocabularies never share a surface.
+
+     The three-slot cap still applies to any form where two ARBITRARY marks can
+     end up side by side (scatter, heatmap): those validate on all-pairs rather
+     than adjacent pairs, and past three slots the pairs collapse. See
+     ALL_PAIRS_SERIES_CAP in `lib/console-theme.ts`. */
+  --color-s1: var(--s1);
+  --color-s2: var(--s2);
+  --color-s3: var(--s3);
+  --color-s4: var(--s4);
+  --color-s5: var(--s5);
+
+  /* Sequential ramp (magnitude): one hue, monotone lightness, low → high.
+     Blue rather than the brand red: a red magnitude ramp inside a console where
+     red means failure would make "large value" and "broken" the same colour. */
+  --color-seq-1: var(--seq-1);
+  --color-seq-2: var(--seq-2);
+  --color-seq-3: var(--seq-3);
+  --color-seq-4: var(--seq-4);
+  --color-seq-5: var(--seq-5);
+
+  /* ── legacy token aliases ──────────────────────────────────────────────────
+     The evidence surfaces (/verify, /console, /studio, /pipeline, /billboard)
+     run the real cryptography and are ~80 files of working, tested UI. Renaming
+     every class across them by hand would be a large mechanical diff over code
+     whose correctness matters more than its class names, and a mistyped token
+     there fails silently as an invisible element rather than loudly as an error.
+
+     So the old names are kept as aliases onto the new semantic tokens. Those
+     surfaces adopt the new palette wholesale — including light mode, which they
+     never had — without a single edit to their logic, and each one can be
+     restyled properly on its own schedule.
+
+     This block is a migration aid with an end date, not part of the design
+     system. Nothing new should use these names. */
+  --color-void: var(--canvas);
+  --color-panel: var(--surface);
+  --color-fog: var(--ink-muted);
+  --color-mist: var(--ink-subtle);
+  --color-faint: var(--sunken);
+  --color-verify: var(--accent);
+  --color-verify-deep: var(--accent-hover);
+  --color-live: var(--ok);
+  --color-mock: var(--ink-subtle);
+
+  /* ── motion ────────────────────────────────────────────────────────────────
+     Fast, flat, and short. The brief: opacity, small translate, small scale.
+     No bounce, no spin, no overshoot — every curve below is monotonic, so
+     nothing can travel past its destination and come back.
+
+     140ms is the ceiling for a state change (hover, focus, toggle) and 240ms
+     for an entrance. Past ~250ms the reader perceives the interface as waiting
+     for the animation rather than the animation serving the interface. */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  --duration-state: 140ms;
+  --duration-enter: 240ms;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Base
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-color: var(--line);
 }
 
 html {
-  background: var(--color-void);
-  color-scheme: dark;
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* `contain` and not `none`: `none` also kills the rubber-band at the document
+     ends, which on iOS reads as the page having jammed. */
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+  /* Anchored headings must not land under the sticky header. */
+  scroll-padding-top: 5.5rem;
 }
 
-/* Snapping belongs to the deck, not to the document.
-
-   This used to sit on `html` unconditionally, which meant every route paid for
-   it — including the ones with no slides at all, where a mandatory snap axis
-   with no snap points still changes how a flick decelerates. The landing page
-   is ordinary prose that people read with a thumb, and it must scroll the way
-   every other page they have ever read does.
-
-   `SlideRail` sets `data-deck` on the html element while it is mounted, so the
-   deck keeps exactly the behaviour it had and nothing else inherits it. */
-/* PROXIMITY, never MANDATORY.
-
-   `mandatory` promises the browser that a snap point is always reachable, and
-   when a section grows taller than the viewport that promise becomes a trap:
-   the scroller drags you back to the snap line and the content above or below
-   it cannot be reached at all. It is the single most common cause of "the page
-   is stuck on my phone", and it is a trap that only appears once content grows
-   — which is to say, on the day someone edits copy, not on the day it is
-   built.
-
-   `proximity` assists the same gesture and gives up the moment the user is
-   trying to go somewhere else. The deck feel survives; the trap cannot occur. */
-html[data-deck] {
-  scroll-snap-type: y proximity;
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
 }
 
-/* On a mouse, SnapScroll drives the deck itself (one wheel gesture = exactly
-   one slide) and adds `.snap-js`. CSS snap steps aside then: a JS scroller and
-   CSS snap fighting over the same scrollTop is a classic source of stutter, so
-   exactly one of them is ever in charge. */
-html.snap-js {
-  scroll-snap-type: none;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+  text-wrap: balance;
 }
 
-[data-slide] {
-  scroll-snap-align: start;
-  /* `always` forbids a flick from passing a snap point. Paired with a section
-     that outgrows the screen that is another way to be held in place, so the
-     deck settles for `normal`: fast gestures may pass more than one slide,
-     which is a far smaller cost than a reader who cannot move at all. */
-  scroll-snap-stop: normal;
+p {
+  margin: 0;
+  text-wrap: pretty;
 }
 
-/* taller than the viewport → no snap point, so it can be read at leisure */
-[data-slide].is-tall {
-  scroll-snap-align: none;
-  scroll-snap-stop: normal;
+/* Tabular figures everywhere a number can change under the reader — counters,
+   table cells, metrics. Proportional digits make a live value jitter. */
+.tnum,
+table,
+time,
+[data-numeric] {
+  font-variant-numeric: tabular-nums;
 }
 
-/* ---- snapping is on everywhere, including touch ----
-   It was previously disabled on coarse pointers because the slides carried more
-   content than a ~390px screen could hold, and a snap point on a slide you
-   cannot fully see drags you back to its top as you try to read the bottom.
-
-   The slides are now built to fit one viewport, so that conflict is gone and
-   every device gets the deck behaviour: one gesture reveals one whole slide.
-
-   Two safety nets remain, because "fits" is a promise about content and content
-   changes. `.is-tall` (set by SnapScroll) drops the snap point from any slide
-   that outgrows the viewport anyway — on phones too, now — and SnapScroll only
-   re-measures on width changes, so a collapsing mobile URL bar can never
-   retoggle snap points underneath a scroll already in flight. */
-
-@media (prefers-reduced-motion: reduce) {
-  html[data-deck] {
-    scroll-snap-type: none;
-  }
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+  font-feature-settings: "liga" 0, "calt" 0;
 }
 
-/* custom cursor active (fine pointers only — set from Cursor.tsx) */
-.custom-cursor,
-.custom-cursor * {
-  cursor: none !important;
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ── focus ─────────────────────────────────────────────────────────────────
+   One ring, everywhere, keyboard-only. The 2px offset is what keeps the ring
+   legible against a filled button, where a flush ring disappears into the
+   fill. */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── scrollbars ─────────────────────────────────────────────────────────────
+   Styled only where a panel scrolls internally. The document scrollbar is left
+   native, because overriding it is the fastest way to make a page feel wrong
+   on a platform you did not test. */
+[data-scroll] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+[data-scroll]::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+[data-scroll]::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 3px solid var(--canvas);
+  border-radius: 999px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Reduced motion
+
+   Not "shorter animations" — none. Anything this system animates is decorative
+   by construction (entrances, hovers), so removing it costs the reader nothing
+   and honours the setting literally.
+
+   `scroll-behavior: auto` is included because smooth scrolling is itself
+   vestibular motion, and it is the one people most often forget.
+   ═══════════════════════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-body {
-  background: var(--color-void);
-  color: var(--color-fog);
-  font-family: var(--font-sans);
-  overflow-x: hidden;
-  min-height: 100svh;
+/* ═══════════════════════════════════════════════════════════════════════════
+   Utilities the design system owns
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@utility container-page {
+  width: 100%;
+  max-width: var(--container-page);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 2.5rem;
+  }
 }
 
-::selection {
-  background: rgba(88, 166, 255, 0.35);
-  color: #ffffff;
+/* Vertical rhythm for a top-level section. One utility so the whole site
+   breathes on the same interval and no section can quietly diverge. */
+@utility section-y {
+  padding-block: 4rem;
+
+  @media (width >= 48rem) {
+    padding-block: 5.5rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-block: 7rem;
+  }
 }
 
-/* ---- display type ---- */
+/* The hairline grid. This is the site's structural signature: content sits in
+   cells divided by 1px rules rather than by gaps, which is what makes a page
+   read as a specification rather than as a brochure. */
+@utility rule-grid {
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+
+  & > * {
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+/* Long-form prose defaults, for MDX docs and any editorial page. */
+@utility prose-cool {
+  max-width: var(--container-prose);
+  font-size: var(--text-body);
+  line-height: 1.7;
+  color: var(--ink-muted);
+
+  & > * + * {
+    margin-top: 1.25rem;
+  }
+
+  & h2 {
+    margin-top: 3rem;
+    font-size: var(--text-h2);
+    letter-spacing: -0.017em;
+    color: var(--ink);
+    scroll-margin-top: 6rem;
+  }
+
+  & h3 {
+    margin-top: 2.25rem;
+    font-size: var(--text-h3);
+    letter-spacing: -0.012em;
+    color: var(--ink);
+    scroll-margin-top: 6rem;
+  }
+
+  & strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  & a:not([data-heading-anchor]) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    transition: text-decoration-color var(--duration-state) var(--ease-out);
+  }
+
+  & a:not([data-heading-anchor]):hover {
+    text-decoration-color: var(--accent);
+  }
+
+  & ul,
+  & ol {
+    padding-left: 1.25rem;
+  }
+
+  & li + li {
+    margin-top: 0.5rem;
+  }
+
+  & ul > li::marker {
+    color: var(--ink-subtle);
+  }
+
+  & :not(pre) > code {
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xs);
+    padding: 0.1em 0.34em;
+    font-size: 0.875em;
+    color: var(--ink);
+  }
+
+  & blockquote {
+    border-left: 2px solid var(--accent);
+    padding-left: 1rem;
+    color: var(--ink-muted);
+  }
+
+  & table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  & th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line-strong);
+    padding: 0.6rem 0.75rem;
+  }
+
+  & td {
+    border-bottom: 1px solid var(--line);
+    padding: 0.6rem 0.75rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Syntax highlighting — Shiki dual-theme.
+
+   Shiki emits both themes as CSS variables on the same markup, so switching
+   colour scheme is a class flip with no re-highlight and no flash. The build
+   ships one copy of the HTML, not two.
+   ═══════════════════════════════════════════════════════════════════════════ */
+pre.shiki {
+  background: var(--surface) !important;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.125rem;
+  overflow-x: auto;
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+pre.shiki code {
+  display: grid;
+  background: transparent;
+}
+
+.dark pre.shiki,
+.dark pre.shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: transparent !important;
+}
+
+pre.shiki .line[data-highlighted] {
+  background: var(--accent-wash);
+  box-shadow: inset 2px 0 0 var(--accent);
+  margin-inline: -1.125rem;
+  padding-inline: 1.125rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Legacy utility — see the token-alias note in @theme.
+
+   `.display` survives because the ported evidence surfaces use it in two
+   places. It now resolves to the design system's display face rather than the
+   condensed poster face the old deck used.
+   ═══════════════════════════════════════════════════════════════════════════ */
 .display {
   font-family: var(--font-display);
-  text-transform: uppercase;
-  line-height: 0.94;
-  letter-spacing: 0.005em;
-  color: var(--color-ink);
-  text-wrap: balance;
-}
-
-/* ---- cinematic kicker — poster type, no chip, no box ---- */
-.kicker {
-  font-family: var(--font-poster);
-  text-transform: uppercase;
-  letter-spacing: 0.34em;
-  color: var(--color-verify);
-  text-shadow: 0 0 24px rgba(88, 166, 255, 0.45);
-}
-
-/* ---- frosted glass (dark terminal panes) ----
-   The cipher field runs behind everything, so cards must frost it out: high
-   opacity + strong blur turns the sharp matrix into a soft wash and keeps
-   text crisp on top. */
-.glass {
-  background: rgba(20, 25, 32, 0.82);
-  border: 1px solid rgba(240, 246, 252, 0.12);
-  backdrop-filter: blur(28px) saturate(140%);
-  -webkit-backdrop-filter: blur(28px) saturate(140%);
-  box-shadow:
-    inset 0 1px 0 rgba(240, 246, 252, 0.07),
-    0 8px 28px rgba(0, 0, 0, 0.45);
-}
-
-.glass-strong {
-  background: rgba(20, 25, 32, 0.93);
-  border: 1px solid rgba(240, 246, 252, 0.14);
-  backdrop-filter: blur(32px) saturate(140%);
-  -webkit-backdrop-filter: blur(32px) saturate(140%);
-  box-shadow:
-    inset 0 1px 0 rgba(240, 246, 252, 0.09),
-    0 12px 36px rgba(0, 0, 0, 0.6);
-}
-
-/* ---- frosted panes ----
-   Any info box sits over the live cipher field, so it must frost that field
-   out. `.frost` is a plain dark frosted pane; the tinted variants keep a
-   highlight wash (blue / green) on top of the frost so accent cards stay
-   legible. Compose with border / rounded / shadow utilities as usual. */
-.frost {
-  background: rgba(20, 25, 32, 0.85);
-  backdrop-filter: blur(28px) saturate(140%);
-  -webkit-backdrop-filter: blur(28px) saturate(140%);
-}
-.frost-verify {
-  background:
-    linear-gradient(rgba(88, 166, 255, 0.13), rgba(88, 166, 255, 0.13)),
-    rgba(18, 23, 30, 0.86);
-  backdrop-filter: blur(28px) saturate(140%);
-  -webkit-backdrop-filter: blur(28px) saturate(140%);
-}
-.frost-live {
-  background:
-    linear-gradient(rgba(63, 185, 80, 0.13), rgba(63, 185, 80, 0.13)),
-    rgba(18, 23, 30, 0.86);
-  backdrop-filter: blur(28px) saturate(140%);
-  -webkit-backdrop-filter: blur(28px) saturate(140%);
-}
-
-/* ---- film grain ---- */
-.grain {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: screen;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* ---- hairline dividers ---- */
-.hairline {
-  border-color: var(--color-line);
-}
-
-/* ============================================================
-   THE CONSOLE SCOPE
-   ============================================================
-   The product surface is a different job from the deck. The deck is cinematic:
-   sparse type on a live cipher field, high contrast, soft corners, motion that
-   sets a mood. The console is an instrument someone keeps open all day: dense
-   tables, square edges, and contrast SPENT rather than sprayed.
-
-   Both live in one Next app, so the console's palette is scoped to a `.hud`
-   wrapper instead of replacing the site's. Tailwind v4 utilities compile to
-   `var(--color-…)` lookups, so re-declaring those variables inside this class
-   re-colours the whole subtree — `bg-panel` inside `.hud` resolves to the
-   console's panel, and the same class on a deck slide is untouched.
-
-   Nothing outside a `.hud` element changes. That is the point.
-   ============================================================ */
-
-.hud {
-  /* surfaces: warm graphite, not blue-black */
-  --color-void: #101317;
-  --color-panel: #16191e;
-  --color-raised: #1c2027;
-  --color-line: rgba(223, 228, 234, 0.1);
-  --color-line-strong: rgba(223, 228, 234, 0.2);
-  --color-faint: rgba(223, 228, 234, 0.04);
-
-  /* ink: three measured tiers. The deck's near-white on blue-black is a 15.9:1
-     pair — correct for a headline, glare for a table. Here the maximum is
-     reserved for headings and figures; body sits at ~8:1, labels at ~5:1. */
-  --color-ink: #dfe4ea;
-  --color-fog: #a9b2bd;
-  --color-mist: #848e9b;
-
-  --color-verify: #6cb0ff;
-  --color-live: #4cc26a;
-  --color-warn: #d8a530;
-  --color-fail: #f2726b;
-
-  /* every corner square — `--radius` feeds every derived radius token */
-  --radius: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-  --radius-3xl: 0px;
-  --radius-4xl: 0px;
-
-  --ease-snap: cubic-bezier(0.2, 0.9, 0.25, 1);
-
-  color: var(--color-fog);
-}
-
-/* Corner brackets: four L-marks drawn just inside a panel, as one background
-   image rather than four pseudo-elements — no layout cost, no hit-testing
-   interference. Reserved for panels that are doing something; bracket every
-   card and the brackets stop meaning anything. */
-.hud .hud-brackets {
-  position: relative;
-}
-.hud .hud-brackets::before {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  pointer-events: none;
-  --b: var(--color-line-strong);
-  background:
-    linear-gradient(var(--b), var(--b)) 0 0 / 11px 1px no-repeat,
-    linear-gradient(var(--b), var(--b)) 0 0 / 1px 11px no-repeat,
-    linear-gradient(var(--b), var(--b)) 100% 0 / 11px 1px no-repeat,
-    linear-gradient(var(--b), var(--b)) 100% 0 / 1px 11px no-repeat,
-    linear-gradient(var(--b), var(--b)) 0 100% / 11px 1px no-repeat,
-    linear-gradient(var(--b), var(--b)) 0 100% / 1px 11px no-repeat,
-    linear-gradient(var(--b), var(--b)) 100% 100% / 11px 1px no-repeat,
-    linear-gradient(var(--b), var(--b)) 100% 100% / 1px 11px no-repeat;
-}
-.hud .hud-brackets-accent::before {
-  --b: rgba(108, 176, 255, 0.55);
-}
-
-/* The lift: 1px rise, brightened hairline, hard-edged shadow. No blur halo —
-   a soft glow under a square panel reads as a mistake. 110ms, so it lands. */
-.hud .hud-lift {
-  transition:
-    transform 110ms var(--ease-snap),
-    border-color 110ms var(--ease-snap),
-    box-shadow 110ms var(--ease-snap);
-  will-change: transform;
-}
-.hud .hud-lift:hover {
-  transform: translateY(-1px);
-  border-color: var(--color-line-strong);
-  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.5);
-}
-
-/* Magnetic buttons. The pull is written to --mx/--my by JS so the :active
-   press composes with it instead of fighting it. */
-.hud .hud-button {
-  --mx: 0px;
-  --my: 0px;
-  transform: translate3d(var(--mx), var(--my), 0);
-  transition:
-    transform 90ms var(--ease-snap),
-    border-color 110ms var(--ease-snap),
-    background-color 110ms var(--ease-snap),
-    color 110ms var(--ease-snap);
-}
-/* While the pointer is inside, the pull follows it with no transition — a
-   transition here would lag the cursor and read as drag, not attraction. */
-.hud .hud-button[data-pulling="true"] {
-  transition:
-    border-color 110ms var(--ease-snap),
-    background-color 110ms var(--ease-snap),
-    color 110ms var(--ease-snap);
-}
-.hud .hud-button:active {
-  transform: translate3d(var(--mx), var(--my), 0) scale(0.97);
-  transition: transform 60ms var(--ease-snap);
-}
-
-.hud :where(a, button, [role="button"], input, select):focus-visible {
-  outline: 1px solid var(--color-verify);
-  outline-offset: 2px;
-  border-radius: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hud .hud-lift:hover {
-    transform: none;
-  }
-  .hud .hud-button {
-    --mx: 0px !important;
-    --my: 0px !important;
-  }
-}
-
-/* ---- shared console utilities ---- */
-
-/* Numbers that must align vertically — table columns, axis ticks. Deliberately
-   NOT applied to large standalone figures: equal-width digits make a number
-   like 121 look loose at display sizes. */
-.tnum {
-  font-variant-numeric: tabular-nums;
-}
-
-/* A wide table scrolls inside its own card rather than the page. */
-.table-scroll {
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-}
-
-/* Chart tooltip. Positioned by JS against a `relative` wrapper. */
-.viz-tip {
-  position: absolute;
-  z-index: 30;
-  pointer-events: none;
-  background: #0b0f14;
-  border: 1px solid var(--color-line-strong);
-  border-radius: 8px;
-  padding: 0.5rem 0.65rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
-  white-space: nowrap;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-/* ---- glow accents ---- */
-.glow-blue {
-  text-shadow: 0 0 26px rgba(88, 166, 255, 0.55);
-}
-
-/* ---- claymorphic bloom behind 3D objects ---- */
-.clay-glow {
-  background:
-    radial-gradient(ellipse 58% 52% at 50% 52%, rgba(88, 166, 255, 0.3), transparent 70%),
-    radial-gradient(ellipse 40% 34% at 50% 50%, rgba(240, 246, 252, 0.14), transparent 70%);
-  filter: blur(8px);
-}
-
-/* ---- shake (append-only / tamper feedback) ---- */
-@keyframes shake-x {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-6px); }
-  40% { transform: translateX(5px); }
-  60% { transform: translateX(-3px); }
-  80% { transform: translateX(2px); }
-}
-
-.shake {
-  animation: shake-x 0.4s ease-in-out;
-}
-
-/* ---- border beam (the light that walks the ask's border) ---- */
-@keyframes beam-spin {
-  to { transform: rotate(360deg); }
-}
-.border-beam {
-  padding: 1px;
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
-  overflow: hidden;
-}
-.border-beam::before {
-  content: "";
-  position: absolute;
-  inset: -60%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    transparent 300deg,
-    rgba(31, 111, 235, 0.95) 340deg,
-    #58a6ff 355deg,
-    transparent 360deg
-  );
-  animation: beam-spin 5.5s linear infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .border-beam::before {
-    animation: none;
-    opacity: 0.4;
-  }
-}
-
-/* ---- ticker ---- */
-@keyframes ticker-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.ticker-track {
-  animation: ticker-scroll linear infinite;
-}
-.ticker:hover .ticker-track {
-  animation-play-state: paused;
-}
-@media (prefers-reduced-motion: reduce) {
-  .ticker-track {
-    animation: none;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-}
-
-/* ---- eye-follow button blink ---- */
-@keyframes eye-blink {
-  0%, 94%, 100% { transform: scaleY(1); }
-  96% { transform: scaleY(0.12); }
-}
-.eye-blink {
-  animation: eye-blink 5.5s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .eye-blink {
-    animation: none;
-  }
-}
-
-/* ---- horizontal scroller helpers ---- */
-.no-scrollbar {
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.edge-fade {
-  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-}
-
-/* ---- scrollbars: thin, dark ---- */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(240, 246, 252, 0.22) transparent;
-}
-
-/* ============================================================
-   AMBIENT MOTION — CSS only, on purpose.
-   Anything that loops forever lives here rather than in JS. These all animate
-   transform / opacity only, so the compositor runs them and they keep ticking
-   at full rate even while the main thread is busy. Every one of them is killed
-   under prefers-reduced-motion at the bottom of this block.
-   ============================================================ */
-
-/* the light that walks a border (buttons, the ask panel) */
-.shimmer-ring {
-  padding: 1px;
-  overflow: hidden;
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
-}
-.shimmer-ring::before {
-  content: "";
-  position: absolute;
-  inset: -60%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    transparent 285deg,
-    rgba(88, 166, 255, 0.85) 332deg,
-    #dbeafe 352deg,
-    transparent 360deg
-  );
-  animation: beam-spin 3.4s linear infinite;
-}
-
-/* diagonal wipe on hover — transition, not a loop: it costs nothing at rest */
-.sheen {
-  pointer-events: none;
-  overflow: hidden;
-}
-.sheen::after {
-  content: "";
-  position: absolute;
-  top: -50%;
-  bottom: -50%;
-  left: -60%;
-  width: 40%;
-  transform: translateX(-40%) rotate(14deg);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.22),
-    transparent
-  );
-  opacity: 0;
-  transition:
-    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.4s ease;
-}
-.group:hover .sheen::after {
-  transform: translateX(420%) rotate(14deg);
-  opacity: 1;
-}
-
-/* cursor-tracking spotlight — position comes from JS-written custom props */
-.spot {
-  --spot-x: 50%;
-  --spot-y: 0%;
-  --spot-opacity: 0;
-}
-.spot-layer {
-  background: radial-gradient(
-    260px circle at var(--spot-x) var(--spot-y),
-    rgba(88, 166, 255, 0.14),
-    transparent 65%
-  );
-  opacity: var(--spot-opacity);
-  transition: opacity 0.4s ease;
-}
-
-/* gentle vertical bob */
-@keyframes float-y {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-7px);
-  }
-}
-.float-y {
-  animation: float-y 3.6s ease-in-out infinite;
-}
-
-/* a scan line crossing a card */
-@keyframes scan-y {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  12% {
-    opacity: 1;
-  }
-  88% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(320%);
-    opacity: 0;
-  }
-}
-.scan-y {
-  animation: scan-y 4.6s linear infinite;
-}
-
-/* seamless marquee — the track holds the content twice, so -50% loops cleanly */
-@keyframes marquee-x {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-.marquee {
-  overflow: hidden;
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 8%,
-    black 92%,
-    transparent
-  );
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 8%,
-    black 92%,
-    transparent
-  );
-}
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marquee-x var(--marquee-duration, 38s) linear infinite;
-}
-.marquee:hover .marquee-track {
-  animation-play-state: paused;
-}
-
-/* ---- carousel rail ---- */
-.carousel-rail {
-  scroll-padding-inline: 1.25rem;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-  cursor: grab;
-}
-.carousel-rail.is-dragging {
-  cursor: grabbing;
-  scroll-snap-type: none;
-  user-select: none;
-}
-/* focus effect: the centred card is sharp, its neighbours recede. Driven by a
-   single class toggled from an IntersectionObserver — no per-frame JS. */
-.carousel-card {
-  opacity: 0.45;
-  transform: scale(0.955);
-  transition:
-    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.5s ease;
-}
-.carousel-card.is-active {
-  opacity: 1;
-  transform: scale(1);
-  border-color: rgba(88, 166, 255, 0.28);
-}
-
-/* ---- keynote type (the investors page) ----
-   Apple-keynote scale: very large, very tight, near-white on black, and almost
-   no letterspacing. The restraint is the effect. */
-.keynote {
-  font-family: var(--font-keynote), var(--font-inter), system-ui, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.02;
-  color: var(--color-ink);
-  text-wrap: balance;
-}
-.keynote-lead {
-  font-family: var(--font-keynote), var(--font-inter), system-ui, sans-serif;
-  font-weight: 400;
-  letter-spacing: -0.012em;
-  line-height: 1.42;
-  color: var(--color-fog);
-  text-wrap: pretty;
-}
-
-/* ---- intro curtain ---- */
-.curtain {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  background: #000;
-}
-
-/* ---- reduced motion: stop every ambient loop ---- */
-@media (prefers-reduced-motion: reduce) {
-  .shimmer-ring::before,
-  .float-y,
-  .scan-y,
-  .marquee-track {
-    animation: none !important;
-  }
-  .scan-y {
-    opacity: 0;
-  }
-  .carousel-card {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .sheen::after {
-    transition: none;
-  }
-  /* a Reveal that never got the chance to run must not hide its content */
-  [data-reveal] {
-    opacity: 1 !important;
-    filter: none !important;
-    transform: none !important;
-  }
-}
-
-@theme inline {
-  --font-heading: var(--font-display);
-  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-}
-
-:root {
-  --background: var(--color-void);
-  --foreground: var(--color-fog);
-  --card: var(--color-panel);
-  --card-foreground: var(--color-fog);
-  --popover: var(--color-panel);
-  --popover-foreground: var(--color-fog);
-  --primary: var(--color-verify-deep);
-  --primary-foreground: #ffffff;
-  --secondary: rgba(240, 246, 252, 0.055);
-  --secondary-foreground: var(--color-fog);
-  --muted: rgba(240, 246, 252, 0.055);
-  --muted-foreground: var(--color-mist);
-  --accent: rgba(88, 166, 255, 0.13);
-  --accent-foreground: var(--color-ink);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: var(--color-line);
-  --input: rgba(240, 246, 252, 0.14);
-  --ring: var(--color-verify);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   STUDIO — the product surface: an Atlassian-flavoured console and a
-   VS-Code-flavoured IDE, both living inside a site that is otherwise one
-   dark deck.
-
-   Two skins, two scoped token sets. They are CSS variables rather than
-   Tailwind theme colours on purpose: the deck's palette (`--color-*`) is a
-   single dark canvas, and the console needs a light one. Scoping keeps the
-   two from ever bleeding into each other, and one `data-skin` attribute
-   swaps the whole vocabulary.
-
-   Radii are 3px, not the deck's pills. Atlassian's surfaces are square-ish
-   and dense, and a console is read, not admired — sharp corners let rows,
-   tables and side-by-side panels align on the same grid.
-   ═══════════════════════════════════════════════════════════════════════ */
-
-/* The app shells are fixed-position and own their own scrolling, so the
-   deck's mandatory scroll-snap has to stand down while one is mounted. Two
-   snap engines fighting over one scrollTop is the stutter this avoids. */
-html:has([data-app-shell]) {
-  scroll-snap-type: none;
-  overflow: hidden;
-  overscroll-behavior: none;
-}
-
-[data-skin="atlassian"] {
-  color-scheme: light;
-
-  /* navigation — the dark rail, Slack's shape in Atlassian's navy */
-  --atl-nav: #101b34;
-  --atl-nav-deep: #0a1428;
-  --atl-nav-line: rgba(255, 255, 255, 0.09);
-  --atl-nav-text: #b6c2cf;
-  --atl-nav-text-strong: #ffffff;
-  --atl-nav-hover: rgba(255, 255, 255, 0.07);
-  --atl-nav-active: #1868db;
-
-  /* surfaces */
-  --atl-bg: #f7f8f9;
-  --atl-surface: #ffffff;
-  --atl-raised: #f1f2f4;
-  --atl-sunken: #eceef1;
-  --atl-overlay: rgba(9, 30, 66, 0.54);
-
-  /* lines */
-  --atl-border: #dfe1e6;
-  --atl-border-strong: #c1c7d0;
-
-  /* ink */
-  --atl-text: #172b4d;
-  --atl-subtle: #44546f;
-  --atl-muted: #626f86;
-  --atl-disabled: #8993a4;
-
-  /* the one brand colour, and its quiet backgrounds */
-  --atl-blue: #1868db;
-  --atl-blue-hover: #0055cc;
-  --atl-blue-bg: #e9f2fe;
-  --atl-blue-border: #8fb8f6;
-
-  /* status — each one is always paired with a glyph or a word */
-  --atl-green: #216e4e;
-  --atl-green-bold: #22a06b;
-  --atl-green-bg: #dcfff1;
-  --atl-yellow: #a54800;
-  --atl-yellow-bold: #e56910;
-  --atl-yellow-bg: #fff7d6;
-  --atl-red: #ae2e24;
-  --atl-red-bold: #c9372c;
-  --atl-red-bg: #ffedeb;
-  --atl-purple: #5e4db2;
-  --atl-purple-bg: #f3f0ff;
-  --atl-teal: #206a83;
-  --atl-teal-bg: #e7f9ff;
-  --atl-grey-bg: #dcdfe4;
-
-  --atl-radius: 3px;
-  --atl-shadow: 0 1px 1px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.13);
-  --atl-shadow-raised: 0 8px 16px -4px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31);
-}
-
-[data-skin="vscode"] {
-  color-scheme: dark;
-
-  /* VS Code Dark Modern */
-  --vsc-editor: #1f1f1f;
-  --vsc-chrome: #181818;
-  --vsc-deep: #141414;
-  --vsc-border: #2b2b2b;
-  --vsc-border-strong: #3c3c3c;
-  --vsc-text: #cccccc;
-  --vsc-bright: #e7e7e7;
-  --vsc-muted: #9d9d9d;
-  --vsc-dim: #6e7681;
-  --vsc-accent: #0078d4;
-  --vsc-accent-soft: #04395e;
-  --vsc-hover: #2a2d2e;
-  --vsc-selection: #264f78;
-  --vsc-line-highlight: #282828;
-
-  /* syntax */
-  --vsc-keyword: #569cd6;
-  --vsc-control: #c586c0;
-  --vsc-string: #ce9178;
-  --vsc-comment: #6a9955;
-  --vsc-number: #b5cea8;
-  --vsc-fn: #dcdcaa;
-  --vsc-type: #4ec9b0;
-  --vsc-var: #9cdcfe;
-  --vsc-const: #4fc1ff;
-  --vsc-punct: #cccccc;
-  --vsc-tag: #808080;
-
-  /* terminal */
-  --vsc-term-green: #23d18b;
-  --vsc-term-red: #f14c4c;
-  --vsc-term-yellow: #e5e510;
-  --vsc-term-blue: #3b8eea;
-  --vsc-term-cyan: #29b8db;
-  --vsc-term-magenta: #d670d6;
-}
-
-/* Focus rings: Atlassian's is a 2px blue outline, never removed. */
-[data-skin="atlassian"] :focus-visible {
-  outline: 2px solid var(--atl-blue);
-  outline-offset: 1px;
-  border-radius: 2px;
-}
-
-/* Scrollbars inside the shells, so a light console does not get a dark
-   scrollbar from the document's `color-scheme`. */
-[data-skin] .thin-scroll {
-  scrollbar-width: thin;
-}
-[data-skin="atlassian"] .thin-scroll {
-  scrollbar-color: var(--atl-border-strong) transparent;
-}
-[data-skin="vscode"] .thin-scroll {
-  scrollbar-color: #4f4f4f transparent;
-}
-[data-skin] .thin-scroll::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-[data-skin] .thin-scroll::-webkit-scrollbar-thumb {
-  border-radius: 8px;
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-[data-skin="atlassian"] .thin-scroll::-webkit-scrollbar-thumb {
-  background-color: var(--atl-border-strong);
-}
-[data-skin="vscode"] .thin-scroll::-webkit-scrollbar-thumb {
-  background-color: #4f4f4f;
-}
-
-/* The caret in the IDE's editor gutter — a real one blinks, so this does. */
-@keyframes studio-caret {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-.studio-caret {
-  animation: studio-caret 1.06s steps(1, end) infinite;
-}
-
-/* A row that has just arrived in the ledger flashes once, the way a live
-   console should — enough to notice, not enough to distract. */
-@keyframes studio-flash {
-  from { background-color: var(--atl-blue-bg); }
-  to { background-color: transparent; }
-}
-.studio-flash {
-  animation: studio-flash 1.4s ease-out 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .studio-caret,
-  .studio-flash {
-    animation: none;
-  }
-}
-
-/* ---- the essay site ----
-   Scoped under `.essay` so it cannot leak into the deck, the console or the
-   demo, all of which have their own systems. Values are the brief's, verbatim.
-
-   The load-bearing choice is `min-height: 100svh` rather than `height: 100vh`.
-   `svh` is the SMALL viewport height — the visible area when the mobile browser
-   chrome is expanded — so a section always fits what the reader can actually
-   see. `vh` on a phone is the LARGE viewport, taller than the visible area,
-   which is why the last screen of a `100vh` site always looks cut off. And
-   `min-height` rather than `height` means a section that outgrows its screen
-   simply gets taller instead of hiding its overflow. */
-.essay {
-  --s1: 0.5rem;
-  --s2: 1rem;
-  --s3: 1.5rem;
-  --s4: 2rem;
-  --s5: 3rem;
-  --measure: 640px;
-  --paper: #e9edf5;
-  --quiet: #c7cfdd;
-  --muted: #8a94a8;
-  --accent: #5b8cff;
-  --grn: #3ecf9a;
-  background: var(--color-void);
-  color: var(--paper);
-}
-
-.essay .wrap {
-  max-width: var(--measure);
-  margin: 0 auto;
-  width: 100%;
-}
-
-.essay section {
-  min-height: 100svh;
-  scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  box-sizing: border-box;
-  padding: max(7vh, 2rem) 7vw;
-  padding-top: max(7vh, env(safe-area-inset-top));
-  padding-bottom: max(7vh, env(safe-area-inset-bottom));
-}
-
-/* The founders section is the one allowed to run past a single screen, because
-   two whole people do not fit in one. `auto` height keeps both blocks intact
-   rather than splitting one across the fold. */
-.essay section.tall {
-  min-height: auto;
-  padding-top: max(10vh, 3rem);
-  padding-bottom: max(10vh, 3rem);
-  scroll-snap-align: none;
-}
-
-.essay .opener {
-  font-size: clamp(27px, 7.4vw, 50px);
-  font-weight: 800;
-  line-height: 1.12;
   letter-spacing: -0.02em;
-  margin: 0 0 var(--s3);
-  text-wrap: balance;
-}
-
-.essay p.body {
-  font-size: clamp(16px, 4.3vw, 20px);
-  line-height: 1.55;
-  margin: 0 0 var(--s2);
-  color: var(--quiet);
-  text-wrap: pretty;
-}
-
-.essay p.body:last-of-type {
-  margin-bottom: 0;
-}
-
-.essay .tiny {
-  font-size: clamp(12px, 3vw, 14px);
-  color: var(--muted);
-  margin-top: var(--s2);
-  line-height: 1.5;
-}
-
-.essay .accent { color: var(--accent); }
-.essay .grn { color: var(--grn); }
-
-.essay .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 0 22px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 17px;
-  text-decoration: none;
-  margin: var(--s1);
-}
-.essay .btn-primary { background: var(--accent); color: #06122e; }
-.essay .btn-ghost { border: 1px solid #33436f; color: var(--paper); }
-.essay .btn:active { transform: translateY(1px); }
-
-.essay .avatar {
-  width: clamp(96px, 28vw, 140px);
-  aspect-ratio: 1 / 1;
-  border-radius: 16px;
-  object-fit: cover;
-}
-
-/* The wide comparison table scrolls inside its own box rather than making the
-   PAGE scroll sideways — a horizontally scrolling document on a phone is the
-   other way to lose a reader. */
-.essay .tablewrap {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.essay table { border-collapse: collapse; min-width: 520px; margin: 0 auto; }
-.essay th,
-.essay td {
-  padding: 10px 12px;
-  font-size: clamp(12px, 3.4vw, 15px);
-  text-align: center;
-  border-bottom: 1px solid rgba(240, 246, 252, 0.1);
-}
-.essay th { color: var(--muted); font-weight: 600; }
-.essay td.cap { text-align: left; color: var(--paper); }
-.essay .cool-col { color: var(--grn); font-weight: 700; }
-
-/* Below 720px the six-column table is unreadable however it is scaled, so the
-   same five capabilities render as a stacked two-column comparison instead. */
-.essay .cmp-mobile { display: block; }
-.essay .cmp-desktop { display: none; }
-@media (min-width: 720px) {
-  .essay .cmp-mobile { display: none; }
-  .essay .cmp-desktop { display: block; }
-}
-
-.essay .cmp-row {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(240, 246, 252, 0.1);
-  text-align: left;
-}
-.essay .cmp-row:last-child { border-bottom: 0; }
-
-/* ---- short viewports ----
-   "One section, one screen" is a promise about the reader's screen, not about
-   a nominal size. A 375×667 phone in landscape-ish proportions, or a laptop
-   with a browser toolbar, leaves far less vertical room than the design was
-   drawn against — and the two densest sections (the market rings, the
-   five-row comparison) are the ones that spill first.
-
-   Rather than exempt them, the scale tightens: less padding, tighter leading,
-   a smaller graphic. Type sizes are untouched, because type that shrinks to
-   fit is type nobody reads. */
-/* The market rings are the single tallest element on the page, so they are
-   sized against the viewport's HEIGHT as well as its width — a graphic that
-   only respects width is exactly what pushes a short screen over. */
-.essay .rings { width: min(300px, 74vw, 34vh); }
-
-/* Nav section links: pointer devices only. See EssayNav for why. */
-.essay-navlink { display: none; }
-@media (min-width: 640px) {
-  .essay-navlink { display: inline-flex; }
-}
-
-@media (max-height: 900px) {
-  .essay section {
-    padding-top: max(4vh, 1.25rem);
-    padding-bottom: max(4vh, 1.25rem);
-  }
-  .essay .opener { margin-bottom: var(--s2); }
-  .essay p.body { margin-bottom: 0.7rem; }
-  .essay .cmp-row { padding: 9px 0; }
-}
-
-@media (max-height: 720px) {
-  .essay .opener { font-size: clamp(24px, 6.4vw, 40px); }
-  .essay .cmp-row { padding: 7px 0; }
-  .essay .tiny { margin-top: var(--s1); }
-}
-
-.essay .founders {
-  display: grid;
-  gap: var(--s5);
-  width: 100%;
-}
-@media (min-width: 720px) {
-  .essay .founders { grid-template-columns: 1fr 1fr; gap: var(--s4); align-items: start; }
-}
-
-/* ---- the demo ----
-   Four motions, and no more. Everything in the demo arrives without being
-   asked for, so the entrances have to read as "this happened" rather than as
-   decoration: short, downward, and finished before anyone waits on them. */
-
-/* The notification, dropping in from above the panel it lands on. */
-@keyframes story-drop {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: none; }
-}
-.story-drop {
-  animation: story-drop 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* Each cascade step, rising into the list under the one before it. */
-@keyframes story-rise {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
-}
-.story-rise {
-  animation: story-rise 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* A record sealed during this visit, flashing once as it joins the timeline. */
-@keyframes story-flash {
-  from { background-color: rgba(88, 166, 255, 0.14); }
-  to { background-color: transparent; }
-}
-.story-flash {
-  animation: story-flash 1.6s ease-out 1;
-}
-
-/* The boot indicator. A pulse says "working" without a spinner's urgency. */
-@keyframes story-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-.story-pulse {
-  animation: story-pulse 1.5s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .story-drop,
-  .story-rise,
-  .story-flash,
-  .story-pulse {
-    animation: none;
-  }
 }

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import clsx from "clsx";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Check } from "lucide-react";
 import { CONNECTORS, type Connector, type ConnectorStatus } from "@/lib/demo/integrations";
 

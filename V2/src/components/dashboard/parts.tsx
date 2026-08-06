@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { BAND_STYLE, type RiskBand } from "@/lib/dashboard/risk";
 

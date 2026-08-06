@@ -55,7 +55,7 @@ export const PRINCIPLES: readonly Principle[] = [
     n: "04",
     title: "Buy the hard proven parts",
     detail:
-      "Transparency log, policy engine and durable workflows are battle-tested open source. We build only the layer that is genuinely ours.",
+      "Transparency log, policy engine and durable workflows are solved problems with mature open-source implementations. We build only the layer that is genuinely ours.",
     consequence:
       "Engineering spend goes almost entirely into differentiated IP instead of re-solving solved problems.",
   },
