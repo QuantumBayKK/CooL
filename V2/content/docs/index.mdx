@@ -1,0 +1,54 @@
+---
+title: Documentation
+description: Install the SDK, seal a record, and verify it offline with a verifier we do not control.
+section: Start here
+order: 1
+---
+
+CooL seals every change to an AI system — a prompt edit, a model swap, a
+permission grant — as a signed, tamper-evident record. This documentation covers
+producing those records and, more importantly, checking them.
+
+## Start with verification, not with capture
+
+Most integration guides begin by telling you how to send them data. This one
+begins with how to check what comes back, because that is the only part that
+determines whether any of the rest is worth doing.
+
+```bash
+npm install -g cool-nwc
+cool verify ./change-receipt.json --offline
+```
+
+If you do not have a receipt yet, produce one in your browser at
+[/verify](/verify) and download it. The verifier that runs on that page and the
+one you just installed are the same implementation.
+
+## What the verifier reports
+
+Seven domains, each checked and reported separately.
+
+| Domain | Proves |
+|---|---|
+| `canonical` | The record serialises deterministically |
+| `binding` | The digest matches the record |
+| `signature` | ML-DSA-65 and Ed25519 both verify |
+| `inclusion` | The record is in the log where it claims |
+| `consistency` | The log only ever grew |
+| `attestation` | Where the record was produced |
+| `witnesses` | An independent party saw the same log |
+
+<Warning>
+Two of these do not pass today. `attestation` reports `simulated` because there
+is no hardware root in the loop yet, and `witnesses` reports `absent` because
+external co-signing is not built. Both rules live in the verifier, so no
+presentation layer can make them read as passing. See
+[the security model](/security#simulated).
+</Warning>
+
+## Where to go next
+
+- [Quickstart](/docs/quickstart) — from install to a sealed record in five minutes
+- [Verify it yourself](/docs/verify-it-yourself) — check a record without trusting us
+- [Receipt format](/docs/receipt-format) — what a record contains, field by field
+- [Threat model](/docs/threat-model) — who you still have to trust

@@ -1,0 +1,56 @@
+---
+title: Threat model
+description: What CooL defends against, what it does not, and who you still have to trust.
+section: Concepts
+order: 20
+---
+
+The useful question about an evidence system is not what it proves but who it
+still requires you to trust.
+
+## Removed from the trust set
+
+**CooL, for record contents.** You recompute every digest and signature
+yourself with a published verifier. We cannot alter a record you already hold.
+
+**CooL, for signing keys.** Keys are derived inside the enclave from the
+measurement. There is no escrow — we have no copy to surrender, and no code path
+that would produce one.
+
+**The network.** Verification makes zero network calls, and on the website that
+count is measured rather than claimed.
+
+## Still in the trust set
+
+**CooL, for log history.** A transparency log signed only by its operator is
+tamper-evident against outsiders and *not* against the operator. Against a
+determined insider at CooL, today, the log alone is not sufficient. External
+witnesses close this and they are not built.
+
+**The hardware vendor.** A TEE attestation roots in Intel's signing key. If you
+do not trust the vendor, attestation proves nothing to you. No design removes
+this.
+
+**Your own operators.** CooL records what your people did. It does not prevent
+them doing it, and was never intended to.
+
+## Attacks and outcomes
+
+| Attack | Outcome |
+|---|---|
+| Edit a record after sealing | `binding` and `signature` both fail |
+| Re-sign with a different key | `signature` fails against the pinned key |
+| Staple a quote from another image | `attestation` fails — the quote digest is inside the signature |
+| Redeploy from a patched image | A different key is derived; the old pin no longer verifies |
+| Drop a record from the log | `inclusion` fails for that record |
+| Rewrite log history | `consistency` fails between tree heads |
+| Insider at CooL rewrites the whole log | **Not detected today.** Needs witnesses. |
+
+## Failure model
+
+Capture is asynchronous, out-of-band and fail-open. If CooL is unreachable your
+inference continues; events queue, and what cannot be queued is counted with the
+count itself written as a signed entry. Loss is recorded, never silent.
+
+RA-TLS is the opposite direction: fail-closed toward the network. A measurement
+mismatch means the channel never opens and nothing is transmitted.

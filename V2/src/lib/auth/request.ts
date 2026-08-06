@@ -2,6 +2,8 @@ import "server-only";
 
 import { headers } from "next/headers";
 
+import { truncateIp } from "@/lib/auth/ip";
+
 /**
  * Coarse request context for the audit trail.
  *
@@ -20,41 +22,14 @@ import { headers } from "next/headers";
  *     be smuggled in.
  */
 
+// Re-exported so callers keep one import site; the implementation lives in
+// `ip.ts`, which is not `server-only` and can therefore be unit-tested.
+export { truncateIp };
+
 export interface RequestContext {
   ipPrefix: string | null;
   country: string | null;
   userAgent: string | null;
-}
-
-/**
- * Truncate an IP to its network prefix.
- *
- * Returns null for anything unparseable rather than storing a partial or
- * attacker-controlled string — `x-forwarded-for` is a client-settable header
- * and its contents must never be trusted as a literal.
- */
-export function truncateIp(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-
-  // XFF is a comma-separated chain; the left-most entry is the original client
-  // as reported by the first proxy. It is spoofable, which is precisely why
-  // this value is only ever used as a rate-limit bucket and a forensic hint,
-  // never as an authorisation input.
-  const first = raw.split(",")[0]?.trim();
-  if (!first) return null;
-
-  if (first.includes(":")) {
-    // IPv6 → /48, the first three hextets.
-    const parts = first.split(":").filter(Boolean);
-    if (parts.length < 3) return null;
-    if (!parts.every((p) => /^[0-9a-fA-F]{1,4}$/.test(p))) return null;
-    return `${parts.slice(0, 3).join(":")}::/48`;
-  }
-
-  const octets = first.split(".");
-  if (octets.length !== 4) return null;
-  if (!octets.every((o) => /^\d{1,3}$/.test(o) && Number(o) <= 255)) return null;
-  return `${octets.slice(0, 3).join(".")}.0/24`;
 }
 
 export async function requestContext(): Promise<RequestContext> {

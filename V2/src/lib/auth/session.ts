@@ -4,6 +4,8 @@ import { createHash, randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { EncryptJWT, jwtDecrypt } from "jose";
 
+import { SESSION_COOKIE_NAME as COOKIE } from "@/lib/auth/cookies";
+
 /**
  * Investor session handling.
  *
@@ -28,7 +30,7 @@ import { EncryptJWT, jwtDecrypt } from "jose";
  * blast radius this design avoids.
  */
 
-const COOKIE = "cool_investor";
+
 const ISSUER = "cool:investor-portal";
 const AUDIENCE = "cool:investor";
 
@@ -145,4 +147,4 @@ export async function clearSessionCookie(): Promise<void> {
   jar.set(COOKIE, "", { ...cookieOptions(), maxAge: 0 });
 }
 
-export const SESSION_COOKIE_NAME = COOKIE;
+export { SESSION_COOKIE_NAME } from "@/lib/auth/cookies";

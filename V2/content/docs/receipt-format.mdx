@@ -1,0 +1,66 @@
+---
+title: Receipt format
+description: What a sealed record contains, field by field, and what each field commits to.
+section: Reference
+order: 10
+---
+
+A receipt is not a log line. Every field carries its own proof obligation.
+
+## Top-level shape
+
+```json
+{
+  "v": "cool.receipt.v2",
+  "core": {},
+  "binding_digest": "sha256:...",
+  "signature": { "pq": "...", "classical": "..." },
+  "log": { "leaf": "...", "index": 41, "path": [], "sth": {} },
+  "attestation": { "mode": "simulated" }
+}
+```
+
+## core
+
+The change itself: what was edited, from what, to what, by whom, and under which
+policy. This is the only field with semantic content; everything else exists to
+make it checkable.
+
+Serialised as deterministic CBOR (CDE). Determinism is load-bearing — two
+implementations must produce byte-identical output, or the digest below means
+nothing.
+
+## binding_digest
+
+`SHA-256` over the canonical CBOR of `core`. Alter one byte of the record and
+this stops matching.
+
+## signature
+
+```text
+message = canonicalCBOR(core) || binding_digest
+
+  pq        = ML-DSA-65(message, sk_pq)
+  classical = Ed25519(message, sk_ed)
+```
+
+Both are required. A break in either family does not forge a record.
+
+## log
+
+An RFC 6962 leaf — `SHA256(0x00 || digest)` — plus its audit path and the signed
+tree head it resolves to. This proves position in history rather than asserting
+it.
+
+## attestation
+
+Where the record was produced: the measurement (MRTD and RTMRs) and the quote
+that vouches for it. The quote's `report_data` commits to the very public key
+the record is signed with, so "attested code" and "signing key" become one chain
+rather than two claims that have to be correlated by trusting somebody.
+
+<Warning>
+`mode` reads `simulated` in every build shipped today. It becomes `hardware`
+only when a genuine vendor-rooted quote is present, and the verifier will not
+report `pass` on this domain without one.
+</Warning>

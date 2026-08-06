@@ -1,113 +1,137 @@
-name: ci
-
-# Everything that used to be "a script somebody ran once", on every push.
-#
-# The ordering is cheapest-first so a broken build fails in seconds rather than
-# minutes: types, lint, unit tests, then the two conformance suites, then the
-# consumer install check, then the site build. The consumer check is last of the
-# SDK jobs because it packs, installs and typechecks in a throwaway project —
-# slow, and worth it: it is the only step that sees the package the way a
-# stranger does.
+name: CI
 
 on:
   push:
-    branches: ["**"]
+    branches: [main, "rebuild/**"]
   pull_request:
-  workflow_dispatch:
+    branches: [main]
 
+# A second push to the same branch cancels the first. CI that keeps grinding
+# through superseded commits burns minutes and delays the run people are
+# actually waiting on.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+env:
+  NODE_VERSION: "24"
 
+jobs:
+  # ── static checks ────────────────────────────────────────────────────────
+  # No database, no Docker. These are the fast gates, and they run first so a
+  # typo does not wait behind a container pull.
+  check:
+    name: Types, guards and tests
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install
-        run: npm ci
+      - run: npm ci
 
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Lint
-        run: npm run lint
+      - name: Palette conformance (WCAG AA, both themes)
+        run: npm run verify:palette
 
-      - name: Unit tests
+      # The claim guard. Fails the build if any page contains a phrase reserved
+      # for a readiness gate above the one the product is actually on. This is
+      # the check that stops the site over-selling itself, and it is not
+      # optional or advisory.
+      - name: Claim conformance
+        run: npm run verify:claims
+
+      - name: Unit and conformance tests
         run: npm test
 
-      # The v1 evidence core against the published cool-spec vectors.
-      - name: Conformance — v1 receipts
-        run: npm run verify:sdk
-
-      # The confidential-compute tier, attacked: tampering, quote swapping,
-      # key rotation on redeploy, and a refused RA-TLS channel.
-      - name: Conformance — TEE tier
-        run: npm run verify:tee
-
-      # Pack, install into a clean project, run it, and typecheck a consumer
-      # under both nodenext and bundler resolution.
-      - name: Package works on install
-        run: npm run verify:package
-
-      - name: Build the SDK artefacts
-        run: npm run sdk:build
-
-      # The published page reads public/sdk/manifest.json, so a stale artefact
-      # would advertise a version nobody can download.
-      - name: Artefacts match the package version
-        run: |
-          node -e "
-            const pkg = require('./packages/cool-tee/package.json');
-            const manifest = require('./public/sdk/manifest.json');
-            if (pkg.version !== manifest.version) {
-              console.error('manifest ' + manifest.version + ' != package ' + pkg.version + ' — run: npm run sdk:build');
-              process.exit(1);
-            }
-            const fs = require('fs');
-            const tarball = 'public/sdk/cool-tee-' + pkg.version + '.tgz';
-            if (!fs.existsSync(tarball)) {
-              console.error('missing ' + tarball);
-              process.exit(1);
-            }
-            console.log('artefacts match v' + pkg.version);
-          "
-
-      - name: Build the site
-        run: npm run build
-
-  # Runs only when the secrets exist, so a fork's CI is not red for lacking a
-  # confidential VM. This is the job that will one day print `attestation: pass`
-  # against real silicon.
-  live:
+  # ── secret scanning ──────────────────────────────────────────────────────
+  secrets:
+    name: Secret scan
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    if: github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history: a secret committed and then removed is still a
+          # secret, and a shallow clone would not see it.
+          fetch-depth: 0
+
+      - name: Fail on committed env files
+        run: |
+          if git log --all --diff-filter=A --name-only --pretty=format: \
+             | grep -E '^\.env($|\.)' | grep -v '\.env\.example'; then
+            echo "::error::An environment file was committed. Rotate every value in it."
+            exit 1
+          fi
+          echo "No env files in history."
+
+      - name: Fail on service-role keys in tracked files
+        run: |
+          # Supabase service-role JWTs and secret keys. The anon/publishable key
+          # is public by design and is deliberately not matched here.
+          if git grep -nIE 'sb_secret_[A-Za-z0-9_-]{20,}|service_role' -- \
+             ':!*.md' ':!.github/**' ':!.env.example' ':!scripts/**'; then
+            echo "::error::A service-role reference appears in a tracked file."
+            exit 1
+          fi
+          echo "No service-role keys in tracked files."
+
+  # ── database ─────────────────────────────────────────────────────────────
+  # Applies the migrations to a real Postgres and proves the security
+  # properties the site claims. Separate job so a schema regression is
+  # attributable at a glance.
+  database:
+    name: Schema and RLS conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
-      - run: npm ci
-      - name: Live endpoints
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase
+        run: supabase start
+
+      - name: Apply migrations and seed
+        run: supabase db reset
+
+      - name: Row-level security conformance
         env:
-          DSTACK_ENDPOINT: ${{ secrets.DSTACK_ENDPOINT }}
-          QUOTE_VERIFIER_URL: ${{ secrets.QUOTE_VERIFIER_URL }}
-          QUOTE_VERIFIER_KEY: ${{ secrets.QUOTE_VERIFIER_KEY }}
-          PHALA_LLM_URL: ${{ secrets.PHALA_LLM_URL }}
-          PHALA_API_KEY: ${{ secrets.PHALA_API_KEY }}
-          COOL_PIN_MRTD: ${{ vars.COOL_PIN_MRTD }}
-          COOL_PIN_RTMR0: ${{ vars.COOL_PIN_RTMR0 }}
-          COOL_PIN_RTMR1: ${{ vars.COOL_PIN_RTMR1 }}
-          COOL_PIN_RTMR2: ${{ vars.COOL_PIN_RTMR2 }}
-          COOL_PIN_RTMR3: ${{ vars.COOL_PIN_RTMR3 }}
-        run: npm run verify:live
+          # `supabase start` names containers after the working directory.
+          SUPABASE_DB_CONTAINER: supabase_db_V2
+        run: npm run verify:rls
+
+  # ── build ────────────────────────────────────────────────────────────────
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    needs: [check]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        # Deliberately built WITHOUT Supabase credentials. The public site must
+        # compile and render for a contributor who has never run `supabase
+        # start` — if this job needs secrets, the portal has leaked into the
+        # public tree.
+        env:
+          INVESTOR_SESSION_SECRET: "ci-build-only-secret-not-used-at-runtime-x"
+          ADMIN_SESSION_SECRET: "ci-build-only-admin-secret-not-used-at-run-x"
+        run: npm run build
