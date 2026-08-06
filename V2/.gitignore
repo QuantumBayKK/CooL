@@ -5,10 +5,28 @@ out/
 next-env.d.ts
 .vercel
 
-# Raw source 3D assets — 59 MB, one file 37 MB. The optimised GLBs that ship
-# live in public/models/ (under 1 MB each) and ARE committed; regenerate them
-# with `npm run models`. Committing the sources directly would permanently slow
-# every clone. If they need versioning, use Git LFS rather than removing this.
+# ── secrets ────────────────────────────────────────────────────────────────
+# SUPABASE_SERVICE_ROLE_KEY bypasses every row-level security policy in the
+# database, and the session secrets forge investor and admin sessions. Only
+# `.env.example` — which contains no values — is tracked.
+.env
+.env.*
+!.env.example
+
+# Supabase CLI working state: container ids, generated keys, temp dumps.
+supabase/.branches/
+supabase/.temp/
+
+# ── build/test artefacts ───────────────────────────────────────────────────
+coverage/
+playwright-report/
+test-results/
+lighthouse/
+
+# Raw source 3D assets — 59 MB, one file 37 MB. Kept out of the clone; the
+# 3D layer itself was removed in the enterprise rebuild, so nothing in the app
+# reads these any more. Retained here so a stale working copy cannot commit
+# them by accident.
 3d models/
 
 # Incidental screenshots dropped in the project root.
