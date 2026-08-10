@@ -3,7 +3,11 @@
  *
  * The site claims to be accessible; this proves the claim on the one axis that
  * is mechanically checkable. Every foreground/background pair the design system
- * actually ships is measured against WCAG 2.1 contrast minima, in BOTH themes.
+ * actually ships is measured against WCAG 2.1 contrast minima.
+ *
+ * One theme. The site is light-only by design — see the header comment in
+ * globals.css for why a dark theme cannot reuse the brand red — so there is one
+ * token set here rather than two.
  *
  * Run: node scripts/verify-palette.mjs
  * Exits non-zero on the first failure, so CI catches a bad token before review.
@@ -36,7 +40,6 @@ const contrast = (a, b) => {
 };
 
 // ── the tokens, mirrored from globals.css ────────────────────────────────────
-// Kept in sync by test: tests/palette.test.ts asserts these match the stylesheet.
 export const LIGHT = {
   canvas: "#FFFFFF",
   surface: "#FAFAFA",
@@ -51,22 +54,6 @@ export const LIGHT = {
   ok: "#186A3B",
   warn: "#8A5A00",
   fail: "#A4161A",
-};
-
-export const DARK = {
-  canvas: "#0A0A0B",
-  surface: "#101012",
-  raised: "#18181B",
-  ink: "#FAFAFA",
-  "ink-muted": "#A1A1AA",
-  "ink-subtle": "#8B8B94",
-  line: "#26262B",
-  accent: "#E5484D",
-  "accent-hover": "#F26469",
-  "on-accent": "#1A0405",
-  ok: "#3DD68C",
-  warn: "#E0A72C",
-  fail: "#E5484D",
 };
 
 /**
@@ -97,21 +84,16 @@ const PAIRS = [
 let failures = 0;
 let checks = 0;
 
-for (const [themeName, theme] of [
-  ["light", LIGHT],
-  ["dark", DARK],
-]) {
-  console.log(`\n  ${themeName.toUpperCase()}`);
-  for (const [fg, bg, min] of PAIRS) {
-    const ratio = contrast(theme[fg], theme[bg]);
-    const pass = ratio >= min;
-    checks += 1;
-    if (!pass) failures += 1;
-    console.log(
-      `  ${pass ? "PASS" : "FAIL"}  ${fg.padEnd(11)} on ${bg.padEnd(8)} ` +
-        `${ratio.toFixed(2)}:1  (min ${min.toFixed(1)})`,
-    );
-  }
+console.log("\n  LIGHT");
+for (const [fg, bg, min] of PAIRS) {
+  const ratio = contrast(LIGHT[fg], LIGHT[bg]);
+  const pass = ratio >= min;
+  checks += 1;
+  if (!pass) failures += 1;
+  console.log(
+    `  ${pass ? "PASS" : "FAIL"}  ${fg.padEnd(11)} on ${bg.padEnd(8)} ` +
+      `${ratio.toFixed(2)}:1  (min ${min.toFixed(1)})`,
+  );
 }
 
 console.log(

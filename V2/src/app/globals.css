@@ -19,12 +19,22 @@
    has to stop them. So the accent changes meaning at the console boundary,
    and `[data-surface="console"]` is where it changes.
 
+   LIGHT ONLY. There is no dark theme and no theme toggle — not "dark mode is
+   unfinished", but a deliberate single surface. Two consequences worth knowing
+   before anyone adds one back:
+
+     · Every colour decision below is tuned against #FFFFFF. The deep red
+       (#A4161A) is the identity, and it fails AA on a black canvas — a dark
+       theme cannot reuse it, so it would need a second red, which means the
+       brand has two reds and the palette stops being three colours.
+     · `color-scheme: light` is declared, so form controls, scrollbars and
+       `prefers-color-scheme: dark` readers all get the light rendering rather
+       than a half-inverted one.
+
    Every foreground/background pair below is checked by
-   `scripts/verify-palette.mjs` against WCAG AA in both themes. 28/28 passing.
+   `scripts/verify-palette.mjs` against WCAG AA. 14/14 passing.
    Change a token, run the script.
    ═══════════════════════════════════════════════════════════════════════════ */
-
-@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   color-scheme: light;
@@ -86,59 +96,6 @@
   --seq-3: #60a5fa;
   --seq-4: #2563eb;
   --seq-5: #1e3a8a;
-}
-
-.dark {
-  color-scheme: dark;
-
-  --canvas: #0a0a0b;
-  --surface: #101012;
-  --raised: #18181b;
-  --sunken: #202024;
-
-  --ink: #fafafa;
-  --ink-muted: #a1a1aa;
-  --ink-subtle: #8b8b94;
-  /* Near-black rather than pure black: on a luminous red, pure black rings. */
-  --on-accent: #1a0405;
-
-  --line: #26262b;
-  --line-strong: #35353c;
-
-  /* The deep red of the light theme fails AA on a black canvas, so the dark
-     theme lifts it rather than reusing it. Same identity, different luminance
-     — this is a legibility requirement, not a style preference. */
-  --accent: #e5484d;
-  --accent-hover: #f26469;
-  --accent-wash: #2a0d0f;
-
-  --ok: #3dd68c;
-  --warn: #e0a72c;
-  --fail: #e5484d;
-  --ok-wash: #0d2318;
-  --warn-wash: #241c0a;
-  --fail-wash: #2a0d0f;
-
-  --focus: #e5484d;
-
-  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -6px rgb(0 0 0 / 0.5);
-  --shadow-modal: 0 2px 4px rgb(0 0 0 / 0.4), 0 24px 48px -12px rgb(0 0 0 / 0.7);
-
-  /* Dark series are re-stepped, not brightened copies of the light ones: the
-     dark lightness band (OKLCH L 0.48–0.67) is narrower and sits lower than the
-     light band, so a naive lightening pushes every slot out of gamut for the
-     check and collapses the pairs. */
-  --s1: #3b82f6;
-  --s2: #d96a14;
-  --s3: #0d9488;
-  --s4: #a855f7;
-  --s5: #ec4899;
-
-  --seq-1: #172554;
-  --seq-2: #1e40af;
-  --seq-3: #2563eb;
-  --seq-4: #60a5fa;
-  --seq-5: #bfdbfe;
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -269,22 +226,15 @@
   /* ── chart series ──────────────────────────────────────────────────────────
      Five slots, fixed order, assigned in sequence and never cycled.
 
-     Both sets were measured, not chosen: every candidate was run through the
-     dataviz validator against the real chart surface — #FFFFFF light, #101012
-     dark — on lightness band, chroma floor, adjacent-pair separation under
-     simulated protanopia/deuteranopia/tritanopia, a normal-vision floor, and
-     contrast. Both sets pass all five checks with no warnings.
+     The set was measured, not chosen: every candidate was run through the
+     dataviz validator against the real chart surface — #FFFFFF — on lightness
+     band, chroma floor, adjacent-pair separation under simulated
+     protanopia/deuteranopia/tritanopia, a normal-vision floor, and contrast.
+     All five checks pass with no warnings.
 
-       light  worst adjacent pair  ΔE 13.8 (CVD) · 26.4 (normal)
-       dark   worst adjacent pair  ΔE 12.5 (CVD) · 19.2 (normal)
+       worst adjacent pair  ΔE 13.8 (CVD) · 26.4 (normal)
 
-     Two consequences worth stating, because both look like mistakes otherwise:
-
-     · The dark set is re-stepped rather than lightened. The dark lightness band
-       (OKLCH L 0.48–0.67) sits lower and narrower than the light one, so the
-       obvious "brighten everything for dark mode" move pushes slots out of band
-       and collapses pairs. The orange in particular had to go *darker*, not
-       lighter, to stay legal.
+     One consequence worth stating, because it looks like a mistake otherwise:
 
      · Slot 2 is an orange, which is adjacent to the reserved `warn` hue. It is
        a deliberately different step, and it is safe because status colour never
@@ -318,9 +268,9 @@
      there fails silently as an invisible element rather than loudly as an error.
 
      So the old names are kept as aliases onto the new semantic tokens. Those
-     surfaces adopt the new palette wholesale — including light mode, which they
-     never had — without a single edit to their logic, and each one can be
-     restyled properly on its own schedule.
+     surfaces adopt the new palette wholesale — they were drawn for a dark deck
+     and now render on white — without a single edit to their logic, and each
+     one can be restyled properly on its own schedule.
 
      This block is a migration aid with an end date, not part of the design
      system. Nothing new should use these names. */
@@ -341,9 +291,22 @@
 
      140ms is the ceiling for a state change (hover, focus, toggle) and 240ms
      for an entrance. Past ~250ms the reader perceives the interface as waiting
-     for the animation rather than the animation serving the interface. */
+     for the animation rather than the animation serving the interface.
+
+     ── the one exception ──
+     The landing trailer (`components/trailer/*`) runs a second, cinematic
+     vocabulary: long scroll-driven timelines, 3D rotation, draw-on paths. That
+     is not a loosening of the rule above, because the two obey different
+     clocks. UI motion spends the reader's time — it happens *at* them while
+     they wait, so it must be short. Trailer motion spends the reader's scroll —
+     it only advances because they advanced it, so length costs them nothing and
+     stopping is always instant. Nothing in the trailer animates on a timer.
+
+     `--ease-cine` is the trailer's curve: same monotonic family, slower tail,
+     so a long travel decelerates into place instead of arriving flat. */
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-in-out: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  --ease-cine: cubic-bezier(0.16, 0.84, 0.32, 1);
   --duration-state: 140ms;
   --duration-enter: 240ms;
 }
@@ -518,6 +481,20 @@ a {
   }
 }
 
+/* The scroll track behind a pinned trailer stage.
+   Height comes from `--stage-len`, set inline per act, because the pacing of
+   each act is a property of that act. The `dvh` unit rather than `vh`: on
+   mobile Safari a `vh`-sized track is measured against the *expanded* viewport,
+   so the last chunk of every act sits under the collapsing address bar and the
+   final beat never finishes. */
+@utility stage-track {
+  height: calc(var(--stage-len-sm, 3) * 100dvh);
+
+  @media (width >= 48rem) {
+    height: calc(var(--stage-len, 4) * 100dvh);
+  }
+}
+
 /* The hairline grid. This is the site's structural signature: content sits in
    cells divided by 1px rules rather than by gaps, which is what makes a page
    read as a specification rather than as a brochure. */
@@ -625,11 +602,11 @@ a {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Syntax highlighting — Shiki dual-theme.
+   Syntax highlighting — Shiki, single theme.
 
-   Shiki emits both themes as CSS variables on the same markup, so switching
-   colour scheme is a class flip with no re-highlight and no flash. The build
-   ships one copy of the HTML, not two.
+   One theme, highlighted at build time. The dual-theme setup this replaced
+   emitted every token twice as CSS variables so a class flip could swap them;
+   with no dark theme to flip to, that was pure payload on every code block.
    ═══════════════════════════════════════════════════════════════════════════ */
 pre.shiki {
   background: var(--surface) !important;
@@ -644,12 +621,6 @@ pre.shiki {
 pre.shiki code {
   display: grid;
   background: transparent;
-}
-
-.dark pre.shiki,
-.dark pre.shiki span {
-  color: var(--shiki-dark) !important;
-  background-color: transparent !important;
 }
 
 pre.shiki .line[data-highlighted] {

@@ -1,22 +1,59 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowRight, Check, Minus } from "lucide-react";
 
 import { CodeBlock } from "@/components/ui/code";
 import { Button } from "@/components/ui/button";
-import { Reveal, Stagger } from "@/components/ui/motion";
+import { Reveal } from "@/components/ui/motion";
 import {
   Card,
   Container,
   Eyebrow,
-  Mono,
   Section,
   SectionHeader,
-  StatusBadge,
 } from "@/components/ui/primitives";
-import { PipelineDiagram } from "@/components/diagrams/PipelineDiagram";
+import { ActDashboard } from "@/components/trailer/ActDashboard";
+import { ActReceipt } from "@/components/trailer/ActReceipt";
+import { ActThread } from "@/components/trailer/ActThread";
+import { Hero } from "@/components/trailer/Hero";
+import { TimeSaved } from "@/components/trailer/TimeSaved";
 import { CURRENT_STAGE } from "@/content/gates";
 import { SITE } from "@/lib/site";
+
+/**
+ * The landing page, as a trailer.
+ *
+ * ── the shape ──
+ *
+ *   curtain → hero → 01 install → 02 the record → 03 console & reports
+ *           → 04 what it costs you now → the live demo → the caveats → start
+ *
+ * Three pinned acts carry the product story with motion, and then the page
+ * stops moving and starts proving. That ordering is the whole argument of the
+ * design: the acts earn enough attention to get the reader to the demo, and the
+ * demo is the only thing on the page that is not a claim — it runs the real
+ * ML-DSA-65 signatures and the real Merkle log on the reader's own machine.
+ *
+ * ── what survived the rebuild, and why ──
+ *
+ * `<WhatIsNotTrue />` stays, immediately after the demo. A trailer is a format
+ * built to oversell, and this site's entire position is that it can be checked
+ * rather than believed — so the section listing the two things the product
+ * cannot prove yet has to sit inside the polish, not on a page the polish links
+ * to. A caveat that gets quietly dropped during a visual pass is precisely the
+ * behaviour CooL exists to make detectable.
+ *
+ * ── cost ──
+ *
+ * The three acts are client components and the demo is a five-view crypto
+ * workload, so nothing but the acts is eagerly loaded: `DemoShell` is
+ * `dynamic()`, and it in turn code-splits four of its five views. The hero,
+ * the caveats and the CTA are server-rendered — the reader gets readable HTML
+ * before any of the motion code arrives.
+ */
+
+const DemoShell = dynamic(() => import("@/components/demo/DemoShell"));
 
 export const metadata: Metadata = {
   title: `${SITE.name} — ${SITE.tagline}`,
@@ -24,208 +61,54 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-/**
- * The landing page.
- *
- * Structure borrowed from Phala's philosophy rather than its layout: every
- * claim is immediately followed by the artifact that proves it. The hero makes
- * a statement and then shows the command; the seal section makes a statement
- * and then shows the receipt fields; the verification section makes a statement
- * and then hands the reader a verifier we do not control.
- *
- * The section that matters most is `<WhatIsNotTrue />`. A page that only ever
- * says yes teaches the reader nothing about whether its yeses are worth
- * anything — publishing the two domains that report `simulated` is what makes
- * the five that report `pass` mean something.
- */
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <Seal />
-      <Verify />
+
+      <ActThread />
+      <ActReceipt />
+      <ActDashboard />
+      <TimeSaved />
+
+      <LiveDemoSection />
       <WhatIsNotTrue />
-      <Where />
       <CallToAction />
     </>
   );
 }
 
-/* ── hero ─────────────────────────────────────────────────────────────────── */
+/* ── the demo ─────────────────────────────────────────────────────────────── */
 
-function Hero() {
+/**
+ * The handoff from trailer to product.
+ *
+ * Everything above this line is drawn. Everything below it executes: the same
+ * SDK that is published on npm, running in the reader's browser, with no server
+ * involved. The section header says so plainly, because the transition from
+ * "animation of a pipeline" to "the actual pipeline" is the single most
+ * valuable moment on the page and it is worth one sentence to make sure nobody
+ * scrolls past thinking it is more artwork.
+ */
+function LiveDemoSection() {
   return (
-    <section className="border-b border-line">
+    <section id="demo" className="border-t border-line" data-surface="console">
       <Container>
-        <div className="grid gap-12 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,29rem)] lg:gap-16 lg:py-24">
-          <div className="flex flex-col justify-center gap-6">
-            <Reveal>
-              <Link href="/security/readiness" className="group w-fit">
-                <StatusBadge status="warn" className="transition-colors group-hover:border-warn/50">
-                  Stage 0 · working demo · attestation simulated
-                </StatusBadge>
-              </Link>
-            </Reveal>
-
-            <Reveal delay={0.05}>
-              <h1 className="text-display max-w-[16ch]">
-                Every change to your AI, sealed as evidence.
-              </h1>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <p className="max-w-[52ch] text-lead text-ink-muted">
-                A prompt edit, a model swap, a permission grant — CooL commits
-                each one to a signed, tamper-evident record. Then it hands you a
-                verifier we do not control, so you never have to take our word
-                for any of it.
-              </p>
-            </Reveal>
-
-            <Reveal delay={0.15}>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button asChild size="lg">
-                  <Link href="/verify">
-                    Verify a record yourself
-                    <ArrowRight className="size-4" strokeWidth={2} />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="secondary">
-                  <Link href="/docs/quickstart">Read the quickstart</Link>
-                </Button>
-              </div>
-            </Reveal>
-          </div>
-
-          {/* The artifact, not an illustration of one. This is the actual
-              command, and the output below it is the actual shape of a verify
-              run — which is why it is a code block and not a screenshot. */}
-          <Reveal delay={0.1} className="flex flex-col justify-center">
-            <CodeBlock
-              lang="bash"
-              filename="your machine, offline"
-              code={`$ npm install -g cool-nwc
-$ cool verify ./change-receipt.json --offline
-
-  canonical      pass   deterministic CBOR matches core
-  binding        pass   sha256 digest matches record
-  signature      pass   ML-DSA-65 + Ed25519 hybrid
-  inclusion      pass   RFC 6962 audit path to root
-  consistency    pass   log head is append-only
-  attestation    simulated  no hardware root in this build
-  witnesses      absent     no independent co-signer
-
-  VERDICT  5 pass · 1 simulated · 1 absent
-  network requests during verification: 0`}
+        <div className="py-16 lg:py-20">
+          <Reveal>
+            <SectionHeader
+              eyebrow="05 — Live, on your machine"
+              title="Everything above was drawn. This part runs."
+              lead="Real deterministic CBOR, real SHA-256 commitments, real ML-DSA-65 + Ed25519 signatures and a real RFC 6962 log — executing in this tab, with no server involved. Then forge the receipt and watch the same verifier reject it."
             />
           </Reveal>
+
+          <div className="mt-10">
+            <DemoShell />
+          </div>
         </div>
       </Container>
     </section>
-  );
-}
-
-/* ── what gets sealed ─────────────────────────────────────────────────────── */
-
-const SEALED = [
-  {
-    field: "core",
-    detail:
-      "The change itself — what was edited, from what, to what, by whom, under which policy.",
-  },
-  {
-    field: "binding_digest",
-    detail:
-      "SHA-256 over the canonical CBOR of the core. Change one byte of the record and this stops matching.",
-  },
-  {
-    field: "signature",
-    detail:
-      "ML-DSA-65 (FIPS 204) and Ed25519, together. Never post-quantum alone, never classical alone.",
-  },
-  {
-    field: "log_entry",
-    detail:
-      "An RFC 6962 leaf and its audit path, so the record's position in history is provable, not asserted.",
-  },
-  {
-    field: "attestation",
-    detail:
-      "Where the record was produced. Today this block honestly reads simulated.",
-  },
-] as const;
-
-function Seal() {
-  return (
-    <Section tone="surface">
-      <Container>
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-16">
-          <SectionHeader
-            eyebrow="What a record contains"
-            title="Five fields, and each one can be checked independently."
-            lead="A receipt is not a log line. Every field carries its own proof obligation, and the verifier reports on each separately rather than returning a single green tick."
-          />
-
-          <div>
-            <dl className="border-t border-line">
-              {SEALED.map((row) => (
-                <div
-                  key={row.field}
-                  className="grid gap-1.5 border-b border-line py-4 sm:grid-cols-[minmax(0,12rem)_1fr] sm:gap-8"
-                >
-                  <dt>
-                    <Mono className="text-ink">{row.field}</Mono>
-                  </dt>
-                  <dd className="text-sm text-ink-muted">{row.detail}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
-/* ── verification ─────────────────────────────────────────────────────────── */
-
-function Verify() {
-  return (
-    <Section>
-      <Container>
-        <SectionHeader
-          eyebrow="The part that matters"
-          title="You verify it. Not us."
-          lead="Evidence that only its author can check is not evidence. The verifier is published, it runs offline, and it will reject a record we produced if that record is wrong."
-        />
-
-        <div className="mt-12">
-          <PipelineDiagram />
-        </div>
-
-        <Stagger className="mt-12 grid gap-px bg-line sm:grid-cols-3">
-          {[
-            {
-              title: "Offline is measured, not claimed",
-              body: "During a verify run the page replaces fetch, XMLHttpRequest, WebSocket, EventSource and sendBeacon with counting wrappers, then prints the counter. The zero you see is a measurement.",
-            },
-            {
-              title: "It refuses when it should",
-              body: "Run the verifier with --require-hardware against a record sealed sixty seconds ago and it refuses, because that record has no vendor-rooted quote. A demo that could only go green would prove nothing.",
-            },
-            {
-              title: "The same code is on npm",
-              body: "The verifier in your browser and the one in cool-nwc are the same implementation, checked against the published cool-spec conformance vectors on every build.",
-            },
-          ].map((c) => (
-            <div key={c.title} className="bg-canvas p-6">
-              <h3 className="text-h4">{c.title}</h3>
-              <p className="mt-2 text-sm text-ink-muted">{c.body}</p>
-            </div>
-          ))}
-        </Stagger>
-      </Container>
-    </Section>
   );
 }
 
@@ -240,9 +123,9 @@ function WhatIsNotTrue() {
     <Section tone="surface" id="honest">
       <Container>
         <SectionHeader
-          eyebrow="Where we actually are"
+          eyebrow="06 — Where we actually are"
           title="The two things this cannot prove yet."
-          lead="Both are listed here rather than buried, because a vendor who hides its gaps has told you nothing reliable about its strengths. These are enforced in the verifier — no amount of presentation makes them go green."
+          lead="Listed here rather than buried, because a vendor who hides its gaps has told you nothing reliable about its strengths. Both are enforced in the verifier — no amount of presentation makes them go green."
         />
 
         <div className="mt-12 grid gap-px bg-line lg:grid-cols-2">
@@ -309,59 +192,15 @@ function WhatIsNotTrue() {
   );
 }
 
-/* ── where it runs ────────────────────────────────────────────────────────── */
-
-function Where() {
-  return (
-    <Section>
-      <Container>
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,26rem)_1fr] lg:gap-16">
-          <SectionHeader
-            eyebrow="Where it runs"
-            title="Never in the critical path."
-            lead="Capture is asynchronous, out-of-band and fail-open. CooL adds no latency to inference, and if CooL is down your AI keeps serving. Loss is counted and written as a signed entry — never silent."
-          />
-
-          <div className="flex flex-col gap-px bg-line">
-            {[
-              {
-                k: "Control plane",
-                v: "Ours. Orchestration, billing, updates.",
-              },
-              {
-                k: "Data plane",
-                v: "Yours. Evidence, prompts and PII stay inside your boundary. The split is architectural, not a policy promise.",
-              },
-              {
-                k: "Signing keys",
-                v: "Derived inside the enclave from the measurement. There is no key for us to hold, which is why we cannot forge your records.",
-              },
-              {
-                k: "If CooL is unreachable",
-                v: "Your inference continues. Capture queues, and what it could not queue is counted.",
-              },
-            ].map((row) => (
-              <div key={row.k} className="grid gap-1 bg-canvas py-4 sm:grid-cols-[minmax(0,11rem)_1fr] sm:gap-8">
-                <p className="text-label uppercase text-ink-subtle">{row.k}</p>
-                <p className="text-sm text-ink-muted">{row.v}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
 /* ── CTA ──────────────────────────────────────────────────────────────────── */
 
 function CallToAction() {
   return (
-    <Section tone="surface">
+    <Section>
       <Container>
         <div className="flex flex-col items-start gap-6">
           <SectionHeader
-            eyebrow="Start"
+            eyebrow="07 — Start"
             title="Don't trust it. Check it."
             lead="Install the verifier, take a receipt this site produced in your browser, and run it on your own machine with the network off."
           />

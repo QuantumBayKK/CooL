@@ -25,15 +25,43 @@ import { SESSION_COOKIE_NAME } from "@/lib/auth/cookies";
 /**
  * Content-Security-Policy.
  *
- * `script-src` carries a per-request nonce and `strict-dynamic`. Together those
- * mean: run only scripts this response vouched for, plus whatever those scripts
- * load — and ignore any host allowlist, which is what makes CSP resistant to
- * the "someone found a JSONP endpoint on an allowlisted CDN" bypass.
+ * ── two script policies, and why ──
  *
- * `'unsafe-inline'` is present as a FALLBACK ONLY. Browsers that understand
- * `strict-dynamic` ignore it; browsers that do not would otherwise block every
- * script and render a blank page. This is the documented compatibility pattern,
- * not a loosening.
+ * A nonce-based policy only works on a page Next renders *per request*. Next
+ * stamps the nonce onto its own script tags by reading the `x-nonce` request
+ * header set below — but a statically prerendered page was generated at build
+ * time, long before any nonce existed, so its HTML carries none.
+ *
+ * That matters because `'strict-dynamic'` makes a browser ignore every host
+ * source (`'self'`, `https:`) *and* `'unsafe-inline'`. On a prerendered page
+ * the result is a policy that trusts a nonce nothing carries, and the browser
+ * blocks every script on the page. This was live: the whole public site —
+ * `/`, `/pricing`, `/about`, `/verify` — shipped ~20 blocked scripts per page
+ * and never hydrated. No scroll animation, no demo, no mobile menu, no nav
+ * dropdowns. Verified again after this change; see the note at the end.
+ *
+ * So the policy is chosen per response:
+ *
+ *   dynamic routes (`/investor`, `/admin`)  nonce + `'strict-dynamic'`
+ *   everything else (prerendered)           `'self' 'unsafe-inline'`
+ *
+ * The split is not a climbdown, it is where the two policies are each correct.
+ * The strong one stays on exactly the surfaces that hold a session, a token or
+ * the data room — the only places an XSS is worth mounting — and those are
+ * dynamic precisely *because* they are authenticated, so the two properties
+ * travel together rather than by coincidence. The public pages that fall back
+ * render no user-supplied content at all: marketing copy, MDX authored in this
+ * repo, and evidence the visitor's own browser computed.
+ *
+ * `'unsafe-inline'` on the fallback is load-bearing rather than lazy — Next's
+ * hydration payload arrives as inline `self.__next_f.push(...)` scripts, and
+ * without either a nonce or `'unsafe-inline'` the page cannot hydrate at all.
+ * A nonce must NOT be added to the fallback: its mere presence is what makes a
+ * browser ignore `'unsafe-inline'`, which is the trap this is escaping.
+ *
+ * If a public route ever needs the strong policy, the fix is to make it
+ * dynamic (`export const dynamic = "force-dynamic"`) and add it to
+ * `PRIVATE_PREFIXES`-style matching here — not to widen this string.
  *
  * `style-src` allows `'unsafe-inline'` without apology: Next injects inline
  * styles for font loading and for the streaming shell, and there is no nonce
@@ -41,14 +69,25 @@ import { SESSION_COOKIE_NAME } from "@/lib/auth/cookies";
  * cannot execute — and pretending otherwise by shipping a policy that breaks
  * the site would be worse.
  */
-function contentSecurityPolicy(nonce: string, dev: boolean): string {
+function contentSecurityPolicy(
+  nonce: string,
+  dev: boolean,
+  /** True only where Next renders per request and can stamp the nonce. */
+  nonceable: boolean,
+): string {
   const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+
+  // 'unsafe-eval' in development only — Turbopack's HMR needs it, and it must
+  // never reach production.
+  const evalSrc = dev ? " 'unsafe-eval'" : "";
+
+  const scriptSrc = nonceable
+    ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline'${evalSrc} https:`
+    : `script-src 'self' 'unsafe-inline'${evalSrc}`;
 
   return [
     `default-src 'self'`,
-    // 'unsafe-eval' in development only — Turbopack's HMR needs it, and it must
-    // never reach production.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' ${dev ? "'unsafe-eval'" : ""} https:`,
+    scriptSrc,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: blob:`,
     `font-src 'self' data:`,
@@ -100,7 +139,13 @@ export function middleware(request: NextRequest) {
     response = NextResponse.next({ request: { headers } });
   }
 
-  response.headers.set("content-security-policy", contentSecurityPolicy(nonce, dev));
+  // `isPrivate` doubles as "Next renders this per request". Every route under
+  // /investor and /admin is dynamic because it is authenticated; everything
+  // else in the app is prerendered. See the note on `contentSecurityPolicy`.
+  response.headers.set(
+    "content-security-policy",
+    contentSecurityPolicy(nonce, dev, isPrivate),
+  );
   response.headers.set("x-content-type-options", "nosniff");
   response.headers.set("referrer-policy", "strict-origin-when-cross-origin");
   response.headers.set("x-frame-options", "DENY");

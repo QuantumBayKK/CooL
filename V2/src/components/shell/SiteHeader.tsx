@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 
 import { Collapse } from "@/components/ui/motion";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/shell/ThemeToggle";
 import { Wordmark } from "@/components/shell/Wordmark";
 import { isGroup, NAV, type NavGroup, type NavItem } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -106,7 +105,6 @@ export function SiteHeader() {
           </ul>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle className="hidden sm:inline-flex" />
             <Button asChild size="sm" variant="secondary" className="hidden sm:inline-flex">
               <Link href="/docs/quickstart">Get started</Link>
             </Button>
@@ -178,7 +176,6 @@ export function SiteHeader() {
               <Link href="/docs/quickstart">Get started</Link>
             </Button>
           </div>
-          <ThemeToggle className="mt-4 sm:hidden" />
         </div>
       </Collapse>
     </header>

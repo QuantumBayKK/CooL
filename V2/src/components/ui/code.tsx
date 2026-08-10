@@ -11,9 +11,10 @@ import { cn } from "@/lib/utils";
  * client — ships a tokenizer and a grammar (hundreds of kB) to render text that
  * never changes, and flashes unstyled code while it loads.
  *
- * Dual themes emit both palettes as CSS variables on one set of spans, so the
- * theme toggle is a class flip with no re-highlight and no second copy of the
- * markup. The `.dark` rules that activate `--shiki-dark` live in globals.css.
+ * One theme, not two. The dual-theme mode this replaced emitted every token
+ * twice — once per palette — as CSS variables on each span, so a class flip
+ * could swap them without re-highlighting. With no dark theme to flip to, that
+ * was roughly double the markup on every code block for no behaviour.
  */
 export async function CodeBlock({
   code,
@@ -31,8 +32,7 @@ export async function CodeBlock({
 }) {
   const html = await codeToHtml(code.trim(), {
     lang,
-    themes: { light: "github-light", dark: "github-dark-dimmed" },
-    defaultColor: false,
+    theme: "github-light",
     // `structure: "classic"` keeps the <pre><code> wrapper Shiki's CSS expects.
     transformers: [
       {

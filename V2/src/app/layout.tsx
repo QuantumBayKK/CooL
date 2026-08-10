@@ -4,7 +4,6 @@ import { GeistMono } from "geist/font/mono";
 
 import "./globals.css";
 import { Providers } from "@/app/providers";
-import { THEME_SCRIPT } from "@/components/shell/ThemeToggle";
 import { SITE } from "@/lib/site";
 
 /**
@@ -62,12 +61,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Both entries are required for the browser UI to match the canvas in each
-  // theme; a single colour leaves one theme with a mismatched status bar on iOS.
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0b" },
-  ],
+  // One colour, because there is one theme. Declared unconditionally so that a
+  // reader whose OS is set to dark still gets a white iOS status bar matching
+  // the white canvas, rather than the black one Safari would otherwise infer.
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   // Not `maximumScale: 1`. Blocking pinch-zoom is a WCAG 1.4.4 failure, and on
@@ -80,17 +77,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // No `suppressHydrationWarning` on <html>: it was there only to excuse the
+  // theme script mutating the element before React attached. With that script
+  // gone the server and client trees agree exactly, and leaving the escape
+  // hatch in place would silence real hydration mismatches site-wide.
   return (
     <html
       lang="en"
-      suppressHydrationWarning
       className={`${plex.variable} ${inter.variable} ${GeistMono.variable}`}
     >
-      <head>
-        {/* Before first paint, so a dark-mode reader never sees a white flash.
-            This must stay inline and must stay in <head>. */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-      </head>
       <body className="min-h-dvh bg-canvas text-ink antialiased">
         {/* Skip link — the first tab stop on every page. Visually hidden until
             focused, which is the only way it helps the people who need it
