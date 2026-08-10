@@ -9,6 +9,7 @@ import {
   SectionHeader,
 } from "@/components/ui/primitives";
 import { CONTACT, HAS_PHONE, PHONES } from "@/lib/contact";
+import { RESPONSE } from "@/content/marketing";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -29,6 +30,21 @@ export default function ContactPage() {
               title="Talk to the people who wrote it."
               lead="Not a sales team. If you ask a technical question you will get a technical answer, including when the answer is that we have not built it yet."
             />
+
+            {/* The response-time promise, stated before the form rather than
+                after it. The question "how long until someone replies?" is
+                what a reader weighs while deciding whether to type anything,
+                so answering it afterwards answers it too late. Same string as
+                the thank-you page and the FAQ — one constant, so the promise
+                cannot say different things in different places. */}
+            <div className="mt-8 border-l-2 border-accent bg-accent-wash/40 py-3 pl-4">
+              <p className="text-label uppercase text-ink-subtle">
+                Response time
+              </p>
+              <p className="mt-1.5 max-w-[54ch] text-sm text-ink">
+                {RESPONSE.long}
+              </p>
+            </div>
 
             <div className="mt-10 flex flex-col gap-px bg-line">
               <a

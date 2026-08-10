@@ -1,5 +1,7 @@
+import { AutoBreadcrumbs } from "@/components/shell/AutoBreadcrumbs";
 import { SiteFooter } from "@/components/shell/SiteFooter";
 import { SiteHeader } from "@/components/shell/SiteHeader";
+import { StickyMobileCta } from "@/components/shell/StickyMobileCta";
 
 /**
  * The public shell.
@@ -22,10 +24,18 @@ export default function SiteLayout({
   return (
     <div className="flex min-h-dvh flex-col">
       <SiteHeader />
+      {/* Derived from the pathname and mounted once, so a renamed route cannot
+          leave a stale trail behind on a page nobody thought to update.
+          Suppresses itself on the homepage and the full-bleed surfaces. */}
+      <AutoBreadcrumbs />
       <main id="main" className="flex-1">
         {children}
       </main>
       <SiteFooter />
+      {/* Below `lg` only, after 620px of scroll, and never over the footer.
+          It excludes itself from the evidence surfaces and the private rooms —
+          see the component. */}
+      <StickyMobileCta />
     </div>
   );
 }

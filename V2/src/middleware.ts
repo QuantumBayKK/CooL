@@ -79,21 +79,45 @@ function contentSecurityPolicy(
 
   // 'unsafe-eval' in development only — Turbopack's HMR needs it, and it must
   // never reach production.
+  //
+  // Nothing in the app needs it any more. The receipt verifier used to, because
+  // Ajv compiles JSON Schema with `new Function`; that validator is now
+  // precompiled at build time (see `scripts/build-validator.mjs`) precisely so
+  // this line can stay development-only. Do not widen it to fix a library —
+  // `'unsafe-eval'` cannot be scoped, so granting it for one dependency grants
+  // it to every script on the page.
   const evalSrc = dev ? " 'unsafe-eval'" : "";
+
+  /**
+   * Analytics hosts, and only when analytics is actually configured.
+   *
+   * A deployment with no `NEXT_PUBLIC_GA_ID` keeps the tighter policy rather
+   * than carrying permanent holes for a tag it never loads. `googletagmanager`
+   * serves the script; `google-analytics` (and the regional `*.analytics.
+   * google.com`) receive the beacons, so one is a script source and both are
+   * connect sources.
+   */
+  const ga = process.env.NEXT_PUBLIC_GA_ID;
+  const gaScript = ga ? " https://www.googletagmanager.com" : "";
+  const gaConnect = ga
+    ? " https://www.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com"
+    : "";
 
   const scriptSrc = nonceable
     ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline'${evalSrc} https:`
-    : `script-src 'self' 'unsafe-inline'${evalSrc}`;
+    : `script-src 'self' 'unsafe-inline'${evalSrc}${gaScript}`;
 
   return [
     `default-src 'self'`,
     scriptSrc,
     `style-src 'self' 'unsafe-inline'`,
-    `img-src 'self' data: blob:`,
+    // `www.google-analytics.com` also serves the collection pixel on some
+    // transports, which is an image load rather than a fetch.
+    `img-src 'self' data: blob:${ga ? " https://www.google-analytics.com" : ""}`,
     `font-src 'self' data:`,
     // The portal talks to Supabase; nothing else is allowed out. In dev the
     // websocket for HMR is added.
-    `connect-src 'self' ${supabase} ${dev ? "ws: http://127.0.0.1:*" : ""}`,
+    `connect-src 'self' ${supabase}${gaConnect} ${dev ? "ws: http://127.0.0.1:*" : ""}`,
     `object-src 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,

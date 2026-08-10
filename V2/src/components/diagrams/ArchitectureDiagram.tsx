@@ -24,7 +24,16 @@ export function ArchitectureDiagram() {
         </>
       }
     >
-      <svg viewBox="0 0 900 400" className="h-auto w-full">
+      {/* The accessible name describes what the drawing PROVES, not what it
+          contains. "A diagram with boxes and arrows" tells a screen-reader
+          user nothing; the load-bearing fact — that no evidence arrow crosses
+          the boundary — is the whole reason the diagram exists. */}
+      <svg
+        viewBox="0 0 900 400"
+        className="h-auto w-full"
+        role="img"
+        aria-label="Architecture: the customer's data plane holds all evidence, prompts and personal data, while CooL's control plane holds only orchestration, health and billing. Every arrow crossing between them is dashed and carries configuration only — no arrow carrying evidence leaves the customer boundary."
+      >
         <ArrowDefs />
 
         {/* ── our side ───────────────────────────────────────────────────── */}

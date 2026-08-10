@@ -25,7 +25,12 @@ export function PipelineDiagram() {
         </>
       }
     >
-      <svg viewBox="0 0 900 300" className="h-auto w-full">
+      <svg
+        viewBox="0 0 900 300"
+        className="h-auto w-full"
+        role="img"
+        aria-label="The evidence pipeline, left to right: the application calls the model directly, and that path does not pass through CooL — capture runs alongside it, so CooL is never in the critical path of inference. Captured changes are canonicalised, hashed, signed and appended to a transparency log. The verifier sits outside the trust boundary, because a verifier inside the system it checks proves nothing."
+      >
         <ArrowDefs />
 
         {/* ── inference path — the one that must never be blocked ────────── */}

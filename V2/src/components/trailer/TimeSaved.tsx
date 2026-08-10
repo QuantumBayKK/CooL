@@ -191,14 +191,29 @@ function Figure({
           walking a counting element otherwise announces whatever integer
           happened to be rendered when focus reached it. */}
       <p
-        className={`tnum font-display text-h1 leading-none ${
+        className={`font-editorial text-h1 leading-none ${
           muted ? "text-ink-subtle" : "text-ink"
         }`}
         aria-label={value === null ? unit : `${value} ${unit}`}
       >
         <span aria-hidden>
-          {value === null ? "—" : <motion.span>{shown}</motion.span>}{" "}
-          <span className="text-h4 font-normal">{unit}</span>
+          {/* Abril Fatface has no tabular figures, so a counter set in it
+              changes width as the digits tick and shoves the unit label
+              around. `.tnum` cannot fix what the font does not contain — so
+              the width is reserved from the FINAL value instead. A count-up
+              only ever grows its digit count, which makes the final width the
+              maximum, and the box stops moving entirely. */}
+          {value === null ? (
+            "—"
+          ) : (
+            <motion.span
+              className="inline-block text-right"
+              style={{ minWidth: `${String(value).length}ch` }}
+            >
+              {shown}
+            </motion.span>
+          )}{" "}
+          <span className="font-sans text-h4 font-normal">{unit}</span>
         </span>
       </p>
       <p

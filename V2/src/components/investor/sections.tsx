@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ArchitectureDiagram } from "@/components/diagrams/ArchitectureDiagram";
+import { Deck } from "@/components/investor/Deck";
 import { GateLadder } from "@/components/security/GateLadder";
 import {
   Card,
@@ -37,6 +38,8 @@ export function RoomSectionBody({ slug }: { slug: string }) {
   switch (slug) {
     case "overview":
       return <Overview />;
+    case "deck":
+      return <Deck />;
     case "roadmap":
       return <Roadmap />;
     case "competition":

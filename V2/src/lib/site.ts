@@ -124,6 +124,8 @@ export const FOOTER: readonly NavGroup[] = [
     items: [
       { label: "About", href: "/about" },
       { label: "Contact", href: "/contact" },
+      { label: "FAQ", href: "/#faq" },
+      { label: "Privacy policy", href: "/privacy" },
       { label: "Investor access", href: "/investor" },
     ],
   },
@@ -148,6 +150,10 @@ export const ROUTES = [
   { path: "/studio", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/docs", priority: 0.9, changeFrequency: "weekly" as const },
   { path: "/pricing", priority: 0.85, changeFrequency: "monthly" as const },
+  { path: "/pipeline", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/about", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/contact", priority: 0.7, changeFrequency: "monthly" as const },
+  { path: "/privacy", priority: 0.3, changeFrequency: "yearly" as const },
+  // `/thank-you` is deliberately absent: it is `noindex`, and submitting a
+  // noindex URL asks a crawler to index a page that refuses to be indexed.
 ] as const;

@@ -45,11 +45,14 @@ export const ROOM_SECTIONS: readonly RoomSection[] = [
   {
     slug: "deck",
     title: "Pitch deck",
+    // The twelve slides, transcribed verbatim and rendered in the site's own
+    // typography rather than embedded as a PDF. The version guarantee that
+    // used to justify file-only distribution is kept — one source in git, with
+    // a diff on every change — while the file itself stays in the data room
+    // for anyone who wants the artefact. See `content/deck.ts`.
     summary: "The narrative: problem, product, market, ask.",
     group: "The case",
-    state: "awaiting",
-    awaitingNote:
-      "The deck is distributed as a file rather than rendered here, so that a version sent to one investor cannot silently differ from the one in the room. Upload it to the data room and it appears here.",
+    state: "ready",
   },
   {
     slug: "roadmap",

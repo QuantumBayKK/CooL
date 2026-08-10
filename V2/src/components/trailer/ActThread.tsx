@@ -2,7 +2,7 @@
 
 import { motion, useTransform, type MotionValue } from "motion/react";
 
-import { Captions, Stage, type Beat } from "./Stage";
+import { Captions, Stage, Swing, type Beat } from "./Stage";
 import { stagger, usePulse, useWindow } from "./motion";
 
 /**
@@ -96,12 +96,21 @@ export function ActThread() {
               drops the eight change nodes, which are the part that cannot
               survive the width. Both run off the same progress value and the
               same beat script. */}
-          <div className="hidden md:block">
+          {/* The wide tree swings up out of depth as it draws. The narrow one
+              gets a shallower version of the same move — at 390px a 26° tilt
+              costs more legibility than it buys drama. */}
+          <Swing progress={p} className="hidden md:block">
             <Thread progress={p} />
-          </div>
-          <div className="md:hidden">
+          </Swing>
+          <Swing
+            progress={p}
+            className="md:hidden"
+            rotateX={[14, 6, 0, -3]}
+            rotateY={[-10, -4, 0, 3]}
+            scale={[0.9, 0.96, 1, 0.99]}
+          >
             <ThreadNarrow progress={p} />
-          </div>
+          </Swing>
         </div>
       )}
     </Stage>

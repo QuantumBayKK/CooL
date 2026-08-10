@@ -139,18 +139,28 @@
   --color-fail-wash: var(--fail-wash);
 
   /* ── type ──────────────────────────────────────────────────────────────────
-     Three families, three jobs, no overlap:
+     Four families, four jobs, no overlap. See the long note in `layout.tsx`
+     for which requested faces could be licensed and which could not.
 
-     display — IBM Plex Sans. Headings and anything that has to carry
-               institutional weight. Plex was drawn for IBM; it reads as
-               infrastructure rather than as a startup.
-     sans    — Inter. Body copy and every piece of UI chrome. The best screen
-               reading face at 14–17px, which is where this site lives.
-     mono    — Geist Mono. Digests, keys, CLI output, code. Chosen over the
-               other two for its unambiguous 0/O and 1/l/I, which matters when
-               the reader is comparing a hash by eye. */
-  --font-display: var(--font-plex), "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+     display   — Archivo. Headings. A grotesque that holds its shape at 48px,
+                 where Plex (drawn for text) went soft.
+     editorial — Abril Fatface. FIGURES AND CHAPTER NUMERALS ONLY. A didone at
+                 400 with this much stroke contrast is the loudest thing in the
+                 system; put it on a heading and it wins every fight with the
+                 copy underneath. One weight exists and that is a feature.
+     sans      — Inter. Body copy and every piece of UI chrome. The best screen
+                 reading face at 14–17px, which is where this site lives.
+     serif     — Athelas, then Times New Roman, then Georgia. Pull quotes and
+                 narrative lines. Deliberately NOT a webfont: a dozen sentences
+                 do not justify 40 kB on the critical path when the reader
+                 already has three good serifs installed.
+     mono      — Geist Mono. Digests, keys, CLI output, code. Chosen for its
+                 unambiguous 0/O and 1/l/I, which matters when the reader is
+                 comparing a hash by eye. */
+  --font-display: var(--font-archivo), "Archivo", Arial, ui-sans-serif, system-ui, sans-serif;
+  --font-editorial: var(--font-abril), "Abril Fatface", Georgia, serif;
+  --font-sans: var(--font-inter), "Inter", Arial, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Athelas, "Times New Roman MT", "Times New Roman", Georgia, serif;
   --font-mono: var(--font-geist-mono), "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
 
   /* ── type scale ────────────────────────────────────────────────────────────
@@ -478,6 +488,21 @@ a {
 
   @media (width >= 64rem) {
     padding-block: 7rem;
+  }
+}
+
+/* Room for the sticky mobile CTA, added only while the bar is actually up.
+   A fixed bar does not participate in layout, so without this it sits on top
+   of the last few lines of the footer. The class is toggled by the component
+   rather than applied always, so pages that never show the bar — the console,
+   the investor room — carry no dead space. */
+.has-sticky-cta {
+  padding-bottom: 4.75rem;
+}
+
+@media (width >= 64rem) {
+  .has-sticky-cta {
+    padding-bottom: 0;
   }
 }
 

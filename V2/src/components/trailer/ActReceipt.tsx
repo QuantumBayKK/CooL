@@ -100,11 +100,15 @@ function Scene({ progress: p }: { progress: MotionValue<number> }) {
   const x = useTransform(
     p,
     [0, 0.32, 0.6, 1],
-    ["46%", "0%", "0%", wide ? "-34%" : "0%"],
+    ["62%", "0%", "0%", wide ? "-34%" : "0%"],
   );
-  const rotateY = useTransform(p, [0, 0.32, 0.6, 1], [-52, -8, 0, wide ? 9 : 0]);
-  const rotateX = useTransform(p, [0, 0.32, 0.6, 1], [14, 4, 0, -2]);
-  const scale = useTransform(p, [0, 0.32, 0.6, 1], [0.82, 0.98, 1, wide ? 0.9 : 1]);
+  // 78° at entry means the reader genuinely sees the card edge-on and watches
+  // it turn — at the 52° this started on it read as a tilted rectangle rather
+  // than as an object with a back.
+  const rotateY = useTransform(p, [0, 0.32, 0.6, 1], [-78, -10, 0, wide ? 11 : 0]);
+  const rotateX = useTransform(p, [0, 0.32, 0.6, 1], [22, 5, 0, -3]);
+  const z = useTransform(p, [0, 0.32, 0.6, 1], [-420, -40, 0, -90]);
+  const scale = useTransform(p, [0, 0.32, 0.6, 1], [0.9, 0.99, 1, wide ? 0.94 : 1]);
   const enter = useWindow(p, 0.0, 0.12);
 
   // Fields arrive after the slab has stopped turning. Reading a list while it
@@ -141,6 +145,7 @@ function Scene({ progress: p }: { progress: MotionValue<number> }) {
             x,
             rotateY,
             rotateX,
+            z,
             scale,
             opacity: enter,
             transformStyle: "preserve-3d",

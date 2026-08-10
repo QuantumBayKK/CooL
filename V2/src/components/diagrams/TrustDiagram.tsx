@@ -67,7 +67,12 @@ export function TrustDiagram() {
         </>
       }
     >
-      <svg viewBox="0 0 900 340" className="h-auto w-full">
+      <svg
+        viewBox="0 0 900 340"
+        className="h-auto w-full"
+        role="img"
+        aria-label="Who you still have to trust, drawn as a subtraction: each mechanism removes a party from the set. Signatures remove the operator, the transparency log removes CooL's ability to rewrite history, and offline verification removes the need to trust this website. What remains at the centre is the honest residue — the hardware vendor and the cryptographic primitives themselves."
+      >
         {/* header rules */}
         <line x1="0" y1="28" x2="900" y2="28" className="stroke-line-strong" strokeWidth="1" />
         {["Party", "Removed by", "Status"].map((h, i) => (

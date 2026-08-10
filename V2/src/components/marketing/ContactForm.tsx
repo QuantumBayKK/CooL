@@ -2,14 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
-import { Card, StatusBadge } from "@/components/ui/primitives";
+import { Card } from "@/components/ui/primitives";
 
 const TOPICS = [
   { value: "pilot", label: "A pilot or design partnership" },
@@ -54,6 +54,8 @@ function ContactFormInner() {
     ? (topicParam as Values["topic"])
     : "pilot";
 
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -75,28 +77,24 @@ function ContactFormInner() {
       if (!body.ok) throw new Error(body.error ?? "That did not send.");
       return body;
     },
-    onSuccess: () => reset(),
+    /**
+     * Navigate to a real confirmation page rather than swapping this card for
+     * an inline "sent" state.
+     *
+     * The inline version disappeared on refresh, leaving the reader unsure
+     * whether the message actually went; it also gave analytics nothing to
+     * count but a button click. A distinct URL survives a reload, is a clean
+     * conversion event, and can spend the highest-intent moment on the site on
+     * something useful.
+     *
+     * `reset()` first so a back-navigation lands on an empty form rather than
+     * on a filled one that invites a duplicate send.
+     */
+    onSuccess: () => {
+      reset();
+      router.push("/thank-you");
+    },
   });
-
-  if (send.isSuccess) {
-    return (
-      <Card className="p-7">
-        <StatusBadge status="ok">Sent</StatusBadge>
-        <h2 className="mt-4 text-h3">Thank you — we have it.</h2>
-        <p className="mt-3 text-sm text-ink-muted">
-          A person reads these, not a queue. Expect a reply within two working
-          days; if your message was a security report, sooner.
-        </p>
-        <Button
-          variant="secondary"
-          className="mt-6"
-          onClick={() => send.reset()}
-        >
-          Send another
-        </Button>
-      </Card>
-    );
-  }
 
   return (
     <Card className="p-6 sm:p-7">

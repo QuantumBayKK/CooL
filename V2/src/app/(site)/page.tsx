@@ -13,6 +13,9 @@ import {
   Section,
   SectionHeader,
 } from "@/components/ui/primitives";
+import { CaseStudy } from "@/components/marketing/CaseStudy";
+import { Faq, FaqJsonLd } from "@/components/marketing/Faq";
+import { Reviews } from "@/components/marketing/Reviews";
 import { ActDashboard } from "@/components/trailer/ActDashboard";
 import { ActReceipt } from "@/components/trailer/ActReceipt";
 import { ActThread } from "@/components/trailer/ActThread";
@@ -72,9 +75,80 @@ export default function HomePage() {
       <TimeSaved />
 
       <LiveDemoSection />
+      <CaseStudy />
       <WhatIsNotTrue />
+      {/* Renders nothing until there are real, attributed quotes. See the note
+          on `REVIEWS` in content/marketing.ts. */}
+      <Reviews />
+      <Faq />
       <CallToAction />
+
+      {/* Structured data. Both are `application/ld+json`, which is inert data
+          rather than executable script, so neither needs a CSP nonce. */}
+      <FaqJsonLd />
+      <OrganisationJsonLd />
     </>
+  );
+}
+
+/**
+ * `Organization` + `WebSite` structured data.
+ *
+ * The pair Google actually uses on a homepage: `Organization` is what backs a
+ * knowledge panel and makes the logo and social profiles attributable, and
+ * `WebSite` establishes the canonical name so results stop being labelled with
+ * a guess derived from the domain.
+ *
+ * No `aggregateRating`, deliberately — see the note in `Reviews.tsx`. Marking
+ * up self-authored praise as a rating is the pattern that earns a manual
+ * action, and there are no customer reviews to aggregate in any case.
+ */
+function OrganisationJsonLd() {
+  const data = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${SITE.url}#organisation`,
+        name: SITE.company,
+        alternateName: SITE.name,
+        url: SITE.url,
+        description: SITE.description,
+        logo: `${SITE.url}/icon.svg`,
+        foundingDate: "2026",
+        sameAs: [SITE.repo, SITE.npm],
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "sales",
+          email: "info.quantumbay@gmail.com",
+          url: `${SITE.url}/contact`,
+        },
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE.url}#website`,
+        url: SITE.url,
+        name: SITE.name,
+        description: SITE.description,
+        publisher: { "@id": `${SITE.url}#organisation` },
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: SITE.name,
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "Any",
+        description: SITE.description,
+        url: SITE.url,
+        publisher: { "@id": `${SITE.url}#organisation` },
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
   );
 }
 

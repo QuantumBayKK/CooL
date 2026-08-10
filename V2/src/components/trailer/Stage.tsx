@@ -1,6 +1,12 @@
 "use client";
 
-import { motion, useMotionValue, useReducedMotion, useScroll } from "motion/react";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { useRef, type ReactNode } from "react";
 import type { MotionValue } from "motion/react";
 
@@ -130,6 +136,67 @@ function ScrubBar({ progress }: { progress: MotionValue<number> }) {
         className="h-full origin-left bg-accent"
         style={{ scaleX: progress }}
       />
+    </div>
+  );
+}
+
+/* ── Swing ────────────────────────────────────────────────────────────────── */
+
+/**
+ * Carries a flat composition through 3D space as the act plays.
+ *
+ * The diagram starts laid back and turned away, and rotates up to face the
+ * reader as it finishes drawing itself. That single move is what separates a
+ * schematic that fades in from one that *arrives* — and it costs nothing,
+ * because rotation and scale are compositor properties: the SVG inside is
+ * rasterised once and the GPU turns the texture.
+ *
+ * Three things make it read as depth rather than as skew:
+ *
+ * · `perspective` on the wrapper, not the child. Perspective set on the same
+ *   element it transforms is applied after the rotation and produces a flat
+ *   shear — the classic "why does my 3D look like a parallelogram".
+ * · It rotates on two axes at once. A single-axis tilt reads as a hinge; the
+ *   second axis is what puts a vanishing point in the picture.
+ * · It ends at zero. The composition has to become perfectly flat and
+ *   head-on by the time the reader is meant to read it, or the labels stay
+ *   trapezoidal and the whole thing is decoration.
+ *
+ * Reduced motion renders the children with no wrapper at all.
+ */
+export function Swing({
+  progress,
+  children,
+  className,
+  stops = [0, 0.3, 0.68, 1],
+  rotateX = [26, 11, 0, -7],
+  rotateY = [-22, -8, 0, 6],
+  scale = [0.82, 0.93, 1, 0.97],
+  perspective = 1800,
+}: {
+  progress: MotionValue<number>;
+  children: ReactNode;
+  className?: string;
+  stops?: number[];
+  rotateX?: number[];
+  rotateY?: number[];
+  scale?: number[];
+  perspective?: number;
+}) {
+  const reduced = useReducedMotion();
+
+  // Hooks run unconditionally; the reduced branch simply ignores them.
+  const rx = useTransform(progress, stops, rotateX);
+  const ry = useTransform(progress, stops, rotateY);
+  const sc = useTransform(progress, stops, scale);
+
+  if (reduced) return <div className={className}>{children}</div>;
+
+  return (
+    <div className={className} style={{ perspective: `${perspective}px` }}>
+      <motion.div style={{ rotateX: rx, rotateY: ry, scale: sc }}>
+        {children}
+      </motion.div>
     </div>
   );
 }

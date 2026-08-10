@@ -84,7 +84,15 @@ function Console({ progress: p }: { progress: MotionValue<number> }) {
      a range-form opacity gets hardware-accelerated onto a ScrollTimeline whose
      range does not match this pinned stage, and runs backwards. */
   const opacity = useRamp(p, [0, 0.1, 0.66, 0.82], [0, 1, 1, 0.32]);
-  const scale = useTransform(p, [0, 0.1, 0.66, 0.82], [0.97, 1, 1, 0.94]);
+  const scale = useTransform(p, [0, 0.1, 0.66, 0.82], [0.9, 1, 1, 0.92]);
+
+  /* The console arrives tilted back and pushed away, straightens while it
+     fills, then leans away again as the export comes forward past it. The
+     lean-away is what makes the report read as being *in front of* the
+     console rather than merely on top of it — two objects at different
+     depths, not two stacked rectangles. */
+  const rotateX = useTransform(p, [0, 0.12, 0.66, 0.9], [18, 0, 0, 12]);
+  const z = useTransform(p, [0, 0.12, 0.66, 0.9], [-260, 0, 0, -200]);
 
   return (
     <div
@@ -97,7 +105,7 @@ function Console({ progress: p }: { progress: MotionValue<number> }) {
         // The one red thing left below is the failure count, which is zero.
         data-surface="console"
         className="overflow-hidden border border-line bg-canvas"
-        style={{ opacity, scale }}
+        style={{ opacity, scale, rotateX, z, transformStyle: "preserve-3d" }}
       >
         {/* ── chrome ── */}
         <div className="flex items-center justify-between border-b border-line bg-surface px-4 py-2.5">
@@ -174,7 +182,7 @@ function Tile({
   return (
     <motion.div className="bg-canvas p-4" style={{ opacity, y }}>
       <p className="text-label uppercase text-ink-subtle">{k}</p>
-      <p className="tnum mt-1.5 font-display text-h2 leading-none">{v}</p>
+      <p className="tnum mt-1.5 font-editorial text-h2 leading-none">{v}</p>
       <p className="mt-1 text-xs text-ink-subtle">{note}</p>
     </motion.div>
   );

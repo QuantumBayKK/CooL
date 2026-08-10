@@ -13,8 +13,9 @@
  * to a public chain. Those domains are reported honestly as mock/absent and
  * NEVER as a pass.
  */
-import { Ajv2020 } from "ajv/dist/2020.js";
 import type { ErrorObject, ValidateFunction } from "ajv";
+// Precompiled at build time by `scripts/build-validator.mjs`. See below.
+import precompiledValidate from "./receipt-validator.generated.js";
 import type {
   DomainCheck,
   Receipt,
@@ -23,7 +24,6 @@ import type {
   VerdictSubject,
   VerifyOptions,
 } from "./types";
-import { RECEIPT_SCHEMA } from "./schema";
 import { multihashDigest } from "./multihash";
 import { hybridVerify } from "./sign";
 import { leafHash, verifyInclusion } from "./merkle";
@@ -40,21 +40,36 @@ const ATTESTATION_DETAIL = "MOCK — no hardware quote present (planned)";
 const ANCHOR_DETAIL = "NONE — not anchored to a public chain (planned)";
 
 /**
- * Compile the schema lazily and once.
+ * The receipt validator, precompiled.
  *
- * The upstream SDK compiles at module load. Here the module is pulled into a
- * lazily-imported client chunk, and compiling on first use keeps that chunk's
- * evaluation cheap — the deck can load without paying for the verifier until
- * someone actually runs the demo.
+ * This used to be `new Ajv2020(…).compile(RECEIPT_SCHEMA)` on first use. Ajv's
+ * default mode is a just-in-time compiler — it generates JavaScript for the
+ * schema and evaluates it with `new Function` — so in the browser it needs
+ * `'unsafe-eval'` in the Content-Security-Policy. This site does not grant
+ * that, and should not: `'unsafe-eval'` cannot be scoped to one library, so
+ * permitting it for a schema check would permit it for everything else on the
+ * page too.
+ *
+ * The consequence was not subtle. The live demo ran seven of its eight stages
+ * and then threw `EvalError` on the eighth — the verification stage, which is
+ * the entire point of the demo — and had never once completed in production.
+ * Two separate conditions hid it: development builds allow `'unsafe-eval'` for
+ * Turbopack, and before the CSP nonce fix nothing on the page executed at all.
+ *
+ * `receipt-validator.generated.js` is the same Ajv, compiling the same
+ * `RECEIPT_SCHEMA` with the same options, run at build time instead of at
+ * runtime. `npm run verify:validator` regenerates and diffs it, so the schema
+ * and the validator cannot drift apart unnoticed.
+ *
+ * `RECEIPT_SCHEMA` is deliberately no longer imported here — this module now
+ * consumes the compiled artefact, not the schema. The schema remains the
+ * source of truth: it is the generator's only input, it is still exported from
+ * `./index` for callers, and it is still what the cool-spec conformance test
+ * compares against. The `--check` mode is the link that keeps the artefact
+ * honest about which version of that source it was built from.
  */
-let validateReceipt: ValidateFunction | null = null;
-function receiptValidator(): ValidateFunction {
-  if (!validateReceipt) {
-    const ajv = new Ajv2020({ strict: false, allErrors: true, logger: false });
-    validateReceipt = ajv.compile(RECEIPT_SCHEMA);
-  }
-  return validateReceipt;
-}
+const receiptValidator = (): ValidateFunction =>
+  precompiledValidate as unknown as ValidateFunction;
 
 function formatAjvErrors(errors: ErrorObject[] | null | undefined): string[] {
   if (!errors || errors.length === 0) return ["receipt does not conform to cool.receipt.v1"];

@@ -5,6 +5,9 @@
   "description": "CooL — cryptographic evidence for AI change. Public site, evidence surfaces, investor portal.",
   "scripts": {
     "dev": "next dev -p 3002",
+    "build:validator": "tsx scripts/build-validator.mjs",
+    "verify:validator": "tsx scripts/build-validator.mjs --check",
+    "prebuild": "npm run build:validator",
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "next lint",
@@ -15,7 +18,7 @@
     "verify:rls": "node scripts/verify-rls.mjs",
     "verify:sdk": "tsx scripts/verify-sdk.ts",
     "verify:tee": "tsx scripts/verify-tee.ts",
-    "verify:all": "npm run typecheck && npm run verify:palette && npm run verify:claims && npm run test",
+    "verify:all": "npm run typecheck && npm run verify:validator && npm run verify:palette && npm run verify:claims && npm run test",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
