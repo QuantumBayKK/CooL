@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 
 const NEXT = [
   {
-    href: "/#demo",
+    href: "/demo",
     title: "Run the demo while you wait",
     body: "Seal one AI change and verify it, with real cryptography in your browser. Then forge the receipt and watch the verifier reject it.",
   },

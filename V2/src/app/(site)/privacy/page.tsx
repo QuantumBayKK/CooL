@@ -64,7 +64,7 @@ export default function PrivacyPage() {
             <h2>What runs in your browser and never leaves it</h2>
             <p>
               The{" "}
-              <Link href="/#demo">live demo</Link>, the{" "}
+              <Link href="/demo">live demo</Link>, the{" "}
               <Link href="/verify">verifier</Link>, the{" "}
               <Link href="/pipeline">pipeline page</Link> and the{" "}
               <Link href="/studio">studio</Link> execute real cryptography

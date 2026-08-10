@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { ArrowRight, Check, Minus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { CodeBlock } from "@/components/ui/code";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/motion";
-import {
-  Card,
-  Container,
-  Eyebrow,
-  Section,
-  SectionHeader,
-} from "@/components/ui/primitives";
+import { Container, Section, SectionHeader } from "@/components/ui/primitives";
 import { CaseStudy } from "@/components/marketing/CaseStudy";
 import { Faq, FaqJsonLd } from "@/components/marketing/Faq";
 import { Reviews } from "@/components/marketing/Reviews";
@@ -21,7 +15,6 @@ import { ActReceipt } from "@/components/trailer/ActReceipt";
 import { ActThread } from "@/components/trailer/ActThread";
 import { Hero } from "@/components/trailer/Hero";
 import { TimeSaved } from "@/components/trailer/TimeSaved";
-import { CURRENT_STAGE } from "@/content/gates";
 import { SITE } from "@/lib/site";
 
 /**
@@ -30,30 +23,38 @@ import { SITE } from "@/lib/site";
  * ── the shape ──
  *
  *   curtain → hero → 01 install → 02 the record → 03 console & reports
- *           → 04 what it costs you now → the live demo → the caveats → start
+ *           → 04 what it costs you now → 05 the live demo → case study
+ *           → FAQ → 06 start
  *
  * Three pinned acts carry the product story with motion, and then the page
- * stops moving and starts proving. That ordering is the whole argument of the
- * design: the acts earn enough attention to get the reader to the demo, and the
- * demo is the only thing on the page that is not a claim — it runs the real
- * ML-DSA-65 signatures and the real Merkle log on the reader's own machine.
+ * stops moving and starts proving. The demo is the only thing here that is not
+ * a claim — it runs the real ML-DSA-65 signatures and the real Merkle log on
+ * the reader's own machine.
  *
- * ── what survived the rebuild, and why ──
+ * The acts were trimmed from 5.5/5/5 viewport-heights to 3.5/3.25/3.25. At the
+ * original pacing the demo began 15,800px down — 17.6 screens — which is not a
+ * long page, it is an unreachable one. It also now has its own route at
+ * `/demo`, linked from the header, the hero and the mobile bar, so nobody has
+ * to scroll the trailer to reach the thing the trailer is advertising.
  *
- * `<WhatIsNotTrue />` stays, immediately after the demo. A trailer is a format
- * built to oversell, and this site's entire position is that it can be checked
- * rather than believed — so the section listing the two things the product
- * cannot prove yet has to sit inside the polish, not on a page the polish links
- * to. A caveat that gets quietly dropped during a visual pass is precisely the
- * behaviour CooL exists to make detectable.
+ * ── where the caveats live now ──
+ *
+ * The "where we actually are" section that used to sit here — the two things
+ * the product cannot prove yet — was removed from this page at the owner's
+ * request. The claims themselves are not gone and are not softened: the hero
+ * still carries the "Stage 0 · attestation simulated" badge linking to the
+ * ladder, `/security/readiness` still publishes all four rungs, the FAQ still
+ * answers "what can CooL not prove yet" in full, and `npm run verify:claims`
+ * still fails the build on any phrase from a rung above the current one. What
+ * changed is that the landing page no longer stops to argue against itself.
  *
  * ── cost ──
  *
  * The three acts are client components and the demo is a five-view crypto
  * workload, so nothing but the acts is eagerly loaded: `DemoShell` is
  * `dynamic()`, and it in turn code-splits four of its five views. The hero,
- * the caveats and the CTA are server-rendered — the reader gets readable HTML
- * before any of the motion code arrives.
+ * the case study, the FAQ and the CTA are server-rendered — the reader gets
+ * readable HTML before any of the motion code arrives.
  */
 
 const DemoShell = dynamic(() => import("@/components/demo/DemoShell"));
@@ -76,7 +77,6 @@ export default function HomePage() {
 
       <LiveDemoSection />
       <CaseStudy />
-      <WhatIsNotTrue />
       {/* Renders nothing until there are real, attributed quotes. See the note
           on `REVIEWS` in content/marketing.ts. */}
       <Reviews />
@@ -186,86 +186,6 @@ function LiveDemoSection() {
   );
 }
 
-/* ── the honesty section ──────────────────────────────────────────────────── */
-
-function WhatIsNotTrue() {
-  const stage = CURRENT_STAGE;
-  const real = stage.groups[0]?.items ?? [];
-  const notReal = stage.groups[1]?.items ?? [];
-
-  return (
-    <Section tone="surface" id="honest">
-      <Container>
-        <SectionHeader
-          eyebrow="06 — Where we actually are"
-          title="The two things this cannot prove yet."
-          lead="Listed here rather than buried, because a vendor who hides its gaps has told you nothing reliable about its strengths. Both are enforced in the verifier — no amount of presentation makes them go green."
-        />
-
-        <div className="mt-12 grid gap-px bg-line lg:grid-cols-2">
-          <div className="bg-canvas p-7">
-            <Eyebrow>Real today</Eyebrow>
-            <ul className="mt-5 flex flex-col gap-4">
-              {real.map((item) => (
-                <li key={item.label} className="flex gap-3">
-                  <Check
-                    className="mt-0.5 size-4 shrink-0 text-ok"
-                    strokeWidth={2.25}
-                    aria-hidden
-                  />
-                  <div>
-                    <p className="text-sm text-ink">{item.label}</p>
-                    {item.note && (
-                      <p className="mt-1 text-xs text-ink-subtle">{item.note}</p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="bg-canvas p-7">
-            <Eyebrow>Not real today</Eyebrow>
-            <ul className="mt-5 flex flex-col gap-4">
-              {notReal.map((item) => (
-                <li key={item.label} className="flex gap-3">
-                  <Minus
-                    className="mt-0.5 size-4 shrink-0 text-ink-subtle"
-                    strokeWidth={2.25}
-                    aria-hidden
-                  />
-                  <div>
-                    <p className="text-sm text-ink">{item.label}</p>
-                    {item.note && (
-                      <p className="mt-1 text-xs text-ink-subtle">{item.note}</p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <Reveal>
-          <Card className="mt-8 flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="max-w-[62ch] text-sm text-ink-muted">
-              We publish a four-rung readiness ladder and the exact sentence we
-              are allowed to say at each rung. A build that contains a phrase
-              from a rung above the one we are on fails CI.
-            </p>
-            <Button asChild variant="secondary" className="shrink-0">
-              <Link href="/security/readiness">
-                See the ladder
-                <ArrowRight className="size-4" strokeWidth={2} />
-              </Link>
-            </Button>
-          </Card>
-        </Reveal>
-      </Container>
-    </Section>
-  );
-}
-
 /* ── CTA ──────────────────────────────────────────────────────────────────── */
 
 function CallToAction() {
@@ -274,7 +194,7 @@ function CallToAction() {
       <Container>
         <div className="flex flex-col items-start gap-6">
           <SectionHeader
-            eyebrow="07 — Start"
+            eyebrow="06 — Start"
             title="Don't trust it. Check it."
             lead="Install the verifier, take a receipt this site produced in your browser, and run it on your own machine with the network off."
           />

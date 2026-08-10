@@ -17,9 +17,14 @@ import { useRamp } from "./motion";
  * parallaxes away as the reader starts scrolling toward Act I.
  *
  * The hero is one statement, one qualifier and two buttons — no artwork. The
- * three acts below it are five viewport-heights of artwork each, and a hero
+ * three acts below it are several viewport-heights of artwork each, and a hero
  * that also had a diagram would be competing with them before they started.
  * The restraint here is what gives the first act somewhere to arrive from.
+ *
+ * The primary button goes to `/demo`, not to the `#demo` anchor further down
+ * this page. The anchor technically worked and was useless: on a phone it
+ * landed the reader on a section heading with the run button 968px below a
+ * 844px viewport, so the call to action delivered them to nothing to press.
  *
  * The readiness badge stays. It says "Stage 0 · attestation simulated" directly
  * beneath a headline that promises sealed evidence, which looks like a mistake
@@ -55,7 +60,7 @@ export function Hero() {
               left-aligned hero above them left the right half of the first
               screen empty — the old layout had a code block there, and the
               trailer deliberately does not, because a hero with artwork
-              competes with five viewport-heights of artwork immediately
+              competes with the artwork immediately
               below it. Centring turns that emptiness into margin. */}
           <Container>
             <div className="flex min-h-[calc(100dvh-4rem)] flex-col items-center justify-center py-20 text-center">
@@ -88,7 +93,7 @@ export function Hero() {
               <DropIn delay={0.2}>
                 <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                   <Button asChild size="lg">
-                    <Link href="#demo">
+                    <Link href="/demo">
                       Run the demo
                       <ArrowRight className="size-4" strokeWidth={2} />
                     </Link>

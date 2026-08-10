@@ -38,6 +38,12 @@ export interface NavGroup {
  * slot lives inside a group or in the footer.
  */
 export const NAV: readonly (NavItem | NavGroup)[] = [
+  // Top level, not inside a group. The demo is the most persuasive thing on
+  // the site — it runs the real cryptography and invites the visitor to attack
+  // it — and it previously lived only at the bottom of a 17-screen homepage
+  // and at `/pipeline`, which appeared in no menu. A thing that good has to be
+  // one click from every page.
+  { label: "Demo", href: "/demo" },
   {
     label: "Product",
     items: [
@@ -92,6 +98,7 @@ export const FOOTER: readonly NavGroup[] = [
   {
     label: "Product",
     items: [
+      { label: "Run the demo", href: "/demo" },
       { label: "How CooL works", href: "/technology" },
       { label: "Architecture", href: "/architecture" },
       { label: "Verify a record", href: "/verify" },
@@ -150,7 +157,7 @@ export const ROUTES = [
   { path: "/studio", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/docs", priority: 0.9, changeFrequency: "weekly" as const },
   { path: "/pricing", priority: 0.85, changeFrequency: "monthly" as const },
-  { path: "/pipeline", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/demo", priority: 0.95, changeFrequency: "monthly" as const },
   { path: "/about", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/contact", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" as const },

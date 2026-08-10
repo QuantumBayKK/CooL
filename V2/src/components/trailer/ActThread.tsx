@@ -84,7 +84,7 @@ const BEATS: readonly Beat[] = [
 
 export function ActThread() {
   return (
-    <Stage length={5.5} lengthSm={4.5} label="01 — Install" id="thread">
+    <Stage length={3.5} lengthSm={3} label="01 — Install" id="thread">
       {(p) => (
         <div className="flex h-full w-full max-w-[76rem] flex-col justify-center gap-6 py-24 sm:gap-10">
           <Captions progress={p} beats={BEATS} />

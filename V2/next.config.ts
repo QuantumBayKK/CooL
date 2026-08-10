@@ -45,6 +45,19 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
   },
 
+  /**
+   * `/pipeline` was the demo's old home. It is now `/demo`, which is a name a
+   * visitor can guess and which says what the page is for.
+   *
+   * Permanent (308) rather than temporary: the old URL is not coming back, and
+   * a 308 transfers the ranking signals of anything that ever linked to it.
+   * The redirect stays indefinitely — a link in someone's notes from last month
+   * costs nothing to honour and a 404 costs a reader.
+   */
+  async redirects() {
+    return [{ source: "/pipeline", destination: "/demo", permanent: true }];
+  },
+
   // `poweredByHeader` advertises the framework and version to anyone reading
   // response headers, which is free reconnaissance and buys nothing.
   poweredByHeader: false,

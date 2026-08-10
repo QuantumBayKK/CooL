@@ -211,8 +211,16 @@ export default function LiveDemo() {
     <div className="w-full">
       {/* ── controls ─────────────────────────────────────────────────── */}
       <div className="frost-verify rounded-2xl border border-verify/30 p-4 sm:p-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-mono text-[11px] tracking-[0.16em] text-mist uppercase">
+        {/* One scrolling row on a phone, wrapping only from `sm` up.
+            Wrapping put the three scenario chips on three lines and pushed
+            "Ship this change" — the only control that matters here — below the
+            fold of a 844px viewport. A horizontal strip keeps them on one line
+            and costs nothing: the selected chip is always the leftmost visible
+            one, and the row is short enough that the overflow is obvious.
+            `-mx-1 px-1` lets the focus ring on the first chip breathe instead
+            of being clipped by the scroll container. */}
+        <div className="-mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+          <span className="shrink-0 font-mono text-[11px] tracking-[0.16em] text-mist uppercase">
             Pick a change
           </span>
           {SCENARIOS.map((s) => (
@@ -225,7 +233,7 @@ export default function LiveDemo() {
                 reset();
               }}
               className={clsx(
-                "rounded-full border px-3 py-1.5 font-mono text-[11.5px] transition-colors disabled:opacity-45",
+                "shrink-0 rounded-full border px-3 py-1.5 font-mono text-[11.5px] transition-colors disabled:opacity-45",
                 s.id === scenario.id
                   ? "border-verify/60 bg-verify/15 text-ink"
                   : "border-line text-mist hover:border-verify/40 hover:text-ink",

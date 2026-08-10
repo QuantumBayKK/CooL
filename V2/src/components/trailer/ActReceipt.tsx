@@ -69,7 +69,7 @@ const DESTINATIONS = [
 
 export function ActReceipt() {
   return (
-    <Stage length={5} lengthSm={4} label="02 — The record" id="record">
+    <Stage length={3.25} lengthSm={2.75} label="02 — The record" id="record">
       {(p) => (
         <div className="flex h-full w-full max-w-[76rem] flex-col justify-center gap-8 py-24 sm:gap-12">
           <Captions progress={p} beats={BEATS} />

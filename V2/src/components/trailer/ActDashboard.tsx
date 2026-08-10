@@ -62,7 +62,7 @@ const FEED = [
 
 export function ActDashboard() {
   return (
-    <Stage length={5} lengthSm={4} label="03 — Console & reports" id="console-act">
+    <Stage length={3.25} lengthSm={2.75} label="03 — Console & reports" id="console-act">
       {(p) => (
         <div className="flex h-full w-full max-w-[76rem] flex-col justify-center gap-8 py-24 sm:gap-10">
           <Captions progress={p} beats={BEATS} />

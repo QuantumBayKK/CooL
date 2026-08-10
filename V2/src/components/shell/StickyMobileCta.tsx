@@ -36,6 +36,7 @@ import { useEffect, useState } from "react";
  */
 
 const HIDE_ON = [
+  "/demo",
   "/console",
   "/studio",
   "/verify",
@@ -108,7 +109,7 @@ export function StickyMobileCta() {
     >
       <div className="flex items-center gap-2 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <Link
-          href="/#demo"
+          href="/demo"
           className="flex-1 rounded-[--radius-sm] border border-line px-3 py-2.5 text-center text-sm font-medium text-ink"
           tabIndex={visible ? undefined : -1}
         >

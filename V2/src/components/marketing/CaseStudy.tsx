@@ -60,7 +60,7 @@ export function CaseStudy() {
         <p className="mt-6 max-w-prose text-xs text-ink-subtle">
           Figures describe what the pipeline produces, not a measured customer
           result. You can reproduce each of them on this site: the{" "}
-          <Link href="/#demo" className="text-ink underline underline-offset-4">
+          <Link href="/demo" className="text-ink underline underline-offset-4">
             live demo
           </Link>{" "}
           seals the record,{" "}
