@@ -325,112 +325,125 @@
    Base
    ═══════════════════════════════════════════════════════════════════════════ */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  border-color: var(--line);
-}
+/* `@layer base`, and this is load-bearing rather than tidiness.
 
-html {
-  -webkit-text-size-adjust: 100%;
-  /* `contain` and not `none`: `none` also kills the rubber-band at the document
-     ends, which on iOS reads as the page having jammed. */
-  overscroll-behavior-y: contain;
-  scroll-behavior: smooth;
-  /* Anchored headings must not land under the sticky header. */
-  scroll-padding-top: 5.5rem;
-}
+   Unlayered CSS beats every layered rule in the cascade, regardless of
+   specificity. Tailwind emits its utilities into `@layer utilities`, so
+   while these rules sat outside a layer, `a { color: inherit }` silently
+   beat `text-accent` on every anchor on the site, `* { border-color }`
+   beat `border-accent`, and the heading rule beat `font-mono` on an h3.
+   The utilities were generated correctly and then quietly lost.
 
-body {
-  margin: 0;
-  background: var(--canvas);
-  color: var(--ink);
-  font-family: var(--font-sans);
-  font-size: var(--text-body);
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-synthesis-weight: none;
-  text-rendering: optimizeLegibility;
-}
+   Inside `base` they behave the way the file always read as though they
+   did: they are the default, and a utility on the element overrides them. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-color: var(--line);
+  }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-display);
-  font-weight: 600;
-  margin: 0;
-  text-wrap: balance;
-}
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* `contain` and not `none`: `none` also kills the rubber-band at the document
+       ends, which on iOS reads as the page having jammed. */
+    overscroll-behavior-y: contain;
+    scroll-behavior: smooth;
+    /* Anchored headings must not land under the sticky header. */
+    scroll-padding-top: 5.5rem;
+  }
 
-p {
-  margin: 0;
-  text-wrap: pretty;
-}
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
 
-/* Tabular figures everywhere a number can change under the reader — counters,
-   table cells, metrics. Proportional digits make a live value jitter. */
-.tnum,
-table,
-time,
-[data-numeric] {
-  font-variant-numeric: tabular-nums;
-}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    margin: 0;
+    text-wrap: balance;
+  }
 
-code,
-kbd,
-samp,
-pre {
-  font-family: var(--font-mono);
-  font-feature-settings: "liga" 0, "calt" 0;
-}
+  p {
+    margin: 0;
+    text-wrap: pretty;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  /* Tabular figures everywhere a number can change under the reader — counters,
+     table cells, metrics. Proportional digits make a live value jitter. */
+  .tnum,
+  table,
+  time,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
 
-::selection {
-  background: var(--accent);
-  color: var(--on-accent);
-}
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+    font-feature-settings: "liga" 0, "calt" 0;
+  }
 
-/* ── focus ─────────────────────────────────────────────────────────────────
-   One ring, everywhere, keyboard-only. The 2px offset is what keeps the ring
-   legible against a filled button, where a flush ring disappears into the
-   fill. */
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-  border-radius: var(--radius-xs);
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-:focus:not(:focus-visible) {
-  outline: none;
-}
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
 
-/* ── scrollbars ─────────────────────────────────────────────────────────────
-   Styled only where a panel scrolls internally. The document scrollbar is left
-   native, because overriding it is the fastest way to make a page feel wrong
-   on a platform you did not test. */
-[data-scroll] {
-  scrollbar-width: thin;
-  scrollbar-color: var(--line-strong) transparent;
-}
+  /* ── focus ─────────────────────────────────────────────────────────────────
+     One ring, everywhere, keyboard-only. The 2px offset is what keeps the ring
+     legible against a filled button, where a flush ring disappears into the
+     fill. */
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
 
-[data-scroll]::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 
-[data-scroll]::-webkit-scrollbar-thumb {
-  background: var(--line-strong);
-  border: 3px solid var(--canvas);
-  border-radius: 999px;
+  /* ── scrollbars ─────────────────────────────────────────────────────────────
+     Styled only where a panel scrolls internally. The document scrollbar is left
+     native, because overriding it is the fastest way to make a page feel wrong
+     on a platform you did not test. */
+  [data-scroll] {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  [data-scroll]::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  [data-scroll]::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border: 3px solid var(--canvas);
+    border-radius: 999px;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
