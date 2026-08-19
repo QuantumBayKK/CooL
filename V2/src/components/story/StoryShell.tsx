@@ -144,7 +144,6 @@ function Stage() {
     async (next: string) => {
       if (sealing || saved) return;
       setSealing(true);
-      setSaved(true);
       setStartedAt((prev) => prev ?? Date.now());
 
       // A short, plausible commit id. Synthetic, and the cascade says so.
@@ -161,6 +160,13 @@ function Stage() {
       });
       setSealing(false);
       if (result) {
+        // `saved` is set here rather than at the top of this function, and the
+        // difference is the difference between a recoverable failure and a
+        // dead page. Setting it optimistically locked the editor the instant
+        // the button was pressed; a seal that then returned null — the enclave
+        // not up yet, most plausibly — left the rail locked, the editor
+        // read-only and the reader with nothing to press but reload.
+        setSaved(true);
         setCascade(result);
         setAct("cascade");
       }
@@ -194,7 +200,20 @@ function Stage() {
   const nextAct = ACTS[index + 1];
 
   return (
-    <div className="flex h-[100svh] flex-col overflow-hidden bg-void">
+    /* `100dvh` minus the 64px site header, not `100svh`.
+     *
+     * The deck is one screen by construction — every stop fits, and the rail
+     * that lets a presenter jump between stops is pinned to the top of it. A
+     * full `100svh` inside a layout that also renders a 64px sticky header made
+     * the stage taller than the space it had, so the document scrolled: reach
+     * for the editor's Save control and the rail leaves the screen. `dvh`
+     * rather than `svh` because on mobile Safari the small-viewport unit
+     * measures against the collapsed chrome, which leaves the deck's footer
+     * under the address bar for the whole first scroll.
+     *
+     * The breadcrumb bar and the marketing footer are suppressed on this route
+     * — see `FULL_BLEED` in lib/site.ts — so 4rem is the entire subtraction. */
+    <div className="flex h-[calc(100dvh-4rem)] flex-col overflow-hidden bg-void">
       {/* header */}
       <header className="shrink-0 border-b border-line px-4 py-2.5 sm:px-6">
         <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-4 gap-y-2">
@@ -220,7 +239,12 @@ function Stage() {
                   className="flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                   style={{
                     borderColor: active ? "var(--color-verify)" : "var(--color-line)",
-                    background: active ? "rgba(88,166,255,0.1)" : "transparent",
+                    // Was a hard-coded rgba(88,166,255) — the blue this deck
+                    // was drawn in before the palette went white/black/red.
+                    // It survived the port because it was an inline style
+                    // rather than a token, so the active stop was the one
+                    // element on the page still lit in the old brand colour.
+                    background: active ? "var(--accent-wash)" : "transparent",
                     color: active ? "var(--color-ink)" : "var(--color-mist)",
                   }}
                 >

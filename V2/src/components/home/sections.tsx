@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { GateSummary } from "@/components/security/GateLadder";
 import { Button } from "@/components/ui/button";
@@ -13,19 +13,12 @@ import {
 } from "@/components/ui/primitives";
 import { GATES } from "@/content/gates";
 import {
-  BENEFITS,
   DOMAINS,
   DRIVER_GAP,
   DRIVERS,
-  FOUNDERS,
-  FOUNDERS_NOTE,
   LANDSCAPE,
   LANDSCAPE_COLUMNS,
-  MARKET,
-  MARKET_FOOTNOTE,
   PILLARS,
-  POSITIONS,
-  ROADMAP,
   STANDING,
   type Mark,
 } from "@/content/home";
@@ -36,18 +29,40 @@ import { cn } from "@/lib/utils";
  *
  * ── the format ──
  *
- * One long document, divided by hairlines, alternating canvas and surface so a
+ * One document, divided by hairlines, alternating canvas and surface so a
  * reader can tell where they are by peripheral vision alone. Each band states
- * one thing and then supports it with a table, a matrix or a set of cells —
- * never with an adjective. That is the shape GitHub, Jira and Atlassian all
- * arrive at for their product pages, and the reason is that their buyer reads
- * the page the way an engineer reads a spec: skimming for the row that
- * disqualifies it.
+ * one thing and supports it with a table, a matrix or a set of cells — never
+ * with an adjective. That is the shape GitHub, Jira and Atlassian all arrive at
+ * for their product pages, and the reason is that their buyer reads the page
+ * the way an engineer reads a spec: skimming for the row that disqualifies it.
+ *
+ * ── what was cut, and why ──
+ *
+ * This was fifteen bands. It is now five plus the demo, and the deletions were
+ * not trims — whole sections went:
+ *
+ *   benefits, position   Restatements. Both said in adjectives what the product
+ *                        band and the domain table had already said in code and
+ *                        in verdicts, and a reader who is unconvinced by a
+ *                        recomputed SHA-256 is not going to be convinced by a
+ *                        card headed "Verify independently".
+ *   market, roadmap,     Investor material on a buyer's page. TAM/SAM/SOM tells
+ *   founders             an engineer evaluating a verifier nothing they can act
+ *                        on, and all three still live in `deck.ts`, rendered in
+ *                        the investor room where the audience for them is.
+ *   worked example       A three-column scenario between the demo and the
+ *                        comparison table — the two densest things on the page —
+ *                        that most readers scrolled past to reach one of them.
+ *
+ * What is left is the argument and nothing else: the law wants a record, here
+ * is how one is made, here is what a verdict over it actually says, run it
+ * yourself, here is why the adjacent categories do not do this, and here is
+ * what we do not have yet.
  *
  * ── the grid ──
  *
  * Cards are cells in a hairline grid rather than floating boxes with gaps. The
- * `rule-grid` utility in `globals.css` draws the top and left rules on the
+ * `rule-grid` utility in globals.css draws the top and left rules on the
  * container and the right and bottom rules on each child, which is what makes
  * an odd-numbered last row close cleanly instead of leaving a dangling edge.
  *
@@ -93,6 +108,11 @@ function Snippet({ code, className }: { code: string; className?: string }) {
 
 /**
  * The regulatory case, as citations.
+ *
+ * `ref` is the instrument and the article, because "regulators are getting
+ * serious about AI" is a sentence any vendor can type and none can support. A
+ * compliance reader recognises SR 11-7 on sight and can check Article 12 in
+ * ninety seconds.
  *
  * The band closes on what the regulation does *not* require, which is the
  * unusual move and the load-bearing one. Every competitor in this category
@@ -159,10 +179,7 @@ export function Product() {
           {PILLARS.map((p) => (
             <article key={p.n} className="flex min-w-0 flex-col gap-4 p-7">
               <div className="flex items-center gap-3">
-                <span
-                  className="font-mono text-xs text-ink-subtle"
-                  data-numeric
-                >
+                <span className="font-mono text-xs text-ink-subtle" data-numeric>
                   {p.n}
                 </span>
                 <span className="text-label uppercase text-ink">{p.name}</span>
@@ -231,11 +248,9 @@ export function Domains() {
                 key={d.name}
                 className="grid gap-x-8 gap-y-2 border-b border-line py-5 lg:grid-cols-[minmax(0,11rem)_minmax(0,20rem)_minmax(0,1fr)] lg:items-baseline"
               >
-                <div className="flex items-center gap-3">
-                  <code className="font-mono text-sm font-semibold text-ink">
-                    {d.name}
-                  </code>
-                </div>
+                <code className="font-mono text-sm font-semibold text-ink">
+                  {d.name}
+                </code>
                 <p className="text-sm text-ink">{d.what}</p>
                 <div className="flex flex-col gap-2.5 lg:flex-row lg:items-baseline lg:justify-between lg:gap-8">
                   <p className="max-w-[62ch] text-sm text-ink-muted">{d.how}</p>
@@ -255,30 +270,7 @@ export function Domains() {
   );
 }
 
-/* ── 04 · what it gets you ────────────────────────────────────────────────── */
-
-export function Benefits() {
-  return (
-    <Section id="benefits" tone="surface">
-      <Container>
-        <SectionHeader
-          eyebrow="04 — What it gets you"
-          title="Automatic to produce. Independent to check. Durable enough to keep."
-        />
-        <div className="rule-grid mt-10 grid bg-canvas lg:grid-cols-3">
-          {BENEFITS.map((b) => (
-            <div key={b.title} className="p-7">
-              <h3 className="text-h4">{b.title}</h3>
-              <p className="mt-3 text-sm text-ink-muted">{b.body}</p>
-            </div>
-          ))}
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
-/* ── 05 · the landscape ───────────────────────────────────────────────────── */
+/* ── 04 · the landscape ───────────────────────────────────────────────────── */
 
 const MARK_GLYPH: Record<Mark, { glyph: string; label: string; cls: string }> = {
   yes: { glyph: "✓", label: "Yes", cls: "text-ok" },
@@ -325,10 +317,10 @@ export function Landscape() {
   const caveats = LANDSCAPE.filter((r) => r.caveat);
 
   return (
-    <Section id="landscape">
+    <Section id="landscape" tone="surface">
       <Container>
         <SectionHeader
-          eyebrow="05 — The landscape"
+          eyebrow="04 — The landscape"
           title="Adjacent categories exist. None of them produces evidence."
           lead="Observability tells you what your AI did. Governance tools hold the policy record. Compliance automation collects the certificates. All three are useful, and none of them survives the question a regulator actually asks: can you prove this was not edited afterwards?"
         />
@@ -347,8 +339,11 @@ export function Landscape() {
             The `-mx-5 px-5` pair lets the table bleed to the screen edges on a
             phone, so the first column starts flush with the copy above it
             rather than inset by a gutter the reader then has to scroll past. */}
-        <div data-scroll className="relative mt-10 -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
-          <table className="w-full min-w-[58rem] border-collapse text-sm">
+        <div
+          data-scroll
+          className="relative mt-10 -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0"
+        >
+          <table className="w-full min-w-[58rem] border-collapse bg-canvas text-sm">
             <caption className="sr-only">
               Capability comparison between AI observability, governance and GRC,
               compliance automation, an in-house build, and CooL.
@@ -439,88 +434,7 @@ export function Landscape() {
   );
 }
 
-/* ── 06 · position ────────────────────────────────────────────────────────── */
-
-/**
- * Six numbered decisions.
- *
- * Each one rules something out, which is the only test of whether a stated
- * principle is real rather than an adjective wearing a suit. The numbering is
- * `font-mono` and small: it orders the list without competing with the titles.
- */
-export function PositionSection() {
-  return (
-    <Section id="position" tone="surface">
-      <Container>
-        <SectionHeader
-          eyebrow="06 — Position"
-          title="Six decisions the rest of the product follows from."
-        />
-        <ol className="rule-grid mt-10 grid bg-canvas md:grid-cols-2 lg:grid-cols-3">
-          {POSITIONS.map((p) => (
-            <li key={p.n} className="p-7">
-              <span
-                className="font-mono text-xs text-ink-subtle"
-                data-numeric
-              >
-                {p.n}
-              </span>
-              <h3 className="mt-3 text-h4">{p.title}</h3>
-              <p className="mt-2.5 text-sm text-ink-muted">{p.body}</p>
-            </li>
-          ))}
-        </ol>
-      </Container>
-    </Section>
-  );
-}
-
-/* ── 07 · market ──────────────────────────────────────────────────────────── */
-
-/**
- * TAM, SAM, SOM — with the analyst named on every figure.
- *
- * A market slide on a public product page is unusual. It is here because this
- * page is read by investors as often as by engineers, and because the numbers
- * are already public in the deck; printing them with their sources is strictly
- * better than having two versions of them in circulation.
- */
-export function Market() {
-  return (
-    <Section id="market">
-      <Container>
-        <SectionHeader
-          eyebrow="07 — Market"
-          title="Legislated into existence, not talked into it."
-          lead="The category exists because compliance obligations created it. These are third-party forecasts and they are labelled as forecasts."
-        />
-
-        <dl className="rule-grid mt-10 grid sm:grid-cols-3">
-          {MARKET.map((m) => (
-            <div key={m.k} className="p-7">
-              <dt className="text-label uppercase text-ink-subtle">{m.k}</dt>
-              <dd>
-                <p
-                  className="mt-3 font-editorial text-h1 leading-none text-ink"
-                  data-numeric
-                >
-                  {m.v}
-                </p>
-                <p className="mt-4 text-sm text-ink-muted">{m.note}</p>
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        <p className="mt-6 max-w-[80ch] text-xs text-ink-subtle">
-          {MARKET_FOOTNOTE}
-        </p>
-      </Container>
-    </Section>
-  );
-}
-
-/* ── 08 · standing ────────────────────────────────────────────────────────── */
+/* ── 05 · standing ────────────────────────────────────────────────────────── */
 
 /**
  * What the company does not have.
@@ -538,11 +452,11 @@ export function Market() {
  */
 export function Standing() {
   return (
-    <Section id="standing" tone="surface">
+    <Section id="standing">
       <Container>
         <div className="grid gap-10 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-16">
           <SectionHeader
-            eyebrow="08 — Where we actually are"
+            eyebrow="05 — Where we actually are"
             title="The things we do not have yet."
             lead="Published here rather than discovered later. A company selling evidence has exactly one asset, and it is that its statements can be checked."
           />
@@ -557,9 +471,7 @@ export function Standing() {
                 className="grid gap-1 border-b border-line py-5 sm:grid-cols-[minmax(0,13rem)_1fr] sm:gap-8"
               >
                 <dt className="text-sm font-medium text-ink">{s.label}</dt>
-                <dd className="max-w-[62ch] text-sm text-ink-muted">
-                  {s.value}
-                </dd>
+                <dd className="max-w-[62ch] text-sm text-ink-muted">{s.value}</dd>
               </div>
             ))}
           </dl>
@@ -583,128 +495,19 @@ export function Standing() {
   );
 }
 
-/* ── 09 · founders ────────────────────────────────────────────────────────── */
-
-export function Founders() {
-  return (
-    <Section id="founders">
-      <Container>
-        <SectionHeader
-          eyebrow="09 — Founders"
-          title="Two people, and everything they claim is a link."
-          lead="The rare intersection this product needs: applied post-quantum cryptography on one side, trusted execution and AI inference on the other."
-        />
-
-        <div className="rule-grid mt-10 grid lg:grid-cols-2">
-          {FOUNDERS.map((f) => (
-            <article key={f.name} className="flex flex-col gap-4 p-7">
-              <div>
-                <h3 className="text-h3">{f.name}</h3>
-                <p className="mt-1.5 text-sm text-ink-muted">
-                  {f.role} · {f.city}
-                </p>
-              </div>
-
-              <p className="text-label uppercase text-ink-subtle">{f.focus}</p>
-
-              <ul className="flex flex-1 flex-col gap-3 border-t border-line pt-4">
-                {f.items.map((item) => (
-                  <li
-                    key={item}
-                    className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 text-sm text-ink-muted"
-                  >
-                    <span aria-hidden className="mt-2 h-px w-3 bg-line-strong" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <a
-                href={f.github}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="group inline-flex w-fit items-center gap-1.5 font-mono text-[0.8125rem] text-ink underline-offset-4 hover:underline"
-              >
-                github.com/{f.handle}
-                <ArrowUpRight
-                  className="size-3.5 text-ink-subtle"
-                  strokeWidth={2}
-                />
-              </a>
-            </article>
-          ))}
-        </div>
-
-        <p className="mt-6 max-w-[70ch] text-sm text-ink-subtle">
-          {FOUNDERS_NOTE}
-        </p>
-      </Container>
-    </Section>
-  );
-}
-
-/* ── 10 · roadmap ─────────────────────────────────────────────────────────── */
-
-const PHASE_TONE = {
-  now: { status: "ok" as const, label: "Shipped" },
-  next: { status: "accent" as const, label: "In build" },
-  later: { status: "neutral" as const, label: "Planned" },
-};
-
-/**
- * Four phases on a rule, tied to the readiness ladder rather than to dates.
- *
- * A pre-launch roadmap with quarters on it is a set of promises whose only
- * function is to be broken in public. Rungs are checkable: `/security/readiness`
- * publishes what each one requires, and the site's CI will not let the copy
- * claim a rung the evidence does not support.
- */
-export function Roadmap() {
-  return (
-    <Section id="roadmap" tone="surface">
-      <Container>
-        <SectionHeader
-          eyebrow="10 — Roadmap"
-          title="What is done, what is being built, and where this ends up."
-        />
-
-        <ol className="rule-grid mt-10 grid bg-canvas md:grid-cols-2 lg:grid-cols-4">
-          {ROADMAP.map((p) => {
-            const tone = PHASE_TONE[p.state];
-            return (
-              <li key={p.title} className="flex flex-col gap-3.5 p-7">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-label uppercase text-ink-subtle">
-                    {p.when}
-                  </span>
-                  <StatusBadge status={tone.status} className="shrink-0">
-                    {tone.label}
-                  </StatusBadge>
-                </div>
-                <h3 className="text-h4">{p.title}</h3>
-                <p className="text-sm text-ink-muted">{p.body}</p>
-              </li>
-            );
-          })}
-        </ol>
-      </Container>
-    </Section>
-  );
-}
-
 /* ── the closing call to action ───────────────────────────────────────────── */
 
 /**
  * The last band.
  *
  * "Don't trust it. Check it." is the only closing line consistent with
- * everything above it. A CTA that asked for a demo booking after eleven bands
+ * everything above it. A CTA that asked for a demo booking after five bands
  * arguing that the reader should not have to take our word for anything would
  * be asking them to do the one thing the page told them not to.
  */
 export function CallToAction() {
   return (
-    <Section id="start">
+    <Section id="start" tone="surface">
       <Container>
         {/* `min-w-0` on both cells. A grid item's automatic minimum size is
             `min-content`, and the `truncate` inside a snippet is `nowrap` — so

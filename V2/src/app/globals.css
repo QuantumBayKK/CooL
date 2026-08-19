@@ -319,6 +319,27 @@
   --ease-cine: cubic-bezier(0.16, 0.84, 0.32, 1);
   --duration-state: 140ms;
   --duration-enter: 240ms;
+
+  /* ── the navigation curve ──────────────────────────────────────────────────
+     One more easing, for one job: whole-surface movement. Route changes, the
+     progress bar, the loader.
+
+     It is the curve Apple's interfaces move on — almost all of the travel is
+     spent in the first third, and the last third is a long, nearly-flat glide
+     into place. `--ease-out` above is tuned for a 140ms hover on a button and
+     reads abrupt when the thing moving is an entire page; this one reads as the
+     page settling rather than arriving.
+
+     Still monotonic, so nothing overshoots. The house rule has not moved.
+
+     420ms is longer than the 240ms ceiling for UI motion, and deliberately so:
+     that ceiling exists because UI motion happens *at* a reader who is waiting
+     for a control to respond. A route transition is covering a real network
+     round-trip, so its duration is not spent on top of the wait — it is spent
+     inside it, and a crossfade shorter than the fetch it conceals just shows
+     the reader the seam it was meant to hide. */
+  --ease-nav: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-page: 420ms;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -680,3 +701,112 @@ pre.shiki .line[data-highlighted] {
   font-weight: 600;
   letter-spacing: -0.02em;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Navigation — the page arriving, and the wait before it does
+
+   Two pieces of one mechanism. The progress bar covers the latency of a route
+   change; the fade covers the swap at the end of it. Between them a navigation
+   never shows the reader a blank frame or a hard cut, which is the whole of
+   what "seamless" means here.
+
+   Both are pure CSS on `--ease-nav`. No animation library is involved, and
+   nothing on this path is a Client Component beyond the twenty lines that
+   toggle a class — a route transition that cost the page its server rendering
+   would be an expensive way to buy a crossfade.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── the page arriving ──────────────────────────────────────────────────────
+   Opacity and 6px, once, on mount. There is no exit animation, and that is a
+   decision rather than an omission: animating the outgoing page means holding
+   it on screen after the reader has asked for a different one, which trades
+   real latency for a flourish. The incoming fade alone reads as continuous. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+[data-page-fade] {
+  animation: page-in var(--duration-page) var(--ease-nav) both;
+}
+
+/* ── the progress bar ───────────────────────────────────────────────────────
+   A 2px accent hairline across the top of the viewport.
+
+   It creeps to 80% on an ease-out curve and stops there, because the one thing
+   it must never do is complete before the page does — a bar that hits 100% and
+   waits is a bar that has told the reader a lie they can see. The last 20% is
+   applied by the class change when the new route actually commits. */
+@keyframes nav-creep {
+  from {
+    transform: scaleX(0.02);
+  }
+  to {
+    transform: scaleX(0.8);
+  }
+}
+
+.nav-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 90;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: var(--accent);
+  pointer-events: none;
+}
+
+.nav-progress[data-state="loading"] {
+  animation: nav-creep 8s var(--ease-nav) forwards;
+}
+
+.nav-progress[data-state="done"] {
+  transform: scaleX(1);
+  opacity: 0;
+  transition:
+    transform 180ms var(--ease-nav),
+    opacity 240ms var(--ease-nav) 140ms;
+}
+
+/* ── the loader ─────────────────────────────────────────────────────────────
+   A seal being drawn: one ring, one sweep. It is the wordmark's idea — a thing
+   closed under a mark — at 20px, and it is the only spinner in the system.
+
+   Deliberately small. A full-screen loading state on a route that usually
+   resolves in under 200ms is a flash of anxiety the reader did not need; this
+   sits at the size of a line of text and is easy to miss, which is correct. */
+@keyframes seal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes seal-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.seal-loader {
+  display: inline-block;
+  border-radius: 999px;
+  border: 1.5px solid var(--line-strong);
+  border-top-color: var(--accent);
+  animation: seal-spin 720ms linear infinite;
+}
+
+/* Under `prefers-reduced-motion` the global rule below freezes every animation,
+   which would leave a spinner sitting still and reading as a hung page. The
+   loader components pair the ring with a written label for exactly that reason
+   — the label is the fallback, not decoration. */

@@ -156,6 +156,7 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
   const knownIds = useRef<Set<string>>(new Set());
   const clockRef = useRef<number>(Date.now());
   const bootedRef = useRef(false);
+  const cancelledRef = useRef(false);
 
   /** The plane's clock. Seeded records get plausible past timestamps. */
   const clock = useCallback(() => new Date(clockRef.current).toISOString(), []);
@@ -206,10 +207,33 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
   );
 
   /* ── boot ── */
+  /**
+   * The boot, and the one subtlety in it.
+   *
+   * `bootedRef` stops the enclave being started twice. `cancelledRef` stops a
+   * finished boot writing state into an unmounted tree. Those two guards used
+   * to be a ref and a plain `let`, and together they deadlocked the page under
+   * React's StrictMode double-invoke:
+   *
+   *   run 1  bootedRef := true, starts the async boot, returns its cleanup
+   *   unmount  cleanup sets run 1's `cancelled` to true
+   *   run 2  bootedRef is already true, so it returns immediately
+   *
+   * The only boot in flight was now permanently cancelled and nothing would
+   * ever re-arm it, so every `if (cancelled) return` fired and the enclave
+   * never came up. Locally the walkthrough sat on "starting the enclave"
+   * forever and every record-dependent stop stayed locked — the whole demo,
+   * dead, in exactly the environment it is developed in.
+   *
+   * Holding the flag in a ref and re-arming it at the top of every run fixes
+   * it: the remount clears the cancellation the unmount set, and the boot that
+   * is genuinely in flight carries on. The cleanup is now returned from every
+   * run rather than only the first, so a real unmount still cancels.
+   */
   useEffect(() => {
-    if (bootedRef.current) return;
+    cancelledRef.current = false;
+    if (bootedRef.current) return () => void (cancelledRef.current = true);
     bootedRef.current = true;
-    let cancelled = false;
 
     void (async () => {
       const dstack = new SimulatedDstackClient({
@@ -218,7 +242,7 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
         clock,
       });
       const info = await dstack.info();
-      if (cancelled) return;
+      if (cancelledRef.current) return;
 
       pushStep({
         label: "dstack",
@@ -239,7 +263,7 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
         capture: { flushMs: 1 },
         retain: 200,
       });
-      if (cancelled) return;
+      if (cancelledRef.current) return;
       coolRef.current = cool;
 
       pushStep({
@@ -268,7 +292,7 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       const { simulatedGpu } = await import("@/lib/cool/phala");
 
       for (const change of changes) {
-        if (cancelled) return;
+        if (cancelledRef.current) return;
         clockRef.current = Date.now() - change.minutesAgo * 60_000;
         await seal(
           (c) =>
@@ -305,7 +329,7 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       }
 
       for (const run of inferences) {
-        if (cancelled) return;
+        if (cancelledRef.current) return;
         clockRef.current = Date.now() - run.minutesAgo * 60_000;
         await seal(
           (c) =>
@@ -340,14 +364,14 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
         await yieldToBrowser();
       }
 
-      if (cancelled) return;
+      if (cancelledRef.current) return;
       clockRef.current = Date.now();
       setProgress(1);
       setPhase("ready");
     })();
 
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
     };
   }, [clock, pushStep, seal]);
 

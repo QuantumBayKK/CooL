@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 import { Breadcrumbs, type Crumb } from "@/components/shell/Breadcrumbs";
 import { Container } from "@/components/ui/primitives";
-import { FOOTER, isGroup, NAV } from "@/lib/site";
+import { FOOTER, isFullBleed, isGroup, NAV } from "@/lib/site";
 
 /**
  * Breadcrumbs for every page, derived from the URL, mounted once.
@@ -29,10 +29,17 @@ import { FOOTER, isGroup, NAV } from "@/lib/site";
  *
  * Not on the homepage: a trail reading just "Home" is noise. Not on the
  * full-bleed evidence surfaces or the private rooms, which have their own
- * chrome and where a marketing breadcrumb above a console is clutter.
+ * chrome and where a marketing breadcrumb above a console is clutter — on the
+ * walkthrough it was worse than clutter, because it pushed a viewport-sized
+ * deck down by its own height and scrolled the deck's rail off the screen.
  */
 
-const SUPPRESS = ["/", "/billboard", "/console", "/studio", "/investor", "/admin"];
+/**
+ * The homepage plus the private rooms. The full-bleed surfaces are excluded
+ * separately, through `isFullBleed`, so the walkthrough, the console and the
+ * studio cannot drift apart from the footer gate that uses the same list.
+ */
+const SUPPRESS = ["/", "/investor", "/admin"];
 
 /** `{ "/security/readiness": "Readiness" }` for every route the nav names. */
 function labelRegistry(): Record<string, string> {
@@ -73,6 +80,7 @@ function titleCase(segment: string) {
 export function AutoBreadcrumbs() {
   const pathname = usePathname();
 
+  if (isFullBleed(pathname)) return null;
   if (SUPPRESS.some((p) => pathname === p || (p !== "/" && pathname.startsWith(`${p}/`)))) {
     return null;
   }

@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/ui/copy-button";
 import { Container, StatusBadge } from "@/components/ui/primitives";
-import { DOMAINS, HERO_STATS, PROOF_STRIP } from "@/content/home";
+import { DOMAINS, HERO_STATS } from "@/content/home";
 
 /**
  * The hero.
@@ -268,6 +268,12 @@ function VerdictMark({ verdict }: { verdict: "real" | "simulated" | "absent" }) 
  * on `HERO_STATS`. The band also does a structural job: it closes the hero with
  * a horizontal rule the eye can rest on, so the first section below it starts
  * against a boundary instead of drifting up into the headline.
+ *
+ * A second strip of named standards used to sit under this one — ML-DSA-65,
+ * RFC 6962, deterministic CBOR. It was accurate and it was noise: the reader
+ * who cares meets all six of those terms in the domain table two screens down,
+ * where each one is attached to the check it performs rather than floating in a
+ * row of credentials.
  */
 function StatRail() {
   return (
@@ -300,22 +306,6 @@ function StatRail() {
         </dl>
       </Container>
 
-      {/* The standards strip. Six named specifications, no adjectives — this is
-          the band where a sceptical engineer decides whether to keep reading. */}
-      <div className="border-t border-line">
-        <Container>
-          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2 py-3.5">
-            {PROOF_STRIP.map((item) => (
-              <li
-                key={item}
-                className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-ink-subtle"
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </div>
     </div>
   );
 }

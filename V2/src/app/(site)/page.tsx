@@ -3,22 +3,17 @@ import dynamic from "next/dynamic";
 
 import { Hero } from "@/components/home/Hero";
 import {
-  Benefits,
   CallToAction,
   Domains,
-  Founders,
   Landscape,
-  Market,
-  PositionSection,
   Product,
-  Roadmap,
   Standing,
   WhyNow,
 } from "@/components/home/sections";
-import { CaseStudy } from "@/components/marketing/CaseStudy";
 import { Faq, FaqJsonLd } from "@/components/marketing/Faq";
 import { Reviews } from "@/components/marketing/Reviews";
 import { Container, SectionHeader } from "@/components/ui/primitives";
+import { LoadingPanel } from "@/components/ui/loader";
 import { SITE } from "@/lib/site";
 
 /**
@@ -27,40 +22,35 @@ import { SITE } from "@/lib/site";
  * ── the shape ──
  *
  *   hero + verdict panel → 01 why now → 02 product → 03 verification domains
- *        → the live demo → 04 what it gets you → worked example
- *        → 05 landscape → 06 position → 07 market → 08 where we actually are
- *        → 09 founders → 10 roadmap → FAQ → start
+ *        → the live demo → 04 landscape → 05 where we actually are
+ *        → FAQ → start
  *
- * A document, not a trailer. The previous version of this page opened with a
- * centred headline and three pinned scroll acts — several viewport-heights of
- * animation each — and the demo, the most persuasive thing the company has,
- * began 15,800px down. It was rebuilt as a dense sectioned page in the shape
- * developer-infrastructure buyers actually read: numbered bands, hairline
- * grids, a comparison matrix, and every claim next to the artefact that
- * supports it.
- *
- * The three trailer acts still exist in `components/trailer/` and are no longer
- * mounted anywhere. They were not deleted: they are working, tested scroll
- * choreography, and the decision to stop using them on the homepage is a
- * layout decision rather than a judgement that the code is wrong.
+ * Six bands and a demo. Two revisions got it here: first from a scroll trailer
+ * whose three pinned acts put the demo 15,800px down the page, then from a
+ * fifteen-band document that had every section a landing page can have. This
+ * version has the ones that carry the argument and none of the ones that
+ * restate it — see the note at the top of `components/home/sections.tsx` for
+ * exactly what was cut and on what grounds.
  *
  * ── the ordering rule ──
  *
  * Sceptic-first. The regulatory case, the pipeline and the honest verdict table
- * all come before the demo; the market, the founders and the roadmap come
- * after. Someone evaluating this product decides whether the cryptography is
- * real long before they care who built it, and a page that opens with the team
- * is a page that has misread its own reader.
+ * all come before the demo; the comparison and the admission of what is missing
+ * come after. Someone evaluating this product decides whether the cryptography
+ * is real long before they care about anything else, and a page that opens with
+ * the company has misread its own reader.
  *
  * ── cost ──
  *
  * Everything above is a Server Component and ships no JavaScript. `DemoShell`
- * is the single client island — `dynamic()`, and it code-splits four of its
- * five views internally — so the reader gets the whole argument as readable
- * HTML before any crypto workload arrives.
+ * is the single client island — `dynamic()`, code-splitting four of its five
+ * views internally, with a loader while it arrives — so the reader gets the
+ * whole argument as readable HTML before any crypto workload does.
  */
 
-const DemoShell = dynamic(() => import("@/components/demo/DemoShell"));
+const DemoShell = dynamic(() => import("@/components/demo/DemoShell"), {
+  loading: () => <LoadingPanel label="Loading the demo" className="min-h-[420px]" />,
+});
 
 export const metadata: Metadata = {
   title: `${SITE.name} — ${SITE.tagline}`,
@@ -79,15 +69,8 @@ export default function HomePage() {
 
       <LiveDemoSection />
 
-      <Benefits />
-      <CaseStudy />
-
       <Landscape />
-      <PositionSection />
-      <Market />
       <Standing />
-      <Founders />
-      <Roadmap />
 
       {/* Renders nothing until there are real, attributed quotes. See the note
           on `REVIEWS` in content/marketing.ts. */}
@@ -121,11 +104,7 @@ export default function HomePage() {
  */
 function LiveDemoSection() {
   return (
-    <section
-      id="demo"
-      className="border-t border-line bg-surface"
-      data-surface="console"
-    >
+    <section id="demo" className="border-t border-line" data-surface="console">
       <Container>
         <div className="py-16 lg:py-20">
           <SectionHeader

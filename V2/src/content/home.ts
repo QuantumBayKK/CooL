@@ -3,11 +3,18 @@
  *
  * ── why this file exists ──
  *
- * The homepage is a long, dense, sectioned document rather than a scroll
- * trailer: a dozen bands, each making one checkable claim. Written inline that
- * is two thousand lines of JSX with the argument buried inside the markup, and
+ * The homepage is a sectioned document rather than a scroll trailer: five
+ * bands plus the demo, each making one checkable claim. Written inline that is
+ * a thousand lines of JSX with the argument buried inside the markup, and
  * nobody can answer "what does the homepage actually claim?" without reading
  * all of it.
+ *
+ * It was fifteen bands. The market figures, the roadmap, the founders and the
+ * worked example were cut rather than shortened — they are investor material
+ * and restatement, they still live in `deck.ts` and on `/about`, and a landing
+ * page that makes its argument in five bands makes it better than one that
+ * makes it in fifteen. See the note at the top of `components/home/sections.tsx`
+ * for what went and why.
  *
  * Kept here, the claims are a list you can audit in one sitting — which is the
  * only way `scripts/verify-claims.mjs` and a human reviewer can both do their
@@ -56,23 +63,6 @@ export const HERO_STATS: readonly {
     v: "network calls to verify",
     note: "The verifier runs offline, on your machine, with no account.",
   },
-];
-
-/**
- * The technical facts strip under the hero.
- *
- * Every entry is a named standard or a published artefact, so each one is a
- * search away from being confirmed. No adjectives, deliberately: this band is
- * where a sceptical engineer decides whether to keep reading, and adjectives
- * are what they are scanning for reasons to stop.
- */
-export const PROOF_STRIP: readonly string[] = [
-  "ML-DSA-65 · FIPS 204",
-  "Ed25519 hybrid",
-  "SHA-256 commitments",
-  "Deterministic CBOR",
-  "RFC 6962 log",
-  "Apache-2.0",
 ];
 
 /* ── 01 · why now ─────────────────────────────────────────────────────────── */
@@ -233,68 +223,7 @@ export const DOMAINS: readonly Domain[] = [
   },
 ];
 
-/* ── 04 · what it gets you ────────────────────────────────────────────────── */
-
-export const BENEFITS: readonly {
-  readonly title: string;
-  readonly body: string;
-}[] = [
-  {
-    title: "Capture automatically",
-    body: "The record is produced by the pipeline that made the change, not by an engineer remembering to write it down afterwards. Nobody opens a ticket, and nothing depends on anyone's discipline during a bad week.",
-  },
-  {
-    title: "Verify independently",
-    body: "Hand a receipt to a regulator, an auditor, a counterparty or a customer's own analyst. They check it on their machine, with the network off, using a verifier we neither host nor control.",
-  },
-  {
-    title: "Prove for a decade",
-    body: "Hybrid post-quantum signatures mean a record sealed today is still meaningful evidence once a cryptographically relevant quantum computer exists — which is the horizon a ten-year retention obligation actually spans.",
-  },
-];
-
-/* ── 05 · position ────────────────────────────────────────────────────────── */
-
-export interface Position {
-  readonly n: string;
-  readonly title: string;
-  readonly body: string;
-}
-
-export const POSITIONS: readonly Position[] = [
-  {
-    n: "01",
-    title: "Provider-neutral capture",
-    body: "CooL instruments the choke points every AI system already has — CI, the gateway, the SDK — rather than one vendor's console. Swap one provider for another, or for a self-hosted model, and the evidence trail does not break.",
-  },
-  {
-    n: "02",
-    title: "Proof, not storage",
-    body: "Keeping more logs does not help when the question is whether the logs were edited. CooL produces a small signed artefact whose integrity is checkable arithmetic, and leaves the bulk data where it already lives.",
-  },
-  {
-    n: "03",
-    title: "Post-quantum from day one",
-    body: "Always hybrid, never post-quantum alone: ML-DSA-65 with Ed25519, ML-KEM with X25519. The new schemes are too young to bet uptime on, and hybrid means a break in either one is survivable.",
-  },
-  {
-    n: "04",
-    title: "Reuse what is already proven",
-    body: "The transparency log is RFC 6962 — the structure behind Certificate Transparency and Sigstore. The policy engine and the durable workflows are off the shelf. A hand-rolled Merkle log is how you ship a subtle break nobody finds for two years.",
-  },
-  {
-    n: "05",
-    title: "Never in the critical path",
-    body: "Capture is asynchronous and fails open, so CooL going down cannot take a customer's AI down with it. That removes the objection which kills infrastructure deals before the security review even starts.",
-  },
-  {
-    n: "06",
-    title: "Honesty enforced in code",
-    body: "The verifier will not report a hardware pass without a hardware root. This site's CI fails the build if any page claims a readiness rung above the one we are on. Neither rule can be talked around by whoever is editing copy that week.",
-  },
-];
-
-/* ── 06 · the landscape ───────────────────────────────────────────────────── */
+/* ── 04 · the landscape ───────────────────────────────────────────────────── */
 
 export type Mark = "yes" | "partial" | "no";
 
@@ -365,41 +294,7 @@ export const LANDSCAPE: readonly LandscapeRow[] = [
   },
 ];
 
-/* ── 07 · market ──────────────────────────────────────────────────────────── */
-
-/**
- * Transcribed from `src/content/deck.ts`, which is itself transcribed verbatim
- * from the pitch deck. Attribution travels with the figure: a market number
- * without its analyst is an assertion, and an investor who finds two different
- * numbers on two surfaces of the same company has a diligence problem we made
- * for them.
- */
-export const MARKET: readonly {
-  readonly k: string;
-  readonly v: string;
-  readonly note: string;
-}[] = [
-  {
-    k: "TAM",
-    v: "$15.8B",
-    note: "AI-governance software by 2030 (Forrester) — around 7% of all AI software spend.",
-  },
-  {
-    k: "SAM",
-    v: "$3–5B",
-    note: "The regulated audit and evidentiary slice: BFSI, health, government, legal.",
-  },
-  {
-    k: "SOM",
-    v: "$15–40M",
-    note: "CooL's India-first capture over three to five years, via open-core conversion.",
-  },
-];
-
-export const MARKET_FOOTNOTE =
-  "These are third-party forecasts, not measured demand. The published analyst range for this category by 2030 runs from $1B (Gartner, platforms) to $15.8B (Forrester, governance software), and we print the source next to the figure so you can weigh it yourself. Gartner separately projects that AI regulation reaches 75% of world economies by 2030.";
-
-/* ── 08 · standing ────────────────────────────────────────────────────────── */
+/* ── 05 · standing ────────────────────────────────────────────────────────── */
 
 /**
  * What the company does not have yet, on the homepage rather than in a footer.
@@ -432,99 +327,5 @@ export const STANDING: readonly {
     label: "Pricing",
     value:
       "Not live. The SDK, the receipt format and the verifier are Apache-2.0 and free; commercial terms around the managed log are not published yet.",
-  },
-];
-
-/* ── 09 · founders ────────────────────────────────────────────────────────── */
-
-export interface Founder {
-  readonly name: string;
-  readonly role: string;
-  readonly city: string;
-  readonly focus: string;
-  readonly items: readonly string[];
-  readonly github: string;
-  readonly handle: string;
-}
-
-/**
- * Transcribed from the deck's team slide.
- *
- * Every line is a thing with a URL behind it — a repository, a published piece
- * of research, a named company. That is deliberate: this section sits two bands
- * below a table admitting the company holds no certifications, and the only
- * thing that makes the admission survivable is that everything else here can be
- * checked in a browser tab.
- */
-export const FOUNDERS: readonly Founder[] = [
-  {
-    name: "Pranauv Shrinaath S",
-    role: "Founder & CEO",
-    city: "Chennai",
-    focus: "Post-quantum cryptography and blockchain",
-    items: [
-      "ipsec-pqc-ikev2 — one of roughly 200 ML-KEM projects worldwide, mapping ML-KEM into IKEv2 against liboqs.",
-      "Published research on decentralising public banks, secured with post-quantum cryptography and Hyperledger Fabric.",
-      "Onsite research internship, NUS Singapore. Five years building, since 14.",
-    ],
-    github: "https://github.com/KenidoesCode",
-    handle: "KenidoesCode",
-  },
-  {
-    name: "Kailosh Kalimuthu",
-    role: "Co-founder & CTO",
-    city: "Bangalore",
-    focus: "Trusted execution environments and AI inference",
-    items: [
-      "Built BIFROST — a decentralised peer-to-peer comms, storage and compute network that turns idle hardware into an encrypted distributed micro-cloud.",
-      "Six months with the US startup Decipher.",
-      "Three years building, since 16.",
-    ],
-    github: "https://github.com/Sk1zmo",
-    handle: "Sk1zmo",
-  },
-];
-
-export const FOUNDERS_NOTE =
-  "Nothing here is claimed beyond what is listed, and every line is one click from being checked.";
-
-/* ── 10 · roadmap ─────────────────────────────────────────────────────────── */
-
-export interface Phase {
-  readonly when: string;
-  readonly title: string;
-  readonly body: string;
-  readonly state: "now" | "next" | "later";
-}
-
-/**
- * Four phases, aligned to the readiness ladder in `gates.ts` rather than to a
- * calendar. Dates on a pre-launch roadmap are fiction with a deadline attached;
- * rungs are checkable, and the ladder page publishes what each one requires.
- */
-export const ROADMAP: readonly Phase[] = [
-  {
-    when: "Today",
-    title: "Working demo, open verifier",
-    body: "Real hybrid signatures, a real RFC 6962 log and a published offline verifier — running in your browser on this site, with the forgery controls included so you can watch it reject a tampered receipt.",
-    state: "now",
-  },
-  {
-    when: "Building now",
-    title: "Hardware attestation and an independent witness",
-    body: "Replace the simulated attestor with a real NVIDIA Confidential Compute or Intel TDX quote, then add witness co-signing and RFC 3161 timestamping so the log is no longer signed only by us.",
-    state: "next",
-  },
-  {
-    when: "Then",
-    title: "Pilots with regulated-AI teams",
-    body: "Design partners in RBI-regulated fintech and health-tech, single-tenant and on-prem deployments of the same artefact, an independent security review, and the certification groundwork a regulated buyer's procurement will ask for.",
-    state: "later",
-  },
-  {
-    when: "Where this goes",
-    title: "The neutral evidentiary standard for regulated AI",
-    body: "Self-attestation always gives way to cryptographic evidence — Certificate Transparency, Sigstore, RFC 3161. CooL brings that one-way migration to AI, and the format is open so it can outlive the company that wrote it.",
-    state: "later",
   },
 ];

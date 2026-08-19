@@ -121,13 +121,37 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
   const coolRef = useRef<CoolTee | null>(null);
   const clockRef = useRef<number>(Date.now());
   const bootedRef = useRef(false);
+  const cancelledRef = useRef(false);
 
   const clock = useCallback(() => new Date(clockRef.current).toISOString(), []);
 
+  /**
+   * The boot, and the one subtlety in it.
+   *
+   * `bootedRef` stops the enclave being started twice. `cancelledRef` stops a
+   * finished boot writing state into an unmounted tree. Those two guards used
+   * to be a ref and a plain `let`, and together they deadlocked the page under
+   * React's StrictMode double-invoke:
+   *
+   *   run 1  bootedRef := true, starts the async boot, returns its cleanup
+   *   unmount  cleanup sets run 1's `cancelled` to true
+   *   run 2  bootedRef is already true, so it returns immediately
+   *
+   * The only boot in flight was now permanently cancelled and nothing would
+   * ever re-arm it, so every `if (cancelled) return` fired and the enclave
+   * never came up. Locally the walkthrough sat on "starting the enclave"
+   * forever and every record-dependent stop stayed locked — the whole demo,
+   * dead, in exactly the environment it is developed in.
+   *
+   * Holding the flag in a ref and re-arming it at the top of every run fixes
+   * it: the remount clears the cancellation the unmount set, and the boot that
+   * is genuinely in flight carries on. The cleanup is now returned from every
+   * run rather than only the first, so a real unmount still cancels.
+   */
   useEffect(() => {
-    if (bootedRef.current) return;
+    cancelledRef.current = false;
+    if (bootedRef.current) return () => void (cancelledRef.current = true);
     bootedRef.current = true;
-    let cancelled = false;
 
     void (async () => {
       const dstack = new SimulatedDstackClient({
@@ -136,7 +160,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
         clock,
       });
       const info = await dstack.info();
-      if (cancelled) return;
+      if (cancelledRef.current) return;
       setEnclave(info);
       setBooting("deriving keys from the measurement");
       await yieldToBrowser();
@@ -155,7 +179,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
         capture: { flushMs: 1 },
         retain: 200,
       });
-      if (cancelled) return;
+      if (cancelledRef.current) return;
       coolRef.current = cool;
       setHandshake(cool.handshake);
       setBooting("sealing the estate");
@@ -164,7 +188,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
       // Oldest first, so leaf indices and timestamps tell the same story.
       const seeds = [...BACKDROP].sort((a, b) => b.minutesAgo - a.minutesAgo);
       for (const seed of seeds) {
-        if (cancelled) return;
+        if (cancelledRef.current) return;
         clockRef.current = Date.now() - seed.minutesAgo * 60_000;
         try {
           const receipt = await cool.change({
@@ -181,7 +205,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
             receipt.record.schema === "cool.change.v2"
               ? (receipt.record.change.approval?.decision ?? "—")
               : "—";
-          if (cancelled) return;
+          if (cancelledRef.current) return;
           setRows((prev) =>
             [
               {
@@ -208,7 +232,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
         await yieldToBrowser();
       }
 
-      if (cancelled) return;
+      if (cancelledRef.current) return;
       clockRef.current = Date.now();
       setLogSize(cool.plane.logSize);
       setBooting(null);
@@ -216,7 +240,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
     })();
 
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
     };
   }, [clock]);
 

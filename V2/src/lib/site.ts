@@ -89,6 +89,33 @@ export const NAV: readonly (NavItem | NavGroup)[] = [
   { label: "Company", href: "/about" },
 ] as const;
 
+/**
+ * Routes that own the whole viewport.
+ *
+ * These are not documents with a header on top — they are single-screen
+ * instruments. The walkthrough sizes itself to `100dvh` minus the site header
+ * and expects nothing above or below it; mounted inside the normal shell it
+ * got a breadcrumb bar pushed onto its top and a four-column marketing footer
+ * hung off its bottom, so the deck's own rail scrolled out of view the moment
+ * anyone reached for the Save button. The rail is the thing that makes it a
+ * walkthrough, so losing it is not a cosmetic problem.
+ *
+ * One list, consumed by the breadcrumbs, the footer gate and the sticky mobile
+ * bar, so a surface cannot be full-bleed according to one of them and not the
+ * others.
+ */
+export const FULL_BLEED: readonly string[] = [
+  "/verify",
+  "/console",
+  "/studio",
+  "/billboard",
+];
+
+/** True when `pathname` is one of the full-bleed surfaces, or inside one. */
+export function isFullBleed(pathname: string): boolean {
+  return FULL_BLEED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
 export function isGroup(item: NavItem | NavGroup): item is NavGroup {
   return "items" in item;
 }

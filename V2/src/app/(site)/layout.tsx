@@ -1,4 +1,7 @@
 import { AutoBreadcrumbs } from "@/components/shell/AutoBreadcrumbs";
+import { HideOnFullBleed } from "@/components/shell/ChromeGate";
+import { PageFade } from "@/components/shell/PageFade";
+import { RouteProgress } from "@/components/shell/RouteProgress";
 import { SiteFooter } from "@/components/shell/SiteFooter";
 import { SiteHeader } from "@/components/shell/SiteHeader";
 import { StickyMobileCta } from "@/components/shell/StickyMobileCta";
@@ -23,15 +26,27 @@ export default function SiteLayout({
 }) {
   return (
     <div className="flex min-h-dvh flex-col">
+      {/* Covers the latency of a route change; the fade below covers the swap
+          at the end of it. Together a navigation never shows a blank frame or
+          a hard cut. Both are CSS on `--ease-nav` — see globals.css. */}
+      <RouteProgress />
       <SiteHeader />
       {/* Derived from the pathname and mounted once, so a renamed route cannot
           leave a stale trail behind on a page nobody thought to update.
           Suppresses itself on the homepage and the full-bleed surfaces. */}
       <AutoBreadcrumbs />
       <main id="main" className="flex-1">
-        {children}
+        {/* `children` passes through as a prop, so every page below this stays
+            a Server Component. See the note in `PageFade`. */}
+        <PageFade>{children}</PageFade>
       </main>
-      <SiteFooter />
+      {/* Suppressed on the full-bleed surfaces. A four-column marketing footer
+          hanging off the bottom of a viewport-sized instrument turns it into a
+          document that scrolls, which is exactly what the walkthrough is built
+          not to be. */}
+      <HideOnFullBleed>
+        <SiteFooter />
+      </HideOnFullBleed>
       {/* Below `lg` only, after 620px of scroll, and never over the footer.
           It excludes itself from the evidence surfaces and the private rooms —
           see the component. */}
