@@ -158,7 +158,11 @@ export default function TerminalBillboard() {
   }, [play, cycle]);
 
   return (
-    <div className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden bg-black px-6 py-16 sm:px-10">
+    <div /* Minus the 64px site header, for the same reason the walkthrough
+          subtracts it: a full viewport claimed underneath a sticky header is a
+          viewport and a header tall, and a board meant to be looked at rather
+          than read should not need scrolling to see its own bottom edge. */
+      className="relative flex min-h-[calc(100dvh-4rem)] w-full items-center justify-center overflow-hidden bg-black px-6 py-16 sm:px-10">
       {/* the faint pool of light a real board sits in */}
       <div
         aria-hidden

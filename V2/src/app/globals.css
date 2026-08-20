@@ -113,6 +113,138 @@
   --focus: var(--ink);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Product skins — `[data-skin="vscode"]` and `[data-skin="atlassian"]`
+
+   ── what these are ──
+
+   Two scenes on this site imitate software the reader already knows: the
+   walkthrough's act one is an editor, and the studio is a Jira-shaped console.
+   Neither is decoration. The argument of act one is made by omission — an
+   engineer changes one line and saves, in the tool they actually use, with no
+   CooL UI anywhere on screen — and it only lands if the thing on screen reads
+   as an editor rather than as a web page pretending to be one.
+
+   ── why this block exists ──
+
+   It was missing. Every one of these names was referenced and none was
+   defined: 57 tokens across ~380 usages, all resolving to nothing. They were
+   declared in the dark stylesheet this file replaced, and the light-palette
+   rewrite dropped the declarations while leaving every `var()` that reads them.
+
+   An undefined custom property makes its whole declaration invalid, so the
+   failures were silent and uneven — most surfaces merely lost a shade and
+   still looked plausible. One did not: the editor's status bar is
+   `background: var(--vsc-accent); color: #fff`, which with the background
+   dropped became white text on a white page. That status bar holds the Save
+   control, and Save is the single action the entire walkthrough is waiting for.
+   So a visitor got as far as the scripted edit, found the button that made it
+   now disabled, and had nothing visible left to press. The demo looked
+   finished and was unstartable.
+
+   ── how they are chosen ──
+
+   Light, because the site is light and there is no theme to switch to. The
+   values are the real Light+ and Atlassian palettes rather than tints of the
+   brand: a simulated editor whose syntax colours are three shades of the CooL
+   red would read as a mock-up, and reading as a mock-up is the one thing act
+   one cannot afford. The same reasoning already governs the macOS traffic
+   lights hard-coded in `EditorScene`.
+
+   These are scoped to `[data-skin]` and inherit nothing from the design
+   system's tokens, deliberately — so a change to the brand palette cannot
+   silently restyle a window that is supposed to look like somebody else's
+   software, and vice versa.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin="vscode"] {
+  /* surfaces, in the order the chrome stacks */
+  --vsc-editor: #ffffff;
+  --vsc-chrome: #f3f3f3;
+  --vsc-deep: #f8f8f8;
+  --vsc-hover: #e8e8e8;
+  --vsc-line-highlight: #f5f5f5;
+  --vsc-selection: #add6ff;
+
+  --vsc-border: #e5e5e5;
+  --vsc-border-strong: #cecece;
+
+  /* text, brightest to faintest. `dim` is the gutter. */
+  --vsc-bright: #1f1f1f;
+  --vsc-text: #3b3b3b;
+  --vsc-muted: #616161;
+  --vsc-dim: #8a8a8a;
+
+  /* The status bar. White text sits on this, so it carries the contrast
+     requirement of the whole skin: 7.2:1 against #ffffff text. */
+  --vsc-accent: #005fb8;
+
+  /* syntax — VS Code Light+ */
+  --vsc-keyword: #0000ff;
+  --vsc-control: #af00db;
+  --vsc-string: #a31515;
+  --vsc-number: #098658;
+  --vsc-comment: #008000;
+  --vsc-fn: #795e26;
+  --vsc-type: #267f99;
+  --vsc-var: #001080;
+  --vsc-const: #0070c1;
+  --vsc-tag: #800000;
+  --vsc-punct: #3b3b3b;
+
+  /* terminal — darkened from the ANSI defaults, which are tuned for a black
+     background and are unreadable on white. */
+  --vsc-term-green: #0a7f28;
+  --vsc-term-red: #cd3131;
+  --vsc-term-yellow: #8a6a00;
+  --vsc-term-blue: #0451a5;
+  --vsc-term-cyan: #0598bc;
+}
+
+[data-skin="atlassian"] {
+  --atl-bg: #ffffff;
+  --atl-surface: #f7f8f9;
+  --atl-raised: #ffffff;
+  --atl-sunken: #f1f2f4;
+
+  --atl-border: #dfe1e6;
+  --atl-border-strong: #c1c7d0;
+
+  --atl-text: #172b4d;
+  --atl-muted: #44546f;
+  --atl-subtle: #626f86;
+
+  /* The navigation is dark and the content is light — Atlassian's own
+     arrangement. Everything below is read against the dark bar, which is why
+     `nav-text` is a light grey rather than a muted ink. */
+  --atl-nav: #1d2125;
+  --atl-nav-deep: #161a1d;
+  --atl-nav-text: #b6c2cf;
+  --atl-nav-line: rgba(255, 255, 255, 0.14);
+  --atl-nav-active: #0055cc;
+  --atl-nav-hover: rgba(255, 255, 255, 0.08);
+
+  /* Status hues, each with its wash. `-bold` is the filled variant. */
+  --atl-blue: #0c66e4;
+  --atl-blue-bg: #e9f2ff;
+  --atl-blue-border: #a6c8ff;
+  --atl-green: #216e4e;
+  --atl-green-bg: #dcfff1;
+  --atl-green-bold: #1f845a;
+  --atl-red: #ae2e24;
+  --atl-red-bg: #ffecea;
+  --atl-red-bold: #c9372c;
+  --atl-yellow: #a54800;
+  --atl-yellow-bg: #fff7d6;
+  --atl-teal: #206a83;
+  --atl-teal-bg: #e3fafc;
+  --atl-purple: #5e4db2;
+  --atl-purple-bg: #f3f0ff;
+  --atl-grey-bg: #f1f2f4;
+
+  --atl-shadow: 0 1px 1px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31);
+}
+
 @theme inline {
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);

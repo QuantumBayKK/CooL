@@ -111,6 +111,34 @@ export function EditorScene({
     onSave(body);
   }, [body, onSave, open, saved]);
 
+
+  /**
+   * One button, three states, never a dead end.
+   *
+   * It used to be "Make the change" and nothing else: press it, the scripted
+   * edit types itself in, and the button immediately disables — `body` is no
+   * longer `PROMPT_BEFORE`, so its own guard turns it off. From that moment the
+   * only way to advance the entire walkthrough was a Save control in the
+   * editor's status bar, which is small, imitates a piece of chrome most
+   * visitors have never clicked, and — while the `--vsc-*` tokens were
+   * undefined — was rendering as white text on a white background.
+   *
+   * So the reader arrived at a screen showing an edit they did not make, with
+   * the one button greyed out and no visible next step. The demo looked
+   * finished and could not be started.
+   *
+   * The button now carries the step the reader is actually on. It only
+   * disables while the edit is typing itself out, which is the one moment
+   * there genuinely is nothing to do.
+   */
+  const action = typing
+    ? { label: "Typing…", onClick: autoEdit, disabled: true, tone: "primary" as const }
+    : saved
+      ? { label: "Change committed", onClick: () => {}, disabled: true, tone: "ghost" as const }
+      : dirty
+        ? { label: "Save the change  ⌘S", onClick: save, disabled: false, tone: "primary" as const }
+        : { label: "Make the change", onClick: autoEdit, disabled: false, tone: "primary" as const };
+
   return (
     <div
       data-skin="vscode"
@@ -184,15 +212,26 @@ export function EditorScene({
             })}
           </div>
 
-          <div className="mt-auto p-3">
+          <div className="mt-auto flex flex-col gap-2 p-3">
             <Button
-              tone={saved ? "ghost" : "primary"}
+              tone={action.tone}
               size="sm"
-              onClick={autoEdit}
-              disabled={typing || saved || body !== PROMPT_BEFORE}
+              onClick={action.onClick}
+              disabled={action.disabled}
             >
-              {saved ? "Change committed" : typing ? "Typing…" : "Make the change"}
+              {action.label}
             </Button>
+            {/* The one line of instruction in the whole demo. It is here
+                because act one is the only stop that asks the reader to do
+                something, and a reader who does not know what to press cannot
+                reach any of the other six. */}
+            {!saved && (
+              <p className="text-[11px] leading-snug" style={{ color: "var(--vsc-muted)" }}>
+                {dirty
+                  ? "Line 1 changed. Save it and the record seals itself."
+                  : "Edit the prompt yourself, or let this type it for you."}
+              </p>
+            )}
           </div>
         </div>
 
@@ -260,18 +299,13 @@ export function EditorScene({
               style={{ borderColor: "var(--vsc-border)", background: "var(--vsc-chrome)" }}
             >
               <Button
-                tone={saved ? "ghost" : "primary"}
+                tone={action.tone}
                 size="sm"
-                onClick={autoEdit}
-                disabled={typing || saved || body !== PROMPT_BEFORE}
+                onClick={action.onClick}
+                disabled={action.disabled}
               >
-                {saved ? "Change committed" : typing ? "Typing…" : "Make the change"}
+                {action.label}
               </Button>
-              {dirty && (
-                <Button tone="primary" size="sm" onClick={save}>
-                  Save
-                </Button>
-              )}
             </div>
           )}
 
