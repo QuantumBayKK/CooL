@@ -130,7 +130,7 @@ export const FOOTER: readonly NavGroup[] = [
       { label: "Architecture", href: "/architecture" },
       { label: "Verify a record", href: "/verify" },
       { label: "Console", href: "/console" },
-      { label: "Studio", href: "/studio" },
+      { label: "Studio", href: "https://cool-recorder.vercel.app" },
       { label: "Pricing", href: "/pricing" },
     ],
   },
