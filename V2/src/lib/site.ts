@@ -22,20 +22,6 @@ export interface NavItem {
   readonly label: string;
   readonly href: string;
   readonly description?: string;
-  /**
-   * Served as a static file rather than by the app router.
-   *
-   * `next/link` assumes its destination is a route it owns: it prefetches an
-   * RSC payload for the href and, on click, navigates on the client. For a
-   * path that resolves to a hand-written `index.html` in `public/` there is no
-   * payload to fetch and no route to render, so the prefetch 404s and the
-   * navigation has to fall back to a full page load anyway.
-   *
-   * Marking the item here makes that a plain `<a>` instead — same tab, one
-   * request, no wasted prefetch. Not the same thing as an external link: it is
-   * our origin, so it gets no `target` and no `rel`.
-   */
-  readonly standalone?: boolean;
 }
 
 export interface NavGroup {
@@ -127,6 +113,47 @@ export const FULL_BLEED: readonly string[] = [
   "/billboard",
 ];
 
+/**
+ * Paths served as static HTML out of `public/` rather than by the app router.
+ *
+ * `/` and `/pricing` are the marketing site; `/studio` is the CooL Recorder.
+ * Each is reached through a rewrite in `next.config.ts`, and this list is the
+ * other half of that arrangement — the half the React side needs to know
+ * about.
+ *
+ * It matters because `next/link` assumes its destination is a route it owns.
+ * It prefetches an RSC payload for the href and navigates on the client. For a
+ * hand-written `index.html` there is no payload: the prefetch fetches a page
+ * of HTML it cannot use, and the click has to fall back to a full page load
+ * anyway. It works, and it is wasted work on every render of the header and
+ * footer, which is every page on the site.
+ *
+ * `SiteLink` reads this and emits a plain `<a>` instead. Keeping it as one
+ * list rather than a flag on each `NavItem` means a path cannot be standalone
+ * in the footer and not in the header — and it also covers the links that are
+ * written inline rather than driven by `NAV`/`FOOTER`.
+ *
+ * Order matters for nothing here, but exactness does: these are matched as
+ * whole paths, not prefixes, because `/pricing` being static says nothing
+ * about a future `/pricing/enterprise` that might be a real route.
+ */
+export const STANDALONE: readonly string[] = ["/", "/pricing", "/studio"];
+
+/**
+ * True when `href` points at one of the static surfaces above.
+ *
+ * Query strings and fragments are stripped first, so `/#faq` — the footer's
+ * link to the marketing page's FAQ — is recognised as `/` rather than missed.
+ */
+export function isStandalone(href: string): boolean {
+  // A bare `#faq` is a jump within the current page, whatever that page is.
+  if (href.startsWith("#")) return false;
+  if (href.startsWith("http") || href.startsWith("mailto:")) return false;
+  // `?? href` only to satisfy `noUncheckedIndexedAccess` — `split` always
+  // yields at least one element, so the fallback is unreachable.
+  return STANDALONE.includes(href.split(/[?#]/)[0] ?? href);
+}
+
 /** True when `pathname` is one of the full-bleed surfaces, or inside one. */
 export function isFullBleed(pathname: string): boolean {
   return FULL_BLEED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
@@ -146,7 +173,7 @@ export const FOOTER: readonly NavGroup[] = [
       { label: "Architecture", href: "/architecture" },
       { label: "Verify a record", href: "/verify" },
       { label: "Console", href: "/console" },
-      { label: "Studio", href: "/studio", standalone: true },
+      { label: "Studio", href: "/studio" },
       { label: "Pricing", href: "/pricing" },
     ],
   },

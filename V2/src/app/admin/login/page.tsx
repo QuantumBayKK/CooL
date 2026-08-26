@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SiteLink } from "@/components/shell/SiteLink";
 import { redirect } from "next/navigation";
 
 import { AdminLoginForm } from "@/components/admin/AdminLoginForm";
@@ -13,9 +13,9 @@ export default async function AdminLoginPage() {
   return (
     <div className="grid min-h-dvh place-items-center px-5 py-12">
       <div className="w-full max-w-[24rem]">
-        <Link href="/" className="inline-block">
+        <SiteLink href="/" className="inline-block">
           <Wordmark />
-        </Link>
+        </SiteLink>
 
         <h1 className="mt-8 text-h2">Admin</h1>
         <p className="mt-2 text-sm text-ink-muted">

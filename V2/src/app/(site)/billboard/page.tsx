@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
+import { SiteLink } from "@/components/shell/SiteLink";
+
 const TerminalBillboard = dynamic(
   () => import("@/components/billboard/TerminalBillboard"),
 );
@@ -38,12 +40,12 @@ export default function BillboardPage() {
 
       <div className="pointer-events-none fixed inset-x-0 bottom-4 z-20 flex justify-center px-5">
         <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-          <Link
+          <SiteLink
             href="/"
             className="font-mono text-[11px] tracking-[0.16em] text-mist/60 uppercase transition-colors hover:text-ink"
           >
             northwindcipher.com
-          </Link>
+          </SiteLink>
           <Link
             href="/demo"
             className="font-mono text-[11px] tracking-[0.16em] text-mist/60 uppercase transition-colors hover:text-ink"

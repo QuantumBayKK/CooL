@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Pricing — CooL | Northwind Cipher</title>
+<meta name="description" content="CooL prices like an API: a free developer tier, simple plans, and usage-based pricing per sealed change. Verifying is always free — offline, with no account." />
+<meta name="theme-color" content="#ffffff" />
+<meta property="og:title" content="CooL Pricing — start free, pay only to seal" />
+<meta property="og:description" content="You pay to seal changes. Verifying them is free forever." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="icon" href="/assets/favicon-solid.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/src/app.css" />
+</head>
+<body>
+<header class="nav" id="nav">
+<div class="nav__in">
+<a href="/" class="brand" aria-label="CooL — home">
+<i class="brand__wm" aria-hidden="true"></i>
+</a>
+<nav class="nav__links">
+<a href="/#product">Product</a>
+<a href="/#verify">Verification</a>
+<a href="/pricing.html" style="color:var(--ink)" aria-current="page">Pricing</a>
+<a href="/#market">Market</a>
+<a href="/#team">Company</a>
+</nav>
+<div class="nav__right">
+<a href="/#faq" class="btn btn--ghost">Contact</a>
+<a href="/studio" class="btn btn--dark btn--sm">See the Studio</a>
+<a href="#sales" class="btn btn--accent btn--sm">Talk to us</a>
+<button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><i></i></button>
+</div>
+</div>
+</header>
+<div class="drawer" id="drawer">
+<a href="/#product">Product</a>
+<a href="/#verify">Verification</a>
+<a href="/pricing.html">Pricing</a>
+<a href="/studio">Studio</a>
+<a href="/#market">Market</a>
+<a href="/#team">Company</a>
+<a href="#sales" class="btn btn--accent btn--full">Talk to us</a>
+</div>
+<main id="top">
+<section class="hero" style="padding-block:var(--s20) var(--s16)">
+<div class="wrap">
+<p class="eyebrow" data-reveal>Pricing</p>
+<h1 class="d1" style="max-width:14ch" data-reveal>Start free. Pay only to&nbsp;seal.</h1>
+<p class="lead" style="margin:var(--s6) 0 var(--s4);max-width:30ch" data-reveal>Verifying is always free.</p>
+<p class="support" data-reveal>CooL prices like an API: a real free tier, simple plans, and usage-based pricing per sealed change. Anyone can verify any record offline, forever, at no cost and with no account — charging for that would break the one promise the product is built on.</p>
+<div class="btn-row" style="margin-top:var(--s8)" data-reveal>
+<button class="cmd cmd--accent" data-copy="npm i -g cool-nwc">
+<span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span>
+<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
+</button>
+<a href="#sales" class="btn btn--line">Talk to us</a>
+</div>
+<div class="launch" data-reveal>
+<b>Billing isn't live yet.</b>
+<span>These are launch prices — designed and benchmarked, to switch on with our design-partner launch. No one is paying them today. The Developer tier and the offline verifier work right now; paid tiers route to a conversation until hosted billing is wired.</span>
+</div>
+</div>
+</section>
+<section class="band band--flush" style="padding-top:0">
+<div class="wrap">
+<div style="display:flex;justify-content:center" data-reveal>
+<div class="toggle" id="billing" role="group" aria-label="Billing period">
+<button data-mode="monthly">Monthly</button>
+<button data-mode="annual" class="is-on">Annual <span class="save">save 20%</span></button>
+</div>
+</div>
+<div class="plans" data-reveal>
+<article class="plan">
+<p class="plan__name">Free · Developer</p>
+<p class="plan__price" data-monthly="$0" data-annual="$0">$0</p>
+<p class="plan__per">per month, forever</p>
+<p class="plan__who">For trying CooL and building the first integration.</p>
+<ul>
+<li>1,000 sealed changes / month</li>
+<li>Unlimited offline verification</li>
+<li>30-day log retention</li>
+<li>1 developer seat</li>
+<li>Community support</li>
+</ul>
+<button class="btn btn--line" data-copy="npm i -g cool-nwc">Start free</button>
+</article>
+<article class="plan">
+<p class="plan__name">Pro</p>
+<p class="plan__price" data-monthly="$49" data-annual="$39">$39</p>
+<p class="plan__per" data-monthly="per month, billed monthly" data-annual="per month, billed annually ($49 monthly)">per month, billed annually ($49 monthly)</p>
+<p class="plan__who">For developers and small teams shipping AI changes.</p>
+<ul>
+<li>20,000 sealed changes / month, then $2.00 per 1,000</li>
+<li>1-year retention · 3 seats</li>
+<li>Policy engine + selective disclosure</li>
+<li>Audit-pack export</li>
+<li>Email support</li>
+</ul>
+<a href="#sales" class="btn btn--line">Join the launch list</a>
+</article>
+<article class="plan plan--pick">
+<span class="plan__flag">Most popular</span>
+<p class="plan__name">Team</p>
+<p class="plan__price" data-monthly="$349" data-annual="$299">$299</p>
+<p class="plan__per" data-monthly="per month, billed monthly" data-annual="per month, billed annually ($349 monthly)">per month, billed annually ($349 monthly)</p>
+<p class="plan__who">For teams standardising AI change governance.</p>
+<ul>
+<li>200,000 sealed changes / month, then $1.50 per 1,000</li>
+<li>Unlimited retention · 10 seats ($15/seat beyond)</li>
+<li>Witnesses + public-chain anchoring</li>
+<li>SSO (OIDC) + RBAC</li>
+<li>High-assurance sealing <span class="plan__soon">at hardware launch</span></li>
+<li>Priority support</li>
+</ul>
+<a href="#sales" class="btn btn--accent">Join the launch list</a>
+</article>
+<article class="plan">
+<p class="plan__name">Enterprise</p>
+<p class="plan__price" data-monthly="Custom" data-annual="Custom">Custom</p>
+<p class="plan__per">annual, org-wide licence</p>
+<p class="plan__who">For regulated organisations deploying CooL as their system of record.</p>
+<ul>
+<li>Volume sealed-change pricing</li>
+<li>On-prem / single-tenant VPC · air-gapped install</li>
+<li>SAML SSO + SCIM · DPA</li>
+<li>BAA <span class="plan__soon">at GA</span></li>
+<li>Dedicated support, SLA <span class="plan__soon">at GA</span></li>
+</ul>
+<a href="#sales" class="btn btn--line">Contact us</a>
+</article>
+</div>
+<details class="compare" data-reveal>
+<summary>Compare every plan <i></i></summary>
+<div class="tablewrap" style="margin-bottom:var(--s8)">
+<table class="tbl--compare">
+<thead>
+<tr>
+<th>Capability</th>
+<th>Free</th>
+<th>Pro</th>
+<th class="us">Team</th>
+<th>Enterprise</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Included sealed changes / month</td><td>1,000</td><td>20,000</td><td class="us">200,000</td><td>Volume</td></tr>
+<tr><td>Overage per 1,000</td><td class="off">hard cap</td><td>$2.00</td><td class="us">$1.50</td><td>Custom</td></tr>
+<tr><td>Offline verification</td><td class="yes">unlimited, free</td><td class="yes">unlimited, free</td><td class="us yes">unlimited, free</td><td class="yes">unlimited, free</td></tr>
+<tr><td>Log retention</td><td>30 days</td><td>1 year</td><td class="us">unlimited</td><td>custom + archival</td></tr>
+<tr><td>Seats</td><td>1</td><td>3</td><td class="us">10, then $15</td><td>unlimited</td></tr>
+<tr><td>Tamper-evident log + PQC signing</td><td class="yes">yes</td><td class="yes">yes</td><td class="us yes">yes</td><td class="yes">yes</td></tr>
+<tr><td>Policy engine + selective disclosure</td><td>basic</td><td class="yes">yes</td><td class="us yes">yes</td><td class="yes">yes</td></tr>
+<tr><td>Audit-pack export</td><td class="off">—</td><td class="yes">yes</td><td class="us yes">yes</td><td class="yes">yes</td></tr>
+<tr><td>Witnesses + public-chain anchoring</td><td class="off">—</td><td class="off">—</td><td class="us yes">yes</td><td class="yes">yes</td></tr>
+<tr><td>High-assurance sealing <span class="plan__soon">at hardware launch</span></td><td class="off">—</td><td>usage add-on</td><td class="us">usage add-on</td><td>bundled options</td></tr>
+<tr><td>SSO + RBAC</td><td class="off">—</td><td class="off">—</td><td class="us">OIDC</td><td>SAML + SCIM</td></tr>
+<tr><td>On-prem / single-tenant VPC</td><td class="off">—</td><td class="off">—</td><td class="off">—</td><td class="yes">yes</td></tr>
+<tr><td>DPA</td><td class="off">—</td><td class="off">—</td><td class="us yes">yes</td><td class="yes">yes</td></tr>
+<tr><td>BAA <span class="plan__soon">at GA</span></td><td class="off">—</td><td class="off">—</td><td class="off">—</td><td>at GA</td></tr>
+<tr><td>Support</td><td>community</td><td>email</td><td class="us">priority</td><td>dedicated, SLA at GA</td></tr>
+</tbody>
+</table>
+</div>
+</details>
+</div>
+</section>
+<section class="band band--surface">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">The meter</p>
+<h2 class="d2">One unit: a sealed change.</h2>
+<p class="support">A sealed change is one change to an AI system — a prompt edit, a model swap, a policy change, a granted tool — canonicalised, hashed, signed and written to the log. One record, one unit. You are billed only for changes that successfully seal.</p>
+</div>
+<div class="tablewrap" data-reveal>
+<table class="tbl--usage">
+<thead>
+<tr><th>Item</th><th class="num">Price</th><th>Unit</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard sealed change<small>Software signing + append to the transparency log</small></td>
+<td class="num">$2.00</td><td>per 1,000 · $0.002 each</td>
+</tr>
+<tr>
+<td>High-assurance sealed change <span class="plan__soon">at hardware launch</span><small>Sealed inside Intel TDX-class confidential hardware, so the attestation and enclave domains verify as real rather than <span class="mono">sim</span></small></td>
+<td class="num">$20.00</td><td>per 1,000 · $0.02 each</td>
+</tr>
+<tr>
+<td>Offline verification<small>No account, no network, no limit — for you or your auditor</small></td>
+<td class="num free">Free</td><td>forever</td>
+</tr>
+<tr>
+<td>Extended log retention</td>
+<td class="num">$0.50</td><td>per 100,000 records / month beyond included</td>
+</tr>
+<tr>
+<td>Additional seat (Team)</td>
+<td class="num">$15.00</td><td>per seat / month beyond the 10 included</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="head head--wide" style="margin:var(--s16) 0 var(--s6)" data-reveal>
+<h3 class="d3">Volume discounts, applied automatically</h3>
+</div>
+<div class="tablewrap" data-reveal>
+<table class="tbl--usage">
+<thead><tr><th>Standard sealed changes / month</th><th class="num">Effective price per 1,000</th></tr></thead>
+<tbody>
+<tr><td>First 1,000 — every account, every plan</td><td class="num free">Free</td></tr>
+<tr><td>Up to 1M</td><td class="num">$2.00</td></tr>
+<tr><td>1M – 10M</td><td class="num">$1.50</td></tr>
+<tr><td>10M – 50M</td><td class="num">$1.00</td></tr>
+<tr><td>50M+</td><td class="num">Custom</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note" style="margin-top:var(--s6)" data-reveal>Standard sealing is a light CPU-and-storage operation, so it is priced for adoption. High-assurance sealing runs on real confidential hardware and is priced as that cost plus margin — which is why it is roughly ten times the standard rate, and why it arrives only when that hardware tier ships.</p>
+</div>
+</section>
+<section class="band">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">In practice</p>
+<h2 class="d2">What a bill actually looks like.</h2>
+<p class="support">Three real shapes of usage, worked all the way through. Verification is $0 in every one of them.</p>
+</div>
+<div class="bills" data-reveal>
+<div class="bill">
+<h3>Solo developer, evaluating</h3>
+<dl>
+<div><dt>800 sealed changes</dt><dd>included</dd></div>
+<div><dt>unlimited verification</dt><dd>$0.00</dd></div>
+<div><dt>plan</dt><dd>Free</dd></div>
+</dl>
+<p class="total"><span>per month</span><b>$0</b></p>
+</div>
+<div class="bill">
+<h3>Pro team, shipping weekly</h3>
+<dl>
+<div><dt>Pro plan</dt><dd>$39.00</dd></div>
+<div><dt>20,000 included</dt><dd>$0.00</dd></div>
+<div><dt>40,000 overage @ $2.00/k</dt><dd>$80.00</dd></div>
+<div><dt>verification</dt><dd>$0.00</dd></div>
+</dl>
+<p class="total"><span>per month</span><b>$119</b></p>
+</div>
+<div class="bill">
+<h3>Team, governing several AI products</h3>
+<dl>
+<div><dt>Team plan</dt><dd>$299.00</dd></div>
+<div><dt>200,000 included</dt><dd>$0.00</dd></div>
+<div><dt>300,000 overage @ $1.50/k</dt><dd>$450.00</dd></div>
+<div><dt>50,000 high-assurance @ $20/k</dt><dd>$1,000.00</dd></div>
+<div><dt>verification</dt><dd>$0.00</dd></div>
+</dl>
+<p class="total"><span>per month</span><b>$1,749</b></p>
+</div>
+</div>
+<p class="note" style="margin-top:var(--s6)" data-reveal>The third example includes the high-assurance line so the arithmetic is complete — that tier bills only once the hardware ships. Until then the same customer pays $749.</p>
+</div>
+</section>
+<section class="band band--flush" id="sales" style="border-top:0">
+<div class="wrap">
+<div class="strip" data-reveal>
+<div>
+<h2 class="d2">Deploy CooL inside your own VPC, or on-prem.</h2>
+<p>Volume pricing, SAML SSO, DPA, air-gapped install and a dedicated team. Your records never leave your environment — and you verify every one of them yourself.</p>
+</div>
+<div class="btn-row">
+<a href="mailto:info.quantumbay@gmail.com?subject=CooL%20—%20technical%20review" class="btn btn--accent">Book a technical review</a>
+</div>
+</div>
+</div>
+</section>
+<section class="band" id="faq">
+<div class="wrap" style="max-width:860px">
+<div class="head" data-reveal>
+<p class="eyebrow">Pricing questions</p>
+<h2 class="d2">The parts worth reading twice.</h2>
+</div>
+<div data-reveal>
+<div class="faq">
+<button class="faq__q">What exactly is a "sealed change"? <i></i></button>
+<div class="faq__a"><p>One change to your AI — a prompt edit, a model swap, a policy change, a granted tool, or a captured governance event — that CooL serialises deterministically, hashes, signs and appends to the transparency log. One provable record, one unit on the meter.</p></div>
+</div>
+<div class="faq">
+<button class="faq__q">Why is verification free? <i></i></button>
+<div class="faq__a"><p>Because the whole promise is "don't trust us — verify it yourself." Charging for that would put a toll booth in front of the one thing that makes the product credible. Anyone — you, your auditor, a regulator, a customer's security team — verifies any record at no cost, offline, with no account. It is also our distribution: a verifier in every auditor's hands is how this becomes a standard.</p></div>
+</div>
+<div class="faq">
+<button class="faq__q">What is the high-assurance tier, and why does it cost ten times more? <i></i></button>
+<div class="faq__a"><p>Sealing that runs inside Intel TDX-class confidential hardware, so the <span class="mono">attestation</span> and <span class="mono">enclave</span> verification domains pass as real instead of <span class="mono">sim</span>. It costs more because it consumes real confidential-compute capacity, which we pass through with margin rather than absorbing into the base rate. It is priced here so the model is complete, and it bills only once that hardware tier ships — which is also when those two domains flip to real across the whole product.</p></div>
+</div>
+<div class="faq">
+<button class="faq__q">Do failed or duplicate changes count? <i></i></button>
+<div class="faq__a"><p>No. You are billed only for changes that successfully seal into the log. A failed seal produces no record, so there is nothing to charge for.</p></div>
+</div>
+<div class="faq">
+<button class="faq__q">What happens when I hit my plan's limit? <i></i></button>
+<div class="faq__a"><p>Pro and Team continue on usage-based overage. Free caps: sealing pauses until the next cycle or an upgrade, but <em>verification keeps working</em> — you never lose access to evidence you already have. Locking someone out of their own record to force an upgrade would be the wrong business.</p></div>
+</div>
+<div class="faq">
+<button class="faq__q">Can I self-host? <i></i></button>
+<div class="faq__a"><p>Yes, on Enterprise — single-tenant VPC, on-prem, or air-gapped, with volume pricing. Since verification needs no network, an air-gapped deployment verifies exactly as well as a connected one.</p></div>
+</div>
+<div class="faq" style="border-bottom:1px solid var(--border)">
+<button class="faq__q">Can I pay you today? <i></i></button>
+<div class="faq__a"><p>Not yet, and we would rather say so than take an order we can't fulfil. Hosted billing isn't wired, so paid tiers currently route to a conversation and a launch list. The Developer tier and the open verifier are live now — <span class="mono">npm i -g cool-nwc</span>.</p></div>
+</div>
+</div>
+</div>
+</section>
+<section class="band band--flush" style="border-top:0;padding-top:0">
+<div class="wrap">
+<div class="final" data-reveal>
+<h2 class="d2">Free to start. Free to verify. Forever.</h2>
+<p>Install the verifier and seal your first change in under an hour. Nothing to buy, nothing to sign.</p>
+<div class="btn-row">
+<button class="cmd cmd--accent" data-copy="npm i -g cool-nwc">
+<span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span>
+<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
+</button>
+<a href="/studio" class="btn btn--line">Open the Studio</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="foot">
+<div class="wrap">
+<div class="foot__cols">
+<div>
+<a href="/" class="brand" aria-label="CooL — home" style="margin-bottom:16px">
+<i class="brand__wm" aria-hidden="true"></i>
+</a>
+<p class="note" style="max-width:30ch">The verifiable system-of-record for AI change. Built by Northwind Cipher.</p>
+</div>
+<div>
+<h4>Product</h4>
+<a href="/#product">Overview</a>
+<a href="/#domains">Verification domains</a>
+<a href="/studio">Studio</a>
+<a href="https://www.npmjs.com/package/cool-nwc" target="_blank" rel="noopener">SDK on npm ↗</a>
+</div>
+<div>
+<h4>Pricing</h4>
+<a href="/pricing.html">Plans</a>
+<a href="/pricing.html#faq">Pricing FAQ</a>
+<a href="/pricing.html#sales">Enterprise</a>
+</div>
+<div>
+<h4>Company</h4>
+<a href="/#team">Founders</a>
+<a href="/#market">Market</a>
+<a href="/#faq">FAQ</a>
+</div>
+<div>
+<h4>Legal</h4>
+<a href="#">Privacy</a>
+<a href="#">Terms</a>
+<a href="#">Responsible disclosure</a>
+</div>
+</div>
+<div class="foot__legal">
+<span>© 2026 Northwind Cipher Pvt. Ltd.</span>
+<span class="mono" id="clock">--:--:--</span>
+<span>Every change, sealed as it ships.</span>
+</div>
+</div>
+</footer>
+<script type="module" src="/src/app.js"></script>
+</body>
+</html>

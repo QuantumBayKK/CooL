@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>CooL — Provable AI change control | Northwind Cipher</title>
+<meta name="description" content="CooL captures every change your AI makes, seals it, and lets anyone verify it offline — no account, no network, no trust required. The verifiable system-of-record for AI change." />
+<meta name="theme-color" content="#ffffff" />
+<meta property="og:title" content="CooL — Private by default. Provable by design." />
+<meta property="og:description" content="Every change your AI makes — captured, sealed, and verifiable offline. Across any provider." />
+<meta property="og:site_name" content="Northwind Cipher" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="icon" href="/assets/favicon-solid.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/src/app.css" />
+</head>
+<body>
+<header class="nav" id="nav">
+<div class="nav__in">
+<a href="/" class="brand" aria-label="CooL — home">
+<i class="brand__wm" aria-hidden="true"></i>
+</a>
+<nav class="nav__links">
+<a href="#product">Product</a>
+<a href="#verify">Verification</a>
+<a href="/pricing.html">Pricing</a>
+<a href="#market">Market</a>
+<a href="#team">Company</a>
+</nav>
+<div class="nav__right">
+<a href="#faq" class="btn btn--ghost">Contact</a>
+<a href="/studio" class="btn btn--dark btn--sm">See the Studio</a>
+<a href="#start" class="btn btn--accent btn--sm">Book a call</a>
+<button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><i></i></button>
+</div>
+</div>
+</header>
+<div class="drawer" id="drawer">
+<a href="#product">Product</a>
+<a href="#verify">Verification</a>
+<a href="/pricing.html">Pricing</a>
+<a href="/studio">Studio</a>
+<a href="#market">Market</a>
+<a href="#compare">Compare</a>
+<a href="#team">Company</a>
+<a href="#faq">FAQ</a>
+<a href="#start" class="btn btn--accent btn--full">Book a call</a>
+</div>
+<main id="top">
+<section class="hero">
+<div class="wrap hero__grid">
+<div>
+<p class="eyebrow" data-reveal>Northwind Cipher · System-of-record for AI change</p>
+<h1 class="d1" data-reveal>The black box for&nbsp;AI.</h1>
+<p class="lead" data-reveal>Private by default. Provable by design.</p>
+<p class="support" data-reveal>Every change your AI makes — prompts, models, policies, tool grants — captured the moment it ships, sealed with post-quantum signatures, and verifiable by anyone, offline, across any provider.</p>
+<div class="btn-row" data-reveal>
+<button class="cmd cmd--accent" data-copy="npm i -g cool-nwc">
+<span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span>
+<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
+</button>
+<a href="/studio" class="btn btn--dark">See the Studio</a>
+<a href="#start" class="btn btn--line">Talk to us</a>
+</div>
+<div class="hero__proof" data-reveal>
+<div><b data-count="7">7</b><span>verification domains</span></div>
+<div><b data-count="5">5</b><span>run for real today</span></div>
+<div><b data-count="0">0</b><span>trust required in us</span></div>
+</div>
+</div>
+<figure class="hero__art" data-reveal aria-label="A Merkle transparency log: four sealed change records chaining upward into one root">
+<svg class="mk" viewBox="0 0 470 400" role="img">
+<defs>
+<linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#12294d"/><stop offset="1" stop-color="#0a1a33"/>
+</linearGradient>
+<linearGradient id="pulse" x1="0" y1="1" x2="0" y2="0">
+<stop offset="0" stop-color="#6fb0ff" stop-opacity="0"/>
+<stop offset=".5" stop-color="#6fb0ff" stop-opacity="1"/>
+<stop offset="1" stop-color="#6fb0ff" stop-opacity="0"/>
+</linearGradient>
+</defs>
+<g class="mk__edges" fill="none" stroke="var(--border-2)" stroke-width="1.4" stroke-linecap="round">
+<path class="mk__e" data-leaf="0" d="M55 300 L170 222"/>
+<path class="mk__e" data-leaf="1" d="M175 300 L170 222"/>
+<path class="mk__e" data-leaf="2" d="M295 300 L350 222"/>
+<path class="mk__e" data-leaf="3" d="M415 300 L350 222"/>
+<path class="mk__e" data-node="0" d="M170 188 L260 118"/>
+<path class="mk__e" data-node="1" d="M350 188 L260 118"/>
+</g>
+<g class="mk__spark" fill="none" stroke="url(#pulse)" stroke-width="2.4" stroke-linecap="round">
+<path class="mk__s" data-leaf="0" d="M55 300 L170 222"/>
+<path class="mk__s" data-leaf="1" d="M175 300 L170 222"/>
+<path class="mk__s" data-leaf="2" d="M295 300 L350 222"/>
+<path class="mk__s" data-leaf="3" d="M415 300 L350 222"/>
+<path class="mk__s" data-node="0" d="M170 188 L260 118"/>
+<path class="mk__s" data-node="1" d="M350 188 L260 118"/>
+</g>
+<g class="mk__root">
+<rect x="196" y="74" width="128" height="44" rx="5" fill="url(#hg)"/>
+<rect class="mk__halo" x="196" y="74" width="128" height="44" rx="5" fill="none" stroke="#6fb0ff" stroke-width="1.4"/>
+<text x="260" y="94" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#6fb0ff">root</text>
+<text x="260" y="108" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9.5" fill="#a9bbd6">e0e0eb0c&#8230;3817</text>
+</g>
+<g font-family="ui-monospace,monospace" font-size="9.5">
+<g class="mk__node" data-node="0">
+<rect x="118" y="188" width="104" height="34" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
+<text x="170" y="209" text-anchor="middle" fill="#44556e">bf595e2f&#8230;bc96</text>
+</g>
+<g class="mk__node" data-node="1">
+<rect x="298" y="188" width="104" height="34" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
+<text x="350" y="209" text-anchor="middle" fill="#44556e">dff5eb4e&#8230;ee02</text>
+</g>
+</g>
+<g font-family="ui-monospace,monospace" font-size="9">
+<g class="mk__leaf" data-leaf="0">
+<rect x="8" y="300" width="94" height="52" rx="4" fill="#1e50a2" stroke="#143a7a"/>
+<text x="18" y="322" fill="#ffffff">prompt.update</text>
+<text x="18" y="338" fill="#c9dcff">seq 1 &#183; sealed</text>
+</g>
+<g class="mk__leaf" data-leaf="1">
+<rect x="128" y="300" width="94" height="52" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
+<text x="138" y="322" fill="#16294a">model.swap</text>
+<text x="138" y="338" fill="#556885">seq 2 &#183; sealed</text>
+</g>
+<g class="mk__leaf" data-leaf="2">
+<rect x="248" y="300" width="94" height="52" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
+<text x="258" y="322" fill="#16294a">policy.change</text>
+<text x="258" y="338" fill="#556885">seq 3 &#183; sealed</text>
+</g>
+<g class="mk__leaf" data-leaf="3">
+<rect x="368" y="300" width="94" height="52" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
+<text x="378" y="322" fill="#16294a">tool.grant</text>
+<text x="378" y="338" fill="#556885">seq 4 &#183; sealed</text>
+</g>
+</g>
+<text class="mk__cap" x="8" y="386" font-family="ui-monospace,monospace" font-size="10" fill="#556885">SHA-256 leaves &#183; RFC-6962 node hashing &#183; append-only</text>
+</svg>
+</figure>
+</div>
+</section>
+<section class="band" id="verify">
+<div class="wrap split">
+<div class="split__media" data-reveal>
+<div class="term">
+<div class="term__bar"><span class="term__dots"><i></i><i></i><i></i></span> terminal · cool-nwc</div>
+<div class="term__body">
+<div class="term__line"><span class="c">$</span> cool verify receipt.json</div>
+<div class="term__line"><span class="m">reading receipt · no network used</span></div>
+<div class="term__line"> </div>
+<div class="term__line"><span class="ok">✓</span> binding      <span class="m">record → digest</span></div>
+<div class="term__line"><span class="ok">✓</span> signature    <span class="m">ML-DSA-65 + Ed25519</span></div>
+<div class="term__line"><span class="ok">✓</span> inclusion    <span class="m">leaf ∈ log</span></div>
+<div class="term__line"><span class="ok">✓</span> consistency  <span class="m">log is append-only</span></div>
+<div class="term__line"><span class="ok">✓</span> witness      <span class="m">independent root</span></div>
+<div class="term__line"><span class="k">~</span> attestation  <span class="m">sim — pending TEE hardware</span></div>
+<div class="term__line"><span class="k">~</span> enclave      <span class="m">sim — pending TEE hardware</span></div>
+<div class="term__line"> </div>
+<div class="term__line"><span class="ok">5 / 5 real domains verified</span> <span class="m">· 2 simulated, labelled</span></div>
+</div>
+</div>
+</div>
+<div class="split__copy" data-reveal>
+<p class="eyebrow">Open verifier</p>
+<h2 class="d2">Every change can carry proof</h2>
+<p class="support">Instead of asking anyone to trust a claim we make, CooL emits a sealed record that software can check on its own. The verifier needs no CooL account and no network connection — it reads the receipt and the maths either holds or it doesn't.</p>
+<div class="btn-row">
+<button class="cmd" data-copy="cool verify receipt.json">
+<span class="cmd__dollar">$</span><span>cool verify receipt.json</span>
+<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
+</button>
+<a href="#domains" class="btn btn--line">What the 7 domains check</a>
+</div>
+<p class="note" style="margin-top:24px">Two of the seven domains depend on confidential hardware we have not deployed yet. They are marked <span class="mono">sim</span> on every receipt, in the open — never hidden, never counted as passes.</p>
+</div>
+</div>
+</section>
+<section class="band" id="studio">
+<div class="wrap split split--flip">
+<div class="split__media" data-reveal>
+<div class="accentbox">
+<div class="accentbox__tabs" id="stTabs">
+<button class="tab is-on" data-tab="seal">1 — seal a change</button>
+<button class="tab" data-tab="verify">2 — verify the log</button>
+<button class="tab" data-tab="tamper">3 — try to tamper</button>
+</div>
+<div class="term" id="studioStage">
+<div class="term__bar">
+<span class="term__dots"><i></i><i></i><i></i></span>
+transparency log <span style="margin-left:auto" id="stSize">0 records</span>
+</div>
+<div class="term__body">
+<div id="stLog" style="max-height:150px;overflow:auto"></div>
+<div id="stReceipt" hidden style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
+<div class="term__line"><span class="m">leaf  </span><span id="rcLeaf" class="c"></span></div>
+<div class="term__line"><span class="m">sig   </span><span id="rcSig" class="c"></span></div>
+<div class="term__line"><span class="m">root  </span><span id="rcRoot" class="c"></span></div>
+</div>
+<div id="stDomains" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);display:grid;grid-template-columns:repeat(2,1fr);gap:2px 16px">
+<div class="term__line dom-row" data-dom="binding"><span class="m">·</span> binding <b class="m">—</b></div>
+<div class="term__line dom-row" data-dom="signature"><span class="m">·</span> signature <b class="m">—</b></div>
+<div class="term__line dom-row" data-dom="inclusion"><span class="m">·</span> inclusion <b class="m">—</b></div>
+<div class="term__line dom-row" data-dom="consistency"><span class="m">·</span> consistency <b class="m">—</b></div>
+<div class="term__line dom-row" data-dom="witness"><span class="m">·</span> witness <b class="m">—</b></div>
+<div class="term__line dom-row" data-dom="attestation"><span class="m">·</span> attestation <b class="k">sim</b></div>
+<div class="term__line dom-row" data-dom="enclave"><span class="m">·</span> enclave <b class="k">sim</b></div>
+</div>
+<div class="term__line" id="stVerdict" style="margin-top:12px"><span class="m">awaiting verification</span></div>
+</div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:24px">
+<button class="btn btn--dark btn--sm" id="stSeal">Seal a change</button>
+<button class="btn btn--line btn--sm" id="stVerify">Verify log</button>
+<button class="btn btn--line btn--sm" id="stTamper">Tamper</button>
+</div>
+</div>
+</div>
+<div class="split__copy" data-reveal>
+<p class="eyebrow">The Studio · runs in your browser</p>
+<h2 class="d2">Don't trust us. Verify it&nbsp;here.</h2>
+<p class="support">This is not a video and not a mock-up. The panel beside this text runs real SHA-256 canonical hashing, a real ECDSA P-256 signature over the digest, and a real Merkle log with real inclusion and consistency proofs — in your browser, with no server involved.</p>
+<p class="support" style="margin-top:16px">Seal a few changes. Then press <em>Tamper</em> and verify again: the signature still passes, because it was made over the original digest — but binding, inclusion and consistency all fail. That precision is the product.</p>
+<div class="btn-row">
+<a href="#domains" class="btn btn--dark">Read the domains</a>
+</div>
+<p class="note" style="margin-top:24px">The browser signs with ECDSA P-256 because that is what browsers expose natively. Production seals with hybrid <span class="mono">ML-DSA-65 + Ed25519</span>. The difference is stated here rather than glossed over.</p>
+</div>
+</div>
+</section>
+<section class="band band--surface">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">Why now</p>
+<h2 class="d2">Regulation is turning "nice to have" into "on the record."</h2>
+<p class="support">We have no customer logos to show you yet. These are the obligations doing the pushing instead — each one a public document you can read yourself.</p>
+</div>
+<div class="cells" data-reveal>
+<div class="cell">
+<b>EU AI Act, Art. 12</b>
+<p>Requires automatic recording of events over the lifetime of high-risk AI systems. Not notes — automatic, lifetime logging.</p>
+</div>
+<div class="cell">
+<b>India DPDP Rules, 2025</b>
+<p>Continuous logging, multi-year retention and independent audit, with financial penalties for gaps.</p>
+</div>
+<div class="cell">
+<b>SR 11-7 lineage</b>
+<p>US model-risk supervision expects documented, defensible records of what a model was and when it changed.</p>
+</div>
+<div class="cell">
+<b>RBI draft AI/ML norms</b>
+<p>Model-risk expectations arriving for Indian financial institutions on the same documentary spine.</p>
+</div>
+</div>
+<p class="note" style="margin-top:24px" data-reveal>Regulation mandates records and logs. It does not — yet — mandate that those records be cryptographically tamper-proof, and we don't claim it does. The narrower, true claim: the volume and rigour now required is beyond what manual, editable processes reliably produce.</p>
+</div>
+</section>
+<section class="band" id="product">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">Product</p>
+<h2 class="d2">Three concrete pieces: capture, log, verify.</h2>
+</div>
+<div class="grid grid--3">
+<article class="card" data-reveal>
+<div class="card__viz">
+<svg viewBox="0 0 260 120" style="width:100%;height:auto">
+<rect x="12" y="16" width="150" height="10" rx="2" fill="#1e50a2"/>
+<rect x="12" y="34" width="104" height="10" rx="2" fill="#c2d0e6"/>
+<rect x="12" y="52" width="132" height="10" rx="2" fill="#c2d0e6"/>
+<rect x="12" y="70" width="76" height="10" rx="2" fill="#1e50a2"/>
+<rect x="12" y="88" width="118" height="10" rx="2" fill="#c2d0e6"/>
+<rect x="176" y="14" width="72" height="92" rx="4" fill="#0a1a33"/>
+<text x="212" y="56" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9" fill="#6fb0ff">SDK</text>
+<text x="212" y="70" text-anchor="middle" font-family="ui-monospace,monospace" font-size="8" fill="#a9bbd6">hooks</text>
+</svg>
+</div>
+<p class="eyebrow" style="margin:0">Capture</p>
+<h3 class="d3">SDK and CLI</h3>
+<p class="support" style="font-size:.875rem">A change ships — a new prompt, a swapped model, an edited policy — and it is recorded at the moment it happens, not written up afterwards by hand.</p>
+<div class="card__foot">
+<button class="cmd" data-copy="npm i -g cool-nwc">
+<span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span>
+<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
+</button>
+</div>
+</article>
+<article class="card" data-reveal>
+<div class="card__viz">
+<svg viewBox="0 0 260 120" style="width:100%;height:auto">
+<g stroke="#c2d0e6" stroke-width="1.1" fill="none">
+<path d="M40 96 L80 58"/><path d="M120 96 L80 58"/>
+<path d="M160 96 L200 58"/><path d="M240 96 L200 58"/>
+<path d="M80 58 L140 24"/><path d="M200 58 L140 24"/>
+</g>
+<rect x="112" y="12" width="56" height="20" rx="3" fill="#0a1a33"/>
+<g fill="#fff" stroke="#c2d0e6"><rect x="58" y="48" width="44" height="18" rx="3"/><rect x="178" y="48" width="44" height="18" rx="3"/></g>
+<g><rect x="20" y="88" width="40" height="18" rx="3" fill="#1e50a2"/>
+<rect x="100" y="88" width="40" height="18" rx="3" fill="#fff" stroke="#c2d0e6"/>
+<rect x="140" y="88" width="40" height="18" rx="3" fill="#fff" stroke="#c2d0e6"/>
+<rect x="220" y="88" width="34" height="18" rx="3" fill="#fff" stroke="#c2d0e6"/></g>
+</svg>
+</div>
+<p class="eyebrow" style="margin:0">Log</p>
+<h3 class="d3">Transparency log</h3>
+<p class="support" style="font-size:.875rem">Records are appended to a Merkle log built the way Certificate Transparency builds one (RFC 6962). Tampering isn't prevented by access control — it's made detectable by anyone.</p>
+<div class="card__foot">
+<a href="#domains" class="btn btn--line btn--sm btn--full">How the log holds</a>
+</div>
+</article>
+<article class="card" data-reveal>
+<div class="card__viz">
+<svg viewBox="0 0 260 120" style="width:100%;height:auto">
+<rect x="16" y="14" width="228" height="92" rx="4" fill="#071528"/>
+<text x="30" y="36" font-family="ui-monospace,monospace" font-size="9" fill="#6fb0ff">$ cool verify</text>
+<g font-family="ui-monospace,monospace" font-size="8.5" fill="#6fb0ff">
+<text x="30" y="54">✓ binding</text><text x="130" y="54">✓ inclusion</text>
+<text x="30" y="70">✓ signature</text><text x="130" y="70">✓ consistency</text>
+<text x="30" y="86">✓ witness</text>
+</g>
+<text x="130" y="86" font-family="ui-monospace,monospace" font-size="8.5" fill="#a9bbd6">~ 2 sim</text>
+</svg>
+</div>
+<p class="eyebrow" style="margin:0">Verify</p>
+<h3 class="d3">Open verifier</h3>
+<p class="support" style="font-size:.875rem">Anyone can check a receipt on their own machine — no CooL account, no network call, nothing of ours in the loop. Trust the maths, not the vendor.</p>
+<div class="card__foot">
+<button class="cmd" data-copy="cool verify receipt.json">
+<span class="cmd__dollar">$</span><span>cool verify receipt.json</span>
+<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
+</button>
+</div>
+</article>
+</div>
+</div>
+</section>
+<section class="band" id="domains">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">Verification</p>
+<h2 class="d2">Seven independent domains. Five run today.</h2>
+<p class="support">A receipt is not a single yes/no. It is seven separate checks that can fail independently — which is what makes a failure diagnostic instead of merely alarming.</p>
+</div>
+<div class="grid grid--4" data-reveal>
+<article class="dom">
+<div class="dom__top">
+<span class="dom__ic"><svg viewBox="0 0 24 24"><path d="M7 12h10M7 8h10M7 16h6"/></svg></span>
+<span class="badge badge--real">real</span>
+</div>
+<h3>binding</h3>
+<p>The record still hashes to the digest that was signed. Edit one character and this fails.</p>
+</article>
+<article class="dom">
+<div class="dom__top">
+<span class="dom__ic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/></svg></span>
+<span class="badge badge--real">real</span>
+</div>
+<h3>signature</h3>
+<p>The digest carries a valid signature from the sealing key. Hybrid ML-DSA-65 + Ed25519 in production.</p>
+</article>
+<article class="dom">
+<div class="dom__top">
+<span class="dom__ic"><svg viewBox="0 0 24 24"><path d="M12 4v6M8 14l4-4 4 4M5 20h14"/></svg></span>
+<span class="badge badge--real">real</span>
+</div>
+<h3>inclusion</h3>
+<p>This leaf is genuinely inside the published log, provable by path, not by our say-so.</p>
+</article>
+<article class="dom">
+<div class="dom__top">
+<span class="dom__ic"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h16M9 4v16"/></svg></span>
+<span class="badge badge--real">real</span>
+</div>
+<h3>consistency</h3>
+<p>The log only ever grew. No earlier entry was rewritten to make a later one look clean.</p>
+</article>
+<article class="dom">
+<div class="dom__top">
+<span class="dom__ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/></svg></span>
+<span class="badge badge--real">real</span>
+</div>
+<h3>witness</h3>
+<p>An independently computed root agrees with the published one — a second pair of eyes on the same maths.</p>
+</article>
+<article class="dom">
+<div class="dom__top">
+<span class="dom__ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg></span>
+<span class="badge badge--sim">sim</span>
+</div>
+<h3>attestation</h3>
+<p>Hardware quote proving which enclave produced the record. Simulated until we deploy on genuine TEE hardware.</p>
+</article>
+<article class="dom">
+<div class="dom__top">
+<span class="dom__ic"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+<span class="badge badge--sim">sim</span>
+</div>
+<h3>enclave</h3>
+<p>Proof the measured environment is the one claimed. Also simulated, also labelled on every receipt.</p>
+</article>
+<article class="dom" style="background:var(--surface);border-style:dashed">
+<div class="dom__top">
+<span class="dom__ic" style="background:#fff"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+<span class="badge badge--soon">roadmap</span>
+</div>
+<h3>Hardware tier</h3>
+<p>Finishing attestation and enclave on real TEE hardware flips the last two from <span class="mono">sim</span> to <span class="mono">real</span>.</p>
+</article>
+</div>
+</div>
+</section>
+<section class="band band--surface">
+<div class="wrap">
+<div class="facts" data-reveal>
+<div class="fact"><b data-count="7">7</b><span>independent verification domains in the open verifier</span></div>
+<div class="fact"><b data-count="5">5</b><span>of them run for real today, in your browser</span></div>
+<div class="fact"><b data-count="2">2</b><span>marked simulated until TEE deployment — attestation, enclave</span></div>
+<div class="fact"><b data-count="0">0</b><span>customer data in our control plane, by design</span></div>
+</div>
+<p class="note" style="margin-top:40px" data-reveal>These are the only numbers on this page. There are no user counts, run counts, uptime percentages or latency figures here, because CooL has none to report yet — and a number invented to fill a gap would undo every real one beside it.</p>
+</div>
+</section>
+<section class="band">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">Platform</p>
+<h2 class="d2">Capture automatically. Verify offline. Prove for a decade.</h2>
+</div>
+<div class="grid grid--3">
+<div class="card" data-reveal>
+<h3 class="d3">Capture automatically</h3>
+<p class="support" style="font-size:.875rem">The weeks a year lost to change-paperwork come back as engineering time, because the record is a side effect of shipping rather than a task after it.</p>
+</div>
+<div class="card" data-reveal>
+<h3 class="d3">Verify offline</h3>
+<p class="support" style="font-size:.875rem">Evidence assembled by hand for an audit becomes evidence produced continuously. Audits stop being fire drills and become an export.</p>
+</div>
+<div class="card" data-reveal>
+<h3 class="d3">Prove for a decade</h3>
+<p class="support" style="font-size:.875rem">Hybrid post-quantum signing means a record sealed today still stands when the security assumptions of today have moved on.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="band" id="market">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">Market</p>
+<h2 class="d2">Where the money for this is forming.</h2>
+</div>
+<div class="market">
+<figure class="rings" data-reveal aria-label="TAM 12 to 15 billion dollars, SAM 2 to 4 billion dollars, SOM 100 to 300 million dollars">
+<svg viewBox="0 0 460 460">
+<circle class="ring ring--tam" cx="230" cy="230" r="212"/>
+<circle class="ring ring--sam" cx="230" cy="230" r="136"/>
+<circle class="ring ring--som" cx="230" cy="230" r="78"/>
+<text class="ring-v" x="230" y="52">$12–15B</text>
+<text class="ring-l" x="230" y="70">TAM · BY 2030</text>
+<text class="ring-v" x="230" y="128">$2–4B</text>
+<text class="ring-l" x="230" y="146">SAM</text>
+<text class="ring-v" x="230" y="228">$100–300M</text>
+<text class="ring-l" x="230" y="246">SOM</text>
+</svg>
+</figure>
+<div data-reveal>
+<div class="mkt">
+<b><i class="dot dot--tam"></i> TAM · $12–15B by 2030</b>
+<p>AI governance and AI-operations software overall — everything enterprises buy to manage, monitor and document AI.</p>
+<span>How we get there: published category forecasts (Grand View Research; Next Move Strategy) at their 2030 horizon, expressed as a range rather than a point.</span>
+</div>
+<div class="mkt">
+<b><i class="dot dot--sam"></i> SAM · $2–4B</b>
+<p>Organisations running production AI in regulated sectors — banking, healthcare, insurance, legal, government — where a provable change record is a requirement, not a nicety.</p>
+<span>How we get there: the regulated, production-AI slice of that category — roughly a fifth to a quarter of TAM, which is where logging and audit obligations actually bind.</span>
+</div>
+<div class="mkt">
+<b><i class="dot dot--som"></i> SOM · $100–300M</b>
+<p>The portion CooL could credibly serve as the neutral evidence layer — not the whole governance suite.</p>
+<span>How we get there: a low single-digit share of SAM, reflecting that CooL sells one specific layer and expects to sit alongside GRC platforms rather than replace them.</span>
+</div>
+<p class="note" style="margin-top:24px">Estimates, not measured benchmarks. Demand today is loudest for records and logging; demand for the specifically cryptographic version is earlier-stage. Our bet is on which standard is already in place when it matures — and the roadmap owns that this is a bet on timing.</p>
+</div>
+</div>
+<div class="head head--wide" style="margin-top:120px" data-reveal>
+<p class="eyebrow">Position</p>
+<h2 class="d2">The unfair advantage</h2>
+</div>
+<div class="grid grid--3">
+<div class="card" data-reveal><p class="eyebrow" style="margin:0">01</p><h3 class="d3">Provider-neutral capture</h3><p class="support" style="font-size:.875rem">The record spans a real enterprise's messy multi-provider reality. A tool tied to one model vendor structurally cannot be the system of record.</p></div>
+<div class="card" data-reveal><p class="eyebrow" style="margin:0">02</p><h3 class="d3">Proof, not storage</h3><p class="support" style="font-size:.875rem">Everyone else keeps evidence in a database you have to trust. Ours verifies offline, with no account and no network.</p></div>
+<div class="card" data-reveal><p class="eyebrow" style="margin:0">03</p><h3 class="d3">Post-quantum from day one</h3><p class="support" style="font-size:.875rem">Hybrid ML-DSA-65 + Ed25519 means evidence sealed today still stands in ten years. Retrofitting that is a rewrite.</p></div>
+<div class="card" data-reveal><p class="eyebrow" style="margin:0">04</p><h3 class="d3">Credibility that checks out</h3><p class="support" style="font-size:.875rem">Published post-quantum research — ML-KEM mapped into IKEv2 in C with liboqs — plus TEE and distributed-systems depth. One click to verify, which is the point.</p></div>
+<div class="card" data-reveal><p class="eyebrow" style="margin:0">05</p><h3 class="d3">Timing and position</h3><p class="support" style="font-size:.875rem">The moat isn't a patent; the primitives are open standards. It's being the neutral standard already integrated when the requirements mature.</p></div>
+<div class="card" data-reveal><p class="eyebrow" style="margin:0">06</p><h3 class="d3">Honesty as architecture</h3><p class="support" style="font-size:.875rem">We mark the two simulated domains in the open. For a product whose promise is "verify it yourself," that restraint is what makes every other claim believable.</p></div>
+</div>
+</div>
+</section>
+<section class="band" id="compare">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">Landscape</p>
+<h2 class="d2">Everyone tracks AI. No one proves it.</h2>
+<p class="support">These are real, funded, useful companies. Most of them are things CooL sits under rather than replaces — the table is about one specific job, not overall merit.</p>
+</div>
+<div class="tablewrap" data-reveal>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>AI observability<span>Langfuse, Datadog</span></th>
+<th>Governance / GRC<span>Credo AI, OneTrust</span></th>
+<th>Compliance automation<span>Vanta, Drata</span></th>
+<th>Build in-house</th>
+<th class="us">CooL</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Auto-captures every AI change</td><td class="p">partial</td><td class="n">no</td><td class="n">no</td><td class="p">manual</td><td class="y us">yes</td></tr>
+<tr><td>Tamper-evident, provable evidence</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="y us">yes</td></tr>
+<tr><td>Neutral across every provider</td><td class="n">no</td><td class="p">partial</td><td class="p">partial</td><td class="p">—</td><td class="y us">yes</td></tr>
+<tr><td>Verifiable with no account or network</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="y us">yes</td></tr>
+<tr><td>Proves which model actually ran</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="p us">on the roadmap</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note" style="margin-top:24px" data-reveal>The last row is the honest one: proving which model actually ran needs the hardware tier, and that tier is not finished. Confidential-compute platforms already do this for a single run — they are complementary, not competitors. CooL proves the ongoing history of change across many runs and many providers, and does not host inference.</p>
+</div>
+</section>
+<section class="band band--surface">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">Compliance</p>
+<h2 class="d2">What we hold, and what we don't.</h2>
+</div>
+<div class="cells" data-reveal>
+<div class="cell"><b>SOC 2 <span class="badge badge--sim" style="margin-left:6px">not held</span></b><p>CooL is designed to produce the evidence a SOC 2 audit asks for. It does not hold the certification today.</p></div>
+<div class="cell"><b>HIPAA <span class="badge badge--sim" style="margin-left:6px">not held</span></b><p>Same position. The architecture targets the evidence requirements; the attestation of compliance does not exist yet.</p></div>
+<div class="cell"><b>ISO 27001 <span class="badge badge--sim" style="margin-left:6px">not held</span></b><p>Planned alongside the enterprise packaging work, not before it.</p></div>
+<div class="cell"><b>Billing <span class="badge badge--sim" style="margin-left:6px">not live</span></b><p>Launch prices are published in the open on the <a href="/pricing.html" style="border-bottom:1px solid var(--border-2)">pricing page</a>, but hosted billing is not wired yet and no one is paying them.</p></div>
+</div>
+</div>
+</section>
+<section class="band" id="team">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">Founders</p>
+<h2 class="d2">Applied post-quantum cryptography, and confidential-compute inference.</h2>
+</div>
+<div class="grid grid--2">
+<article class="person" data-reveal>
+<div class="person__plate">
+<svg viewBox="0 0 400 120" preserveAspectRatio="none">
+<g stroke="#6fb0ff" stroke-opacity=".5" stroke-width="1" fill="none">
+<path d="M0 90 L60 60 L120 78 L180 40 L240 66 L300 30 L360 54 L400 36"/>
+</g>
+<g fill="#6fb0ff" fill-opacity=".85">
+<circle cx="60" cy="60" r="2.5"/><circle cx="180" cy="40" r="2.5"/><circle cx="300" cy="30" r="2.5"/>
+</g>
+<text x="20" y="106" font-family="ui-monospace,monospace" font-size="9" fill="#8fa6c6">ML-KEM · IKEv2 · liboqs</text>
+</svg>
+</div>
+<h3>Pranauv Shrinaath S</h3>
+<p class="role">Founder &amp; CEO · Post-quantum cryptography &amp; blockchain</p>
+<ul>
+<li><span class="mono">ipsec-pqc-ikev2</span> — published research mapping ML-KEM into IKEv2 (liboqs / C).</li>
+<li>Research on decentralising public banks, secured with PQC + Hyperledger Fabric.</li>
+<li>Onsite research internship, NUS Singapore.</li>
+<li>Building since 14.</li>
+</ul>
+<a class="src" href="https://github.com/KenidoesCode" target="_blank" rel="noopener">github.com/KenidoesCode ↗</a>
+</article>
+<article class="person" data-reveal>
+<div class="person__plate">
+<svg viewBox="0 0 400 120" preserveAspectRatio="none">
+<g stroke="#6fb0ff" stroke-opacity=".35" stroke-width="1" fill="none">
+<path d="M60 30 L140 70 L220 30 L300 70 L360 40"/><path d="M60 30 L140 70 L60 100"/><path d="M300 70 L220 30"/>
+</g>
+<g fill="#6fb0ff" fill-opacity=".8">
+<circle cx="60" cy="30" r="3"/><circle cx="140" cy="70" r="3"/><circle cx="220" cy="30" r="3"/><circle cx="300" cy="70" r="3"/>
+</g>
+<text x="20" y="106" font-family="ui-monospace,monospace" font-size="9" fill="#8fa6c6">TEE · P2P · distributed compute</text>
+</svg>
+</div>
+<h3>Kailosh Kalimuthu</h3>
+<p class="role">Co-Founder &amp; CTO · Trusted execution environments &amp; AI inference</p>
+<ul>
+<li>Built <strong>BIFROST</strong> — a decentralised P2P comms / storage / compute network.</li>
+<li>Repurposes idle hardware into an encrypted, distributed micro-cloud.</li>
+<li>6 months building with US startup Decipher.</li>
+<li>Building since 16.</li>
+</ul>
+<a class="src" href="https://github.com/Sk1zmo" target="_blank" rel="noopener">github.com/Sk1zmo ↗</a>
+</article>
+</div>
+<p class="note" style="margin-top:24px" data-reveal>Nothing here is claimed beyond what is listed, and every line is one click from being checked. On a deep-tech team page, one exaggeration a reader can disprove poisons every true line next to it.</p>
+</div>
+</section>
+<section class="band">
+<div class="wrap">
+<div class="head head--wide" data-reveal>
+<p class="eyebrow">Roadmap</p>
+<h2 class="d2">What is built, what is next, and in what order.</h2>
+</div>
+<div data-reveal>
+<div class="phase">
+<span class="phase__n">01</span>
+<div>
+<h3>SDK and reference integrations</h3>
+<p><span class="mono">npm i -g cool-nwc</span> is live today. Automatic capture and the reference integrations are the active build — making it genuinely easy to adopt and proving it works end to end.</p>
+</div>
+<span class="badge badge--real">building</span>
+</div>
+<div class="phase">
+<span class="phase__n">02</span>
+<div>
+<h3>Pilots with regulated-AI teams</h3>
+<p>Scoped deployments with design partners in the sectors that feel the pain — including finishing the hardware-attestation tier on genuine TEE hardware, so the two simulated domains flip to real.</p>
+</div>
+<span class="badge badge--sim">next</span>
+</div>
+<div class="phase">
+<span class="phase__n">03</span>
+<div>
+<h3>The enterprise standard</h3>
+<p>Single-tenant and on-prem packaging, the security and certification work, and the org-wide licence motion. We do not hold SOC 2, HIPAA or ISO today — CooL is designed to produce the evidence those audits require.</p>
+</div>
+<span class="badge badge--sim">then</span>
+</div>
+<div class="phase" style="border-bottom:1px solid var(--border)">
+<span class="phase__n">04</span>
+<div>
+<h3>The control plane for enterprise AI</h3>
+<p>Long-term: every change, across every provider, documented, governed and provable. The layer every AI change flows through.</p>
+</div>
+<span class="badge badge--sim">vision</span>
+</div>
+</div>
+</div>
+</section>
+<section class="band" id="faq">
+<div class="wrap" style="max-width:860px">
+<div class="head" data-reveal>
+<p class="eyebrow">Questions</p>
+<h2 class="d2">The parts people ask about twice.</h2>
+</div>
+<div data-reveal>
+<div class="faq">
+<button class="faq__q">What does CooL actually record? <i></i></button>
+<div class="faq__a"><p>A change to the behaviour of an AI system: an edited prompt, a swapped model, a changed policy, a granted tool. Each one is serialised deterministically, hashed, signed, and appended to a transparency log. It records the change, not your users' data.</p></div>
+</div>
+<div class="faq">
+<button class="faq__q">What does "verifiable offline" mean in practice? <i></i></button>
+<div class="faq__a"><p>You take a receipt file and run the open verifier on your own machine, with the network switched off. It recomputes the digest, checks the signature, checks the inclusion path and the consistency of the log. Nothing of ours is contacted, so nothing of ours has to be trusted.</p></div>
+</div>
+<div class="faq">
+<button class="faq__q">Why are two of the seven domains simulated? <i></i></button>
+<div class="faq__a"><p>Attestation and enclave depend on confidential-compute hardware we have not deployed yet. Simulating them lets the full receipt format exist today; labelling them <span class="mono">sim</span> everywhere means nobody mistakes a placeholder for a proof. When the hardware tier ships, they flip to real and old receipts stay honest about what they were.</p></div>
+</div>
+<div class="faq">
+<button class="faq__q">Does CooL run or host my model? <i></i></button>
+<div class="faq__a"><p>No. Your model runs wherever it already runs, on whichever provider you already use. CooL sits beside it and records what changed. That neutrality is the point — a system of record tied to one vendor cannot be the system of record.</p></div>
+</div>
+<div class="faq">
+<button class="faq__q">Why post-quantum, when nothing is broken yet? <i></i></button>
+<div class="faq__a"><p>Because evidence has a long shelf life. A record sealed for a seven-year retention obligation has to survive the whole seven years, and "harvest now, verify later" is a real problem for signatures that outlive their assumptions. Hybrid ML-DSA-65 + Ed25519 holds if either scheme is broken.</p></div>
+</div>
+<div class="faq" style="border-bottom:1px solid var(--border)">
+<button class="faq__q">Can I use it today? <i></i></button>
+<div class="faq__a"><p><span class="mono">npm i -g cool-nwc</span> is published and installs the verifier. Automatic capture is the active build, and there is no billing yet, so there is nothing to buy — which is also why there are no prices on this page.</p></div>
+</div>
+</div>
+</div>
+</section>
+<section class="band band--flush" id="start" style="border-top:0">
+<div class="wrap">
+<div class="final" data-reveal>
+<h2 class="d2">A product you check, not one you're asked to believe.</h2>
+<p>Install the verifier, or send us a change you'd want on the record and we'll walk it through end to end.</p>
+<div class="btn-row">
+<button class="cmd cmd--accent" data-copy="npm i -g cool-nwc">
+<span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span>
+<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
+</button>
+<a href="/studio" class="btn btn--line">Open the Studio</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="foot">
+<div class="wrap">
+<div class="foot__cols">
+<div>
+<a href="/" class="brand" aria-label="CooL — home" style="margin-bottom:16px">
+<i class="brand__wm" aria-hidden="true"></i>
+</a>
+<p class="note" style="max-width:30ch">The verifiable system-of-record for AI change. Built by Northwind Cipher.</p>
+</div>
+<div>
+<h4>Product</h4>
+<a href="#product">Overview</a>
+<a href="#domains">Verification domains</a>
+<a href="/studio">Studio</a>
+<a href="https://www.npmjs.com/package/cool-nwc" target="_blank" rel="noopener">SDK on npm ↗</a>
+</div>
+<div>
+<h4>Pricing</h4>
+<a href="/pricing.html">Plans</a>
+<a href="/pricing.html#faq">Pricing FAQ</a>
+<a href="/pricing.html#sales">Enterprise</a>
+<a href="#compare">How we compare</a>
+</div>
+<div>
+<h4>Company</h4>
+<a href="#team">Founders</a>
+<a href="#market">Market</a>
+<a href="#faq">FAQ</a>
+</div>
+<div>
+<h4>Legal</h4>
+<a href="#">Privacy</a>
+<a href="#">Terms</a>
+<a href="#">Responsible disclosure</a>
+</div>
+</div>
+<div class="foot__legal">
+<span>© 2026 Northwind Cipher Pvt. Ltd.</span>
+<span class="mono" id="clock">--:--:--</span>
+<span>Every change, sealed as it ships.</span>
+</div>
+</div>
+</footer>
+<script type="module" src="/src/app.js"></script>
+</body>
+</html>

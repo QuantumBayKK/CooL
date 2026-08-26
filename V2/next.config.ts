@@ -79,8 +79,39 @@ const nextConfig: NextConfig = {
    * `/studio`, a relative specifier resolves against the site root and 404s.
    * The absolute path in the HTML is load-bearing; see the comment there.
    */
+  /**
+   * The pages a visitor arrives on are hand-written static HTML, not React.
+   *
+   * `/` and `/pricing` are the Northwind Cipher marketing site, vendored into
+   * `public/` from the build that was signed off. `/studio` is the CooL
+   * Recorder. None of the three is a route the app router owns, and all three
+   * are addresses that existed before this change — so each gets a rewrite
+   * rather than a redirect, and the address bar never shows the `.html`.
+   *
+   * These are `afterFiles` rewrites (the plain-array form). They fire only
+   * once the router and `public/` have both declined the request, which means
+   * adding a real route at any of these paths later would silently take
+   * precedence instead of colliding.
+   *
+   * The marketing pages keep their upstream asset paths — `/src/app.css`,
+   * `/src/app.js`, `/assets/*.svg` — and those files are vendored at exactly
+   * those locations under `public/`. That is deliberate: it means the CSS and
+   * JS are byte-identical to the source build and re-syncing from upstream is
+   * a copy, not a patch. (`public/src` is a URL namespace and has nothing to
+   * do with the app's `src/`; tsconfig compiles only TypeScript, with `allowJs`
+   * off, so nothing there is picked up by the type checker.)
+   *
+   * `/pricing.html` needs no entry — the marketing pages link to each other by
+   * that exact name and `public/` serves it directly. `/pricing` is here so
+   * the older, cleaner URL that the sitemap and the site header already point
+   * at keeps resolving.
+   */
   async rewrites() {
-    return [{ source: "/studio", destination: "/studio/index.html" }];
+    return [
+      { source: "/", destination: "/index.html" },
+      { source: "/pricing", destination: "/pricing.html" },
+      { source: "/studio", destination: "/studio/index.html" },
+    ];
   },
 
   // `poweredByHeader` advertises the framework and version to anyone reading

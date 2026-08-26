@@ -20,7 +20,8 @@
  * by the time anyone presses Save the enclave has been up for a minute.
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+
+import { SiteLink } from "@/components/shell/SiteLink";
 import { ArrowLeft, ArrowRight, Lock, RotateCcw } from "lucide-react";
 import type { CascadeResult } from "@/lib/story/cascade";
 import { CHANGE_REF, PROMPT_BEFORE, PROMPT_PATH } from "@/lib/story/script";
@@ -217,12 +218,12 @@ function Stage() {
       {/* header */}
       <header className="shrink-0 border-b border-line px-4 py-2.5 sm:px-6">
         <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-4 gap-y-2">
-          <Link
+          <SiteLink
             href="/"
             className="flex shrink-0 items-center gap-1.5 text-[12px] text-mist transition-colors hover:text-ink"
           >
             <ArrowLeft size={13} /> CooL
-          </Link>
+          </SiteLink>
 
           {/* the rail */}
           <nav className="thin-scroll -mx-1 flex min-w-0 flex-1 items-center gap-1 overflow-x-auto px-1">

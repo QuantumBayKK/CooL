@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
+import { SiteLink } from "@/components/shell/SiteLink";
 import { ArrowRight, Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -109,7 +111,7 @@ export default function ThankYouPage() {
           </div>
 
           <Button asChild variant="secondary" className="mt-10">
-            <Link href="/">Back to the start</Link>
+            <SiteLink href="/">Back to the start</SiteLink>
           </Button>
         </div>
       </Container>

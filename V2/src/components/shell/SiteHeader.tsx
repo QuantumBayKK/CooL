@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Collapse } from "@/components/ui/motion";
 import { Button } from "@/components/ui/button";
+import { SiteLink } from "@/components/shell/SiteLink";
 import { Wordmark } from "@/components/shell/Wordmark";
 import { isGroup, NAV, type NavGroup, type NavItem } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -64,13 +65,16 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-line bg-canvas">
       <nav ref={navRef} className="container-page" aria-label="Primary">
         <div className="flex h-16 items-center justify-between gap-6">
-          <Link
+          {/* The wordmark goes to `/`, which is the marketing page rather
+              than a route — hence `SiteLink`. Same for anything driven by
+              `NAV` below, since Pricing is static too. */}
+          <SiteLink
             href="/"
             className="flex items-center gap-2.5"
             aria-label="CooL — home"
           >
             <Wordmark />
-          </Link>
+          </SiteLink>
 
           {/* ── desktop ───────────────────────────────────────────────── */}
           <ul className="hidden items-center gap-1 lg:flex">
@@ -87,7 +91,7 @@ export function SiteHeader() {
                 />
               ) : (
                 <li key={item.href}>
-                  <Link
+                  <SiteLink
                     href={item.href}
                     className={cn(
                       "inline-flex h-8 items-center rounded-[--radius-sm] px-3 text-sm",
@@ -98,7 +102,7 @@ export function SiteHeader() {
                     )}
                   >
                     {item.label}
-                  </Link>
+                  </SiteLink>
                 </li>
               ),
             )}
@@ -145,24 +149,24 @@ export function SiteHeader() {
                   <ul className="mt-2 flex flex-col gap-0.5">
                     {item.items.map((sub) => (
                       <li key={sub.href}>
-                        <Link
+                        <SiteLink
                           href={sub.href}
                           className="block py-1.5 text-sm text-ink-muted hover:text-ink"
                         >
                           {sub.label}
-                        </Link>
+                        </SiteLink>
                       </li>
                     ))}
                   </ul>
                 </li>
               ) : (
                 <li key={item.href} className="border-b border-line">
-                  <Link
+                  <SiteLink
                     href={item.href}
                     className="block py-3 text-sm text-ink"
                   >
                     {item.label}
-                  </Link>
+                  </SiteLink>
                 </li>
               ),
             )}
@@ -236,7 +240,7 @@ function DesktopGroup({
 function DropdownItem({ item, active }: { item: NavItem; active: boolean }) {
   return (
     <li>
-      <Link
+      <SiteLink
         href={item.href}
         className={cn(
           "block rounded-[--radius-sm] px-3 py-2.5",
@@ -250,7 +254,7 @@ function DropdownItem({ item, active }: { item: NavItem; active: boolean }) {
             {item.description}
           </span>
         )}
-      </Link>
+      </SiteLink>
     </li>
   );
 }

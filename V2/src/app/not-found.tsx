@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
+import { SiteLink } from "@/components/shell/SiteLink";
 import { ArrowRight } from "lucide-react";
 
 import { SiteFooter } from "@/components/shell/SiteFooter";
@@ -83,10 +85,10 @@ export default function NotFound() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <Link href="/">
+                <SiteLink href="/">
                   Back to the start
                   <ArrowRight className="size-4" strokeWidth={2} />
-                </Link>
+                </SiteLink>
               </Button>
               <Button asChild size="lg" variant="secondary">
                 <Link href="/docs">Search the docs</Link>
@@ -95,7 +97,7 @@ export default function NotFound() {
 
             <div className="mt-14 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
               {DESTINATIONS.map((d) => (
-                <Link
+                <SiteLink
                   key={d.href}
                   href={d.href}
                   className="group bg-canvas p-6 transition-colors duration-[--duration-state] hover:bg-surface"
@@ -109,7 +111,7 @@ export default function NotFound() {
                     />
                   </p>
                   <p className="mt-2 text-sm text-ink-muted">{d.body}</p>
-                </Link>
+                </SiteLink>
               ))}
             </div>
           </div>

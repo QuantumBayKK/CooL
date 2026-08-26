@@ -1,4 +1,6 @@
 import Link from "next/link";
+
+import { SiteLink } from "@/components/shell/SiteLink";
 import { redirect } from "next/navigation";
 
 import { RedeemForm } from "@/components/investor/RedeemForm";
@@ -31,9 +33,9 @@ export default async function InvestorLoginPage({
     <div className="grid min-h-dvh lg:grid-cols-2">
       {/* ── the form ──────────────────────────────────────────────────── */}
       <div className="flex flex-col justify-between p-6 sm:p-10">
-        <Link href="/" className="w-fit">
+        <SiteLink href="/" className="w-fit">
           <Wordmark />
-        </Link>
+        </SiteLink>
 
         <div className="mx-auto w-full max-w-[26rem] py-12">
           <h1 className="text-h2">Investor access</h1>
@@ -73,9 +75,12 @@ export default async function InvestorLoginPage({
         </div>
 
         <p className="text-xs text-ink-subtle">
-          <Link href="/" className="underline underline-offset-4 hover:text-ink">
+          <SiteLink
+            href="/"
+            className="underline underline-offset-4 hover:text-ink"
+          >
             Back to the public site
-          </Link>
+          </SiteLink>
         </p>
       </div>
 
