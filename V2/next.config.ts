@@ -58,6 +58,31 @@ const nextConfig: NextConfig = {
     return [{ source: "/pipeline", destination: "/demo", permanent: true }];
   },
 
+  /**
+   * `/studio` is not a React route any more — it is the CooL Recorder, a
+   * self-contained static app vendored into `public/studio/`.
+   *
+   * Next serves `public/` files at their literal path, so the console is
+   * reachable at `/studio/index.html` and nowhere else. That is not a URL to
+   * put in a nav bar, and it is not the URL the sitemap, the footer and every
+   * existing inbound link already point at. This rewrite makes `/studio` serve
+   * that file while leaving the address bar alone.
+   *
+   * It is an `afterFiles` rewrite (the plain-array form), which is what we
+   * want: it fires only once the router and the public directory have both
+   * declined the request, so it can never shadow a real route someone adds at
+   * `/studio/...` later.
+   *
+   * The reason the URL keeps no trailing slash — and the reason `index.html`
+   * loads its bundle from `/studio/bundle.js` rather than `./bundle.js` — is
+   * that a rewrite does not change the document's base URL. Served at
+   * `/studio`, a relative specifier resolves against the site root and 404s.
+   * The absolute path in the HTML is load-bearing; see the comment there.
+   */
+  async rewrites() {
+    return [{ source: "/studio", destination: "/studio/index.html" }];
+  },
+
   // `poweredByHeader` advertises the framework and version to anyone reading
   // response headers, which is free reconnaissance and buys nothing.
   poweredByHeader: false,

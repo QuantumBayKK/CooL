@@ -49,17 +49,32 @@ export function SiteFooter() {
                 <ul className="mt-3 flex flex-col gap-2">
                   {col.items.map((item) => {
                     const external = item.href.startsWith("http");
+                    const cls =
+                      "text-sm text-ink-muted underline-offset-4 transition-colors duration-[--duration-state] hover:text-ink hover:underline";
+
+                    // Two different reasons to drop out of `next/link`, and
+                    // only one of them leaves the tab. An external link goes
+                    // to another origin; a `standalone` one is ours but is
+                    // served as a static file the router knows nothing about,
+                    // so client-side navigation has nothing to render. Both
+                    // need a real anchor — see `NavItem.standalone`.
                     return (
                       <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          {...(external
-                            ? { target: "_blank", rel: "noreferrer noopener" }
-                            : {})}
-                          className="text-sm text-ink-muted underline-offset-4 transition-colors duration-[--duration-state] hover:text-ink hover:underline"
-                        >
-                          {item.label}
-                        </Link>
+                        {external || item.standalone ? (
+                          <a
+                            href={item.href}
+                            {...(external
+                              ? { target: "_blank", rel: "noreferrer noopener" }
+                              : {})}
+                            className={cls}
+                          >
+                            {item.label}
+                          </a>
+                        ) : (
+                          <Link href={item.href} className={cls}>
+                            {item.label}
+                          </Link>
+                        )}
                       </li>
                     );
                   })}

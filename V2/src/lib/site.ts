@@ -22,6 +22,20 @@ export interface NavItem {
   readonly label: string;
   readonly href: string;
   readonly description?: string;
+  /**
+   * Served as a static file rather than by the app router.
+   *
+   * `next/link` assumes its destination is a route it owns: it prefetches an
+   * RSC payload for the href and, on click, navigates on the client. For a
+   * path that resolves to a hand-written `index.html` in `public/` there is no
+   * payload to fetch and no route to render, so the prefetch 404s and the
+   * navigation has to fall back to a full page load anyway.
+   *
+   * Marking the item here makes that a plain `<a>` instead — same tab, one
+   * request, no wasted prefetch. Not the same thing as an external link: it is
+   * our origin, so it gets no `target` and no `rel`.
+   */
+  readonly standalone?: boolean;
 }
 
 export interface NavGroup {
@@ -104,10 +118,12 @@ export const NAV: readonly (NavItem | NavGroup)[] = [
  * bar, so a surface cannot be full-bleed according to one of them and not the
  * others.
  */
+// `/studio` used to be listed here. It is now the CooL Recorder — a static app
+// in `public/studio/` reached through a rewrite — so it never renders inside
+// this shell at all, and an entry for it would be a rule that can never fire.
 export const FULL_BLEED: readonly string[] = [
   "/verify",
   "/console",
-  "/studio",
   "/billboard",
 ];
 
@@ -130,7 +146,7 @@ export const FOOTER: readonly NavGroup[] = [
       { label: "Architecture", href: "/architecture" },
       { label: "Verify a record", href: "/verify" },
       { label: "Console", href: "/console" },
-      { label: "Studio", href: "/studio" },
+      { label: "Studio", href: "/studio", standalone: true },
       { label: "Pricing", href: "/pricing" },
     ],
   },

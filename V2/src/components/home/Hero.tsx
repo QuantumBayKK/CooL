@@ -71,12 +71,25 @@ export function Hero() {
               control, so you never have to take our word for any of it.
             </p>
 
+            {/* One primary and two alternatives. The demo stays the primary —
+                it is the thing that proves the claim — with the Studio next to
+                it because a reader who is past "is this real" immediately wants
+                to know what operating it looks like, and the quickstart last
+                for the one who has already decided.
+
+                The Studio is a plain `<a>`, not a `next/link`: it is the CooL
+                Recorder, a static app served out of `public/studio/`, so there
+                is no route for the client router to navigate to. See
+                `NavItem.standalone` in `lib/site.ts`. */}
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg">
                 <Link href="/demo">
                   Run the live demo
                   <ArrowRight className="size-4" strokeWidth={2} />
                 </Link>
+              </Button>
+              <Button asChild size="lg" variant="secondary">
+                <a href="/studio">Open the Studio</a>
               </Button>
               <Button asChild size="lg" variant="secondary">
                 <Link href="/docs/quickstart">Read the quickstart</Link>
