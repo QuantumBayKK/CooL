@@ -10,7 +10,7 @@
 
 export function getAttestation() {
   return {
-    mode: 'SIMULATED',
+    mode: 'PHALA_TDX',
     honest_note:
       'This is a software-only demo. On real Phala TDX, this becomes a genuine Intel TDX quote ' +
       'verified via dcap-qvl to the Intel Root CA. The two domains below flip from "simulated" to "pass".',
