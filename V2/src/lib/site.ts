@@ -14,7 +14,7 @@ export const SITE = {
   tagline: "Cryptographic evidence for AI change",
   description:
     "CooL seals every change to your AI — prompt, model, permission — as a signed, tamper-evident record. Verify any record yourself, offline, with a verifier we do not control.",
-  repo: "https://github.com/KenidoesCode/cool-sdk",
+  repo: "https://github.com/Northwind-Cipher/cool-sdk",
   npm: "https://www.npmjs.com/package/cool-nwc",
 } as const;
 

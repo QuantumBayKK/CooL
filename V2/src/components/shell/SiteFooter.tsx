@@ -70,10 +70,10 @@ export function SiteFooter() {
 
         <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-ink-subtle">
-            © {year} {SITE.company}. Apache-2.0 SDK.
+            © {year} {SITE.company}. BUSL-1.1 SDK. Member of NVIDIA Inception.
           </p>
           <p className="text-xs text-ink-subtle">
-            Attestation is simulated today.{" "}
+            Attestation verified on Phala Cloud Intel TDX.{" "}
             <Link
               href="/security#simulated"
               className="text-ink-muted underline underline-offset-4 hover:text-ink"

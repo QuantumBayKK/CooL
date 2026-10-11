@@ -40,8 +40,8 @@ export const CONTACT = {
   city: "Coimbatore",
   country: "IN",
   founders: [
-    { name: "Pranauv Shrinaath S", role: "Founder & CEO" },
-    { name: "Kailosh Kalimuthu", role: "Co-Founder & CTO" },
+    { name: "Pranauv Shrinaath S", role: "Founder & CEO", email: "pranauvshrinaath@northwindcipher.com" },
+    { name: "Kailosh Kalimuthu", role: "Co-Founder & CTO", email: "kailoshkalimuthu@northwindcipher.com" },
   ],
 } as const;
 

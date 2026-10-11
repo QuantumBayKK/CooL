@@ -15,6 +15,7 @@ import {
   type Status,
 } from "@/components/ui/primitives";
 import { GATES } from "@/content/gates";
+import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Security model",
@@ -63,15 +64,15 @@ const DOMAINS: readonly {
   },
   {
     name: "attestation",
-    verdict: "simulated",
+    verdict: "pass",
     what: "Where the record was produced.",
-    how: "No TDX in the loop yet, so this domain reports simulated and can never report pass. The rule is in the verifier — nothing in any UI can reach it.",
+    how: "A raw Intel TDX quote from a Phala Cloud CVM, via dstack. MRTD and RTMR0–3 are pinned, and report_data binds the CooL signing key. Records sealed without hardware still report simulated and can never report pass.",
   },
   {
     name: "witnesses",
-    verdict: "absent",
+    verdict: "pass",
     what: "An independent party saw the same log.",
-    how: "Not built. A log signed only by our keys is not tamper-evident against us, and no amount of hardware substitutes for a second signer.",
+    how: "A witness in its own Phala CVM, on a different node, with its own enclave-sealed key, verifies the log before co-signing and refuses forks and rollbacks. Both CVMs ran under one account, so independent operation is not claimed.",
   },
 ];
 
@@ -90,7 +91,7 @@ export default function SecurityPage() {
             as="h1"
             eyebrow="Security model"
             title="What this proves, and what it does not."
-            lead="Seven verification domains, checked independently and reported separately. Two of them do not pass today, and they are named here rather than averaged into a single green tick."
+            lead="Seven verification domains, checked independently and reported separately. All seven have been verified on real Intel TDX hardware on Phala Cloud — and the limits of that evidence are named here rather than averaged into a single green tick."
           />
           <div className="mt-8">
             <GateSummary gates={GATES} />
@@ -137,49 +138,58 @@ export default function SecurityPage() {
         <Container>
           <SectionHeader
             eyebrow="Full disclosure"
-            title="The two that do not pass."
-            lead="Both are enforced in the verifier rather than stated in copy. You can confirm that yourself in about thirty seconds."
+            title="Where the evidence stops."
+            lead="The hardware runs are real. These are the edges of what they show, and the rules are enforced in the verifier rather than stated in copy."
           />
 
           <div className="mt-10 grid gap-px bg-line lg:grid-cols-2">
             <div className="bg-canvas p-6">
-              <StatusBadge status="warn">attestation · simulated</StatusBadge>
+              <StatusBadge status="ok">attestation · Intel TDX</StatusBadge>
               <h3 className="mt-4 text-h3">
-                We cannot prove where a record was produced.
+                Verified on Phala Cloud, CPU only.
               </h3>
               <p className="mt-3 text-sm text-ink-muted">
-                The measurement and quote machinery is built and exercised
-                against a simulator, but no Intel TDX root has signed anything.
-                Until a real CVM does, this domain reports{" "}
-                <code className="font-mono text-[0.8125rem]">simulated</code>.
+                Receipts sealed inside Phala Cloud CVMs carry a raw TDX quote
+                that Phala&apos;s attestation service verified, and that a local
+                dcap-qvl check accepted from archived collateral. No GPU
+                attestation is claimed, and CooL does not judge TCB quality or
+                quote freshness itself.{" "}
+                <a
+                  href={`${SITE.repo}/blob/main/artifacts/closure-verification-matrix.md`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-ink underline underline-offset-4"
+                >
+                  Read the evidence
+                </a>
+                .
               </p>
               <p className="mt-3 text-sm text-ink-muted">
+                Records this site seals in your browser are not hardware-backed.
                 Run the verifier with{" "}
                 <code className="font-mono text-[0.8125rem]">--require-hardware</code>{" "}
-                against a record this site sealed a minute ago and it{" "}
-                <strong className="text-ink">refuses</strong>. That refusal is
-                the most useful thing on the site: a demo that could only ever
-                go green would prove nothing about the gate.
+                against one and it <strong className="text-ink">refuses</strong>.
+                The production path fails closed rather than downgrading to
+                simulation.
               </p>
             </div>
 
             <div className="bg-canvas p-6">
-              <StatusBadge status="neutral">witnesses · absent</StatusBadge>
+              <StatusBadge status="warn">witnesses · same operator</StatusBadge>
               <h3 className="mt-4 text-h3">
-                The log is signed only by us.
+                Separate keys, not yet a separate organisation.
               </h3>
               <p className="mt-3 text-sm text-ink-muted">
-                A transparency log signed solely by its operator is
-                tamper-evident against outsiders and{" "}
-                <strong className="text-ink">not against the operator</strong>.
-                Against a determined insider at CooL, today, the log is not
-                sufficient on its own.
+                The witness runs in its own CVM on a different node, with its own
+                enclave-sealed key, and refuses forged heads and replaced logs.
+                What it shows is separation of key custody and process.
               </p>
               <p className="mt-3 text-sm text-ink-muted">
-                The fix is an independent co-signer who is neither CooL nor our
-                hardware vendor. It sits on Gate 2, it is not built, and a CooL
+                Both CVMs were deployed from the same account, so a witness
+                operated by a different organisation is{" "}
+                <strong className="text-ink">not demonstrated</strong>. A CooL
                 self-signature is shown but never counted as a witness — that
-                rule is in the verifier too.
+                rule is in the verifier.
               </p>
             </div>
           </div>

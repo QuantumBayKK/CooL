@@ -14,8 +14,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="icon" href="/assets/favicon-solid.svg" type="image/svg+xml" />
 <link rel="stylesheet" href="/src/app.css" />
+<link rel="stylesheet" href="/src/site-extras.css" />
 </head>
 <body>
+<div class="topbar" role="note" aria-label="NVIDIA Inception Program member">
+<div class="topbar__in">
+<span class="topbar__nv"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#76B900" d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.493 3.374 6.493 3.374s-2.774 3.851-5.75 3.851c-.398 0-.787-.062-1.158-.185v-4.346c1.528.185 1.837.857 2.747 2.385l2.04-1.714s-1.492-1.952-4-1.952a6.016 6.016 0 0 0-.796.035m0-4.735v2.138l.424-.027c5.45-.185 9.01 4.47 9.01 4.47s-4.08 4.964-8.330 4.964c-.37 0-.733-.035-1.095-.097v1.325c.3.035.61.062.91.062 3.957 0 6.82-2.023 9.593-4.408.459.371 2.34 1.263 2.73 1.652-2.633 2.208-8.772 3.984-12.253 3.984-.335 0-.653-.018-.971-.053v1.864H24V4.063zm0 10.326v1.131c-3.657-.654-4.673-4.46-4.673-4.46s1.758-1.944 4.673-2.262v1.237H8.94c-1.528-.186-2.730 1.245-2.730 1.245s.68 2.412 2.739 3.110M2.456 10.9s2.164-3.197 6.5-3.533V6.201C4.153 6.59 0 10.653 0 10.653s2.35 6.802 8.948 7.420v-1.237c-4.84-.6-6.492-5.936-6.492-5.936z"/></svg><b>NVIDIA Inception Program</b></span>
+<span class="topbar__pill">Member</span>
+<span class="topbar__sep" aria-hidden="true"></span>
+<span class="topbar__msg">Northwind Cipher is part of NVIDIA's program for AI startups.</span>
+</div>
+</div>
 <header class="nav" id="nav">
 <div class="nav__in">
 <a href="/" class="brand" aria-label="CooL — home">
@@ -27,11 +36,12 @@
 <a href="/pricing.html">Pricing</a>
 <a href="#market">Market</a>
 <a href="#team">Company</a>
+<a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub</a>
 </nav>
 <div class="nav__right">
-<a href="#faq" class="btn btn--ghost">Contact</a>
+<a href="#start" class="btn btn--ghost">Contact</a>
 <a href="/studio" class="btn btn--dark btn--sm">See the Studio</a>
-<a href="#start" class="btn btn--accent btn--sm">Book a call</a>
+<a href="https://cal.com/coolnwc" target="_blank" rel="noopener" class="btn btn--accent btn--sm">Book a call</a>
 <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><i></i></button>
 </div>
 </div>
@@ -45,7 +55,8 @@
 <a href="#compare">Compare</a>
 <a href="#team">Company</a>
 <a href="#faq">FAQ</a>
-<a href="#start" class="btn btn--accent btn--full">Book a call</a>
+<a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub ↗</a>
+<a href="https://cal.com/coolnwc" target="_blank" rel="noopener" class="btn btn--accent btn--full">Book a call</a>
 </div>
 <main id="top">
 <section class="hero">
@@ -61,11 +72,11 @@
 <svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
 </button>
 <a href="/studio" class="btn btn--dark">See the Studio</a>
-<a href="#start" class="btn btn--line">Talk to us</a>
+<a href="https://github.com/Northwind-Cipher/cool-sdk" class="btn btn--line" target="_blank" rel="noopener">SDK on GitHub</a>
 </div>
 <div class="hero__proof" data-reveal>
 <div><b data-count="7">7</b><span>verification domains</span></div>
-<div><b data-count="5">5</b><span>run for real today</span></div>
+<div><b data-count="7">7</b><span>verified on Intel TDX</span></div>
 <div><b data-count="0">0</b><span>trust required in us</span></div>
 </div>
 </div>
@@ -140,24 +151,50 @@
 </figure>
 </div>
 </section>
+<section class="band band--surface" id="ecosystem">
+<div class="wrap">
+<div class="head head--wide rise">
+<p class="eyebrow">Ecosystem</p>
+<h2 class="d2">Built with the people building confidential AI.</h2>
+</div>
+<div class="eco">
+<div class="eco__item rise">
+<div class="eco__top"><span class="eco__mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#76B900" d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.493 3.374 6.493 3.374s-2.774 3.851-5.75 3.851c-.398 0-.787-.062-1.158-.185v-4.346c1.528.185 1.837.857 2.747 2.385l2.04-1.714s-1.492-1.952-4-1.952a6.016 6.016 0 0 0-.796.035m0-4.735v2.138l.424-.027c5.45-.185 9.01 4.47 9.01 4.47s-4.08 4.964-8.330 4.964c-.37 0-.733-.035-1.095-.097v1.325c.3.035.61.062.91.062 3.957 0 6.82-2.023 9.593-4.408.459.371 2.34 1.263 2.73 1.652-2.633 2.208-8.772 3.984-12.253 3.984-.335 0-.653-.018-.971-.053v1.864H24V4.063zm0 10.326v1.131c-3.657-.654-4.673-4.46-4.673-4.46s1.758-1.944 4.673-2.262v1.237H8.94c-1.528-.186-2.730 1.245-2.730 1.245s.68 2.412 2.739 3.110M2.456 10.9s2.164-3.197 6.5-3.533V6.201C4.153 6.59 0 10.653 0 10.653s2.35 6.802 8.948 7.420v-1.237c-4.84-.6-6.492-5.936-6.492-5.936z"/></svg>NVIDIA <small>Inception</small></span><span class="badge badge--real">member</span></div>
+<p>Northwind Cipher is a member of the NVIDIA Inception Program, NVIDIA's program for startups building in AI.</p>
+<a class="src" href="https://www.nvidia.com/en-us/startups/" target="_blank" rel="noopener">nvidia.com/startups ↗</a>
+</div>
+<div class="eco__item rise" style="--rd:90ms">
+<div class="eco__top"><span class="eco__mark">Phala <small>dstack</small></span><span class="badge badge--real">infrastructure</span></div>
+<p>Phala provides the confidential-compute infrastructure CooL runs on: Intel TDX confidential VMs through dstack. All seven verification domains are verified on it.</p>
+<a class="src" href="https://github.com/Northwind-Cipher/cool-sdk/blob/main/artifacts/closure-verification-matrix.md" target="_blank" rel="noopener">Read the evidence ↗</a>
+</div>
+<div class="eco__item rise" style="--rd:180ms">
+<div class="eco__top"><img class="eco__logo" src="/partners/edgeless-systems.png" alt="Edgeless Systems" width="680" height="244" loading="lazy" /><span class="badge badge--soon">in progress</span></div>
+<div class="eco__award"><img src="/partners/wiwo-best-of-technology-2026.png" alt="WirtschaftsWoche Best of Technology 2026" width="220" height="260" loading="lazy" /><span><b>Best of Technology 2026</b>Awarded by WirtschaftsWoche</span></div>
+<p>Award-winning confidential computing, and the makers of Contrast — confidential containers for Kubernetes. We are working towards a collaboration.</p>
+<a class="src" href="https://www.edgeless.systems/" target="_blank" rel="noopener">edgeless.systems ↗</a>
+</div>
+</div>
+</div>
+</section>
 <section class="band" id="verify">
 <div class="wrap split">
 <div class="split__media" data-reveal>
 <div class="term">
 <div class="term__bar"><span class="term__dots"><i></i><i></i><i></i></span> terminal · cool-nwc</div>
 <div class="term__body">
-<div class="term__line"><span class="c">$</span> cool verify receipt.json</div>
-<div class="term__line"><span class="m">reading receipt · no network used</span></div>
+<div class="term__line"><span class="c">$</span> COOL_REQUIRE_HARDWARE=1 cool verify receipt.json</div>
+<div class="term__line"><span class="m">reading receipt · Phala Cloud · Intel TDX</span></div>
 <div class="term__line"> </div>
 <div class="term__line"><span class="ok">✓</span> binding      <span class="m">record → digest</span></div>
 <div class="term__line"><span class="ok">✓</span> signature    <span class="m">ML-DSA-65 + Ed25519</span></div>
 <div class="term__line"><span class="ok">✓</span> inclusion    <span class="m">leaf ∈ log</span></div>
 <div class="term__line"><span class="ok">✓</span> consistency  <span class="m">log is append-only</span></div>
 <div class="term__line"><span class="ok">✓</span> witness      <span class="m">independent root</span></div>
-<div class="term__line"><span class="k">~</span> attestation  <span class="m">sim — pending TEE hardware</span></div>
-<div class="term__line"><span class="k">~</span> enclave      <span class="m">sim — pending TEE hardware</span></div>
+<div class="term__line"><span class="ok">✓</span> attestation  <span class="m">Intel TDX quote · Phala</span></div>
+<div class="term__line"><span class="ok">✓</span> enclave      <span class="m">MRTD + RTMR0–3 pinned</span></div>
 <div class="term__line"> </div>
-<div class="term__line"><span class="ok">5 / 5 real domains verified</span> <span class="m">· 2 simulated, labelled</span></div>
+<div class="term__line"><span class="ok">7 / 7 domains verified</span> <span class="m">· hardware required</span></div>
 </div>
 </div>
 </div>
@@ -172,7 +209,7 @@
 </button>
 <a href="#domains" class="btn btn--line">What the 7 domains check</a>
 </div>
-<p class="note" style="margin-top:24px">Two of the seven domains depend on confidential hardware we have not deployed yet. They are marked <span class="mono">sim</span> on every receipt, in the open — never hidden, never counted as passes.</p>
+<p class="note" style="margin-top:24px">Binding, signature and inclusion verify fully offline. Attestation is checked against Intel TDX quotes from Phala Cloud — the raw quotes, verifier responses and tamper tests are <a href="https://github.com/Northwind-Cipher/cool-sdk/blob/main/artifacts/closure-verification-matrix.md" target="_blank" rel="noopener" style="border-bottom:1px solid var(--border-2)">published in the SDK repo</a>.</p>
 </div>
 </div>
 </section>
@@ -224,7 +261,7 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <div class="btn-row">
 <a href="#domains" class="btn btn--dark">Read the domains</a>
 </div>
-<p class="note" style="margin-top:24px">The browser signs with ECDSA P-256 because that is what browsers expose natively. Production seals with hybrid <span class="mono">ML-DSA-65 + Ed25519</span>. The difference is stated here rather than glossed over.</p>
+<p class="note" style="margin-top:24px">The browser signs with ECDSA P-256 because that is what browsers expose natively. Production seals with hybrid <span class="mono">ML-DSA-65 + Ed25519</span>. Attestation and enclave show <span class="mono">sim</span> here only because a browser cannot produce an Intel TDX quote — the SDK running on Phala Cloud does.</p>
 </div>
 </div>
 </section>
@@ -319,7 +356,7 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <text x="30" y="70">✓ signature</text><text x="130" y="70">✓ consistency</text>
 <text x="30" y="86">✓ witness</text>
 </g>
-<text x="130" y="86" font-family="ui-monospace,monospace" font-size="8.5" fill="#a9bbd6">~ 2 sim</text>
+<text x="130" y="86" font-family="ui-monospace,monospace" font-size="8.5" fill="#6fb0ff">✓ attestation</text>
 </svg>
 </div>
 <p class="eyebrow" style="margin:0">Verify</p>
@@ -339,7 +376,7 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <div class="wrap">
 <div class="head head--wide" data-reveal>
 <p class="eyebrow">Verification</p>
-<h2 class="d2">Seven independent domains. Five run today.</h2>
+<h2 class="d2">Seven independent domains. All seven verified on real hardware.</h2>
 <p class="support">A receipt is not a single yes/no. It is seven separate checks that can fail independently — which is what makes a failure diagnostic instead of merely alarming.</p>
 </div>
 <div class="grid grid--4" data-reveal>
@@ -386,26 +423,26 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <article class="dom">
 <div class="dom__top">
 <span class="dom__ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg></span>
-<span class="badge badge--sim">sim</span>
+<span class="badge badge--real">real</span>
 </div>
 <h3>attestation</h3>
-<p>Hardware quote proving which enclave produced the record. Simulated until we deploy on genuine TEE hardware.</p>
+<p>An Intel TDX quote, via Phala dstack, proving which enclave produced the record — and binding it to the signing key.</p>
 </article>
 <article class="dom">
 <div class="dom__top">
 <span class="dom__ic"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
-<span class="badge badge--sim">sim</span>
+<span class="badge badge--real">real</span>
 </div>
 <h3>enclave</h3>
-<p>Proof the measured environment is the one claimed. Also simulated, also labelled on every receipt.</p>
+<p>The measured environment (MRTD, RTMR0–3) matches the approved pin. A changed workload is rejected.</p>
 </article>
 <article class="dom" style="background:var(--surface);border-style:dashed">
 <div class="dom__top">
-<span class="dom__ic" style="background:#fff"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
-<span class="badge badge--soon">roadmap</span>
+<span class="dom__ic" style="background:#fff"><svg viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z"/><path d="M9 12h6M9 16h6"/></svg></span>
+<span class="badge badge--soon">evidence</span>
 </div>
-<h3>Hardware tier</h3>
-<p>Finishing attestation and enclave on real TEE hardware flips the last two from <span class="mono">sim</span> to <span class="mono">real</span>.</p>
+<h3>Published runs</h3>
+<p>Receipts, quotes and an 11-row tamper matrix from Phala Cloud runs, in the open. <a href="https://github.com/Northwind-Cipher/cool-sdk/blob/main/artifacts/closure-verification-matrix.md" target="_blank" rel="noopener" style="border-bottom:1px solid var(--border-2)">Read it ↗</a></p>
 </article>
 </div>
 </div>
@@ -414,11 +451,11 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <div class="wrap">
 <div class="facts" data-reveal>
 <div class="fact"><b data-count="7">7</b><span>independent verification domains in the open verifier</span></div>
-<div class="fact"><b data-count="5">5</b><span>of them run for real today, in your browser</span></div>
-<div class="fact"><b data-count="2">2</b><span>marked simulated until TEE deployment — attestation, enclave</span></div>
+<div class="fact"><b data-count="7">7</b><span>verified on real Intel TDX hardware via Phala Cloud</span></div>
+<div class="fact"><b data-count="119">119</b><span>SDK tests passing, 0 skipped</span></div>
 <div class="fact"><b data-count="0">0</b><span>customer data in our control plane, by design</span></div>
 </div>
-<p class="note" style="margin-top:40px" data-reveal>These are the only numbers on this page. There are no user counts, run counts, uptime percentages or latency figures here, because CooL has none to report yet — and a number invented to fill a gap would undo every real one beside it.</p>
+<p class="note" style="margin-top:40px" data-reveal>These are the only numbers on this page. There are no user counts, uptime percentages or latency figures here, because CooL has none to report yet — and a number invented to fill a gap would undo every real one beside it.</p>
 </div>
 </section>
 <section class="band">
@@ -492,7 +529,7 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <div class="card" data-reveal><p class="eyebrow" style="margin:0">03</p><h3 class="d3">Post-quantum from day one</h3><p class="support" style="font-size:.875rem">Hybrid ML-DSA-65 + Ed25519 means evidence sealed today still stands in ten years. Retrofitting that is a rewrite.</p></div>
 <div class="card" data-reveal><p class="eyebrow" style="margin:0">04</p><h3 class="d3">Credibility that checks out</h3><p class="support" style="font-size:.875rem">Published post-quantum research — ML-KEM mapped into IKEv2 in C with liboqs — plus TEE and distributed-systems depth. One click to verify, which is the point.</p></div>
 <div class="card" data-reveal><p class="eyebrow" style="margin:0">05</p><h3 class="d3">Timing and position</h3><p class="support" style="font-size:.875rem">The moat isn't a patent; the primitives are open standards. It's being the neutral standard already integrated when the requirements mature.</p></div>
-<div class="card" data-reveal><p class="eyebrow" style="margin:0">06</p><h3 class="d3">Honesty as architecture</h3><p class="support" style="font-size:.875rem">We mark the two simulated domains in the open. For a product whose promise is "verify it yourself," that restraint is what makes every other claim believable.</p></div>
+<div class="card" data-reveal><p class="eyebrow" style="margin:0">06</p><h3 class="d3">Honesty as architecture</h3><p class="support" style="font-size:.875rem">We publish the raw hardware evidence and its limits side by side. For a product whose promise is "verify it yourself," that is what makes every claim believable.</p></div>
 </div>
 </div>
 </section>
@@ -520,11 +557,11 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <tr><td>Tamper-evident, provable evidence</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="y us">yes</td></tr>
 <tr><td>Neutral across every provider</td><td class="n">no</td><td class="p">partial</td><td class="p">partial</td><td class="p">—</td><td class="y us">yes</td></tr>
 <tr><td>Verifiable with no account or network</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="y us">yes</td></tr>
-<tr><td>Proves which model actually ran</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="p us">on the roadmap</td></tr>
+<tr><td>Hardware-attested runtime (Intel TDX)</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="y us">yes</td></tr>
 </tbody>
 </table>
 </div>
-<p class="note" style="margin-top:24px" data-reveal>The last row is the honest one: proving which model actually ran needs the hardware tier, and that tier is not finished. Confidential-compute platforms already do this for a single run — they are complementary, not competitors. CooL proves the ongoing history of change across many runs and many providers, and does not host inference.</p>
+<p class="note" style="margin-top:24px" data-reveal>The last row comes from running on Phala dstack — CPU Intel TDX today, no GPU attestation claimed. Confidential-compute platforms prove a single run — they are complementary, not competitors. CooL proves the ongoing history of change across many runs and many providers, and does not host inference.</p>
 </div>
 </section>
 <section class="band band--surface">
@@ -543,23 +580,19 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 </section>
 <section class="band" id="team">
 <div class="wrap">
-<div class="head head--wide" data-reveal>
+<div class="head head--wide rise">
 <p class="eyebrow">Founders</p>
 <h2 class="d2">Applied post-quantum cryptography, and confidential-compute inference.</h2>
 </div>
 <div class="grid grid--2">
-<article class="person" data-reveal>
-<div class="person__plate">
-<svg viewBox="0 0 400 120" preserveAspectRatio="none">
-<g stroke="#6fb0ff" stroke-opacity=".5" stroke-width="1" fill="none">
-<path d="M0 90 L60 60 L120 78 L180 40 L240 66 L300 30 L360 54 L400 36"/>
-</g>
-<g fill="#6fb0ff" fill-opacity=".85">
-<circle cx="60" cy="60" r="2.5"/><circle cx="180" cy="40" r="2.5"/><circle cx="300" cy="30" r="2.5"/>
-</g>
-<text x="20" y="106" font-family="ui-monospace,monospace" font-size="9" fill="#8fa6c6">ML-KEM · IKEv2 · liboqs</text>
-</svg>
-</div>
+<article class="person person--photo rise" style="--rd:0ms">
+<figure class="ftile" data-tiles>
+<img src="/founders/pranauv-portrait.jpg" alt="Pranauv Shrinaath S" width="760" height="950" loading="lazy" decoding="async" />
+<div class="ftile__grid" aria-hidden="true"></div>
+<span class="ftile__hash" aria-hidden="true">sig · ML-DSA-65</span>
+<span class="ftile__tag">Founder &amp; CEO</span>
+</figure>
+<div class="person__body">
 <h3>Pranauv Shrinaath S</h3>
 <p class="role">Founder &amp; CEO · Post-quantum cryptography &amp; blockchain</p>
 <ul>
@@ -568,20 +601,20 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <li>Onsite research internship, NUS Singapore.</li>
 <li>Building since 14.</li>
 </ul>
+<div class="person__links">
+<a class="mail" href="mailto:pranauvshrinaath@northwindcipher.com"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M2 4.5l6 4.5 6-4.5"/></svg>pranauvshrinaath@northwindcipher.com</a>
 <a class="src" href="https://github.com/KenidoesCode" target="_blank" rel="noopener">github.com/KenidoesCode ↗</a>
-</article>
-<article class="person" data-reveal>
-<div class="person__plate">
-<svg viewBox="0 0 400 120" preserveAspectRatio="none">
-<g stroke="#6fb0ff" stroke-opacity=".35" stroke-width="1" fill="none">
-<path d="M60 30 L140 70 L220 30 L300 70 L360 40"/><path d="M60 30 L140 70 L60 100"/><path d="M300 70 L220 30"/>
-</g>
-<g fill="#6fb0ff" fill-opacity=".8">
-<circle cx="60" cy="30" r="3"/><circle cx="140" cy="70" r="3"/><circle cx="220" cy="30" r="3"/><circle cx="300" cy="70" r="3"/>
-</g>
-<text x="20" y="106" font-family="ui-monospace,monospace" font-size="9" fill="#8fa6c6">TEE · P2P · distributed compute</text>
-</svg>
 </div>
+</div>
+</article>
+<article class="person person--photo rise" style="--rd:120ms">
+<figure class="ftile" data-tiles>
+<img src="/founders/kailosh-portrait.jpg" alt="Kailosh Kalimuthu" width="760" height="1138" loading="lazy" decoding="async" />
+<div class="ftile__grid" aria-hidden="true"></div>
+<span class="ftile__hash" aria-hidden="true">tee · intel-tdx</span>
+<span class="ftile__tag">Co-Founder &amp; CTO</span>
+</figure>
+<div class="person__body">
 <h3>Kailosh Kalimuthu</h3>
 <p class="role">Co-Founder &amp; CTO · Trusted execution environments &amp; AI inference</p>
 <ul>
@@ -590,10 +623,14 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <li>6 months building with US startup Decipher.</li>
 <li>Building since 16.</li>
 </ul>
+<div class="person__links">
+<a class="mail" href="mailto:kailoshkalimuthu@northwindcipher.com"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M2 4.5l6 4.5 6-4.5"/></svg>kailoshkalimuthu@northwindcipher.com</a>
 <a class="src" href="https://github.com/Sk1zmo" target="_blank" rel="noopener">github.com/Sk1zmo ↗</a>
+</div>
+</div>
 </article>
 </div>
-<p class="note" style="margin-top:24px" data-reveal>Nothing here is claimed beyond what is listed, and every line is one click from being checked. On a deep-tech team page, one exaggeration a reader can disprove poisons every true line next to it.</p>
+<p class="note rise" style="margin-top:24px">Nothing here is claimed beyond what is listed, and every line is one click from being checked. On a deep-tech team page, one exaggeration a reader can disprove poisons every true line next to it.</p>
 </div>
 </section>
 <section class="band">
@@ -607,7 +644,7 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <span class="phase__n">01</span>
 <div>
 <h3>SDK and reference integrations</h3>
-<p><span class="mono">npm i -g cool-nwc</span> is live today. Automatic capture and the reference integrations are the active build — making it genuinely easy to adopt and proving it works end to end.</p>
+<p><span class="mono">npm i -g cool-nwc</span> is live today, with source on <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener" style="border-bottom:1px solid var(--border-2)">GitHub</a>. Automatic capture and the reference integrations are the active build — making it genuinely easy to adopt and proving it works end to end.</p>
 </div>
 <span class="badge badge--real">building</span>
 </div>
@@ -615,7 +652,7 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <span class="phase__n">02</span>
 <div>
 <h3>Pilots with regulated-AI teams</h3>
-<p>Scoped deployments with design partners in the sectors that feel the pain — including finishing the hardware-attestation tier on genuine TEE hardware, so the two simulated domains flip to real.</p>
+<p>Scoped deployments with design partners in the sectors that feel the pain, on the hardware tier already validated on Phala Cloud Intel TDX.</p>
 </div>
 <span class="badge badge--sim">next</span>
 </div>
@@ -654,8 +691,8 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <div class="faq__a"><p>You take a receipt file and run the open verifier on your own machine, with the network switched off. It recomputes the digest, checks the signature, checks the inclusion path and the consistency of the log. Nothing of ours is contacted, so nothing of ours has to be trusted.</p></div>
 </div>
 <div class="faq">
-<button class="faq__q">Why are two of the seven domains simulated? <i></i></button>
-<div class="faq__a"><p>Attestation and enclave depend on confidential-compute hardware we have not deployed yet. Simulating them lets the full receipt format exist today; labelling them <span class="mono">sim</span> everywhere means nobody mistakes a placeholder for a proof. When the hardware tier ships, they flip to real and old receipts stay honest about what they were.</p></div>
+<button class="faq__q">What hardware does attestation run on? <i></i></button>
+<div class="faq__a"><p>Intel TDX confidential VMs on Phala Cloud, through dstack. All seven domains have been verified on that hardware, with the raw quotes and tamper tests published in the SDK repo. Limits, stated plainly: CPU TDX only, no GPU attestation claimed, and quote verification goes through Phala's service unless you supply collateral locally. With <span class="mono">COOL_REQUIRE_HARDWARE=1</span> the verifier fails closed rather than downgrading to simulation.</p></div>
 </div>
 <div class="faq">
 <button class="faq__q">Does CooL run or host my model? <i></i></button>
@@ -667,7 +704,7 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 </div>
 <div class="faq" style="border-bottom:1px solid var(--border)">
 <button class="faq__q">Can I use it today? <i></i></button>
-<div class="faq__a"><p><span class="mono">npm i -g cool-nwc</span> is published and installs the verifier. Automatic capture is the active build, and there is no billing yet, so there is nothing to buy — which is also why there are no prices on this page.</p></div>
+<div class="faq__a"><p><span class="mono">npm i -g cool-nwc</span> is published and installs the SDK and verifier; the source is on <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener" style="border-bottom:1px solid var(--border-2)">GitHub</a> under BUSL-1.1. Automatic capture is the active build. Launch prices are on the <a href="/pricing.html" style="border-bottom:1px solid var(--border-2)">pricing page</a>, but billing is not live yet, so there is nothing to buy today.</p></div>
 </div>
 </div>
 </div>
@@ -676,13 +713,18 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <div class="wrap">
 <div class="final" data-reveal>
 <h2 class="d2">A product you check, not one you're asked to believe.</h2>
-<p>Install the verifier, or send us a change you'd want on the record and we'll walk it through end to end.</p>
+<p>Book a call and we'll walk a change you'd want on the record through end to end — or install the SDK and check it yourself.</p>
 <div class="btn-row">
-<button class="cmd cmd--accent" data-copy="npm i -g cool-nwc">
+<a href="https://cal.com/coolnwc" class="btn btn--accent" target="_blank" rel="noopener">Book a call</a>
+<button class="cmd" data-copy="npm i -g cool-nwc">
 <span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span>
 <svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
 </button>
-<a href="/studio" class="btn btn--line">Open the Studio</a>
+<a href="https://github.com/Northwind-Cipher/cool-sdk" class="btn btn--line" target="_blank" rel="noopener">View on GitHub</a>
+</div>
+<div class="final__mail">
+<a href="mailto:pranauvshrinaath@northwindcipher.com">pranauvshrinaath@northwindcipher.com</a>
+<a href="mailto:kailoshkalimuthu@northwindcipher.com">kailoshkalimuthu@northwindcipher.com</a>
 </div>
 </div>
 </div>
@@ -695,13 +737,14 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <a href="/" class="brand" aria-label="CooL — home" style="margin-bottom:16px">
 <i class="brand__wm" aria-hidden="true"></i>
 </a>
-<p class="note" style="max-width:30ch">The verifiable system-of-record for AI change. Built by Northwind Cipher.</p>
+<p class="note" style="max-width:30ch">The verifiable system-of-record for AI change. Built by Northwind Cipher. Member of NVIDIA Inception.</p>
 </div>
 <div>
 <h4>Product</h4>
 <a href="#product">Overview</a>
 <a href="#domains">Verification domains</a>
 <a href="/studio">Studio</a>
+<a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">SDK on GitHub ↗</a>
 <a href="https://www.npmjs.com/package/cool-nwc" target="_blank" rel="noopener">SDK on npm ↗</a>
 </div>
 <div>
@@ -716,6 +759,7 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <a href="#team">Founders</a>
 <a href="#market">Market</a>
 <a href="#faq">FAQ</a>
+<a href="https://cal.com/coolnwc" target="_blank" rel="noopener">Book a call ↗</a>
 </div>
 <div>
 <h4>Legal</h4>
@@ -732,5 +776,6 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 </div>
 </footer>
 <script type="module" src="/src/app.js"></script>
+<script type="module" src="/src/site-extras.js"></script>
 </body>
 </html>

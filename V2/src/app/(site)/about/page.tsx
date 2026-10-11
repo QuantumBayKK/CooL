@@ -112,7 +112,7 @@ export default function AboutPage() {
               { label: "Legal entity", value: SITE.company },
               { label: "Based in", value: CONTACT.city },
               { label: "Product", value: "CooL — cryptographic evidence for AI change" },
-              { label: "Licence", value: "SDK and verifier are Apache-2.0" },
+              { label: "Licence", value: "SDK is BUSL-1.1 (cool-nwc 3.0.0 and earlier remain Apache-2.0)" },
               {
                 label: "Source",
                 value: (
@@ -122,7 +122,7 @@ export default function AboutPage() {
                     rel="noreferrer noopener"
                     className="text-accent underline underline-offset-4"
                   >
-                    github.com/KenidoesCode/cool-sdk
+                    github.com/Northwind-Cipher/cool-sdk
                   </a>
                 ),
               },

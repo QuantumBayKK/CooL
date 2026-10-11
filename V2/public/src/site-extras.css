@@ -1,0 +1,80 @@
+/* Additions on top of the vendored app.css — kept separate so app.css stays
+   byte-identical to upstream and re-syncing it remains a plain copy. */
+
+/* Top announcement bar: NVIDIA Inception */
+.topbar{background:var(--panel);color:var(--panel-text);font-size:var(--tiny);line-height:1}
+.topbar__in{display:flex;align-items:center;justify-content:center;gap:10px;min-height:38px;padding:8px var(--gutter);text-align:center;flex-wrap:wrap}
+.topbar__nv{display:inline-flex;align-items:center;gap:8px;font-weight:600;letter-spacing:.01em;color:#fff}
+.topbar__nv svg{width:22px;height:22px;flex:none}
+.topbar__nv small{font-weight:400;color:var(--panel-muted);font-size:inherit}
+.topbar__sep{width:1px;height:14px;background:rgba(255,255,255,.18)}
+.topbar__msg{color:var(--panel-muted)}
+@media(max-width:560px){.topbar__sep,.topbar__msg{display:none}}
+
+/* Ecosystem strip */
+.eco{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;background:var(--card)}
+.eco__item{padding:var(--s6);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:var(--s3)}
+.eco__item:last-child{border-right:0}
+.eco__top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s3)}
+.eco__top .badge{white-space:nowrap;flex:none;margin-top:4px}
+.eco__mark{display:inline-flex;align-items:center;flex-wrap:wrap;gap:2px 8px;font-weight:600;color:var(--ink);font-size:1.0625rem;letter-spacing:-.005em}
+.eco__mark svg{width:26px;height:26px;flex:none}
+.eco__mark small{font-weight:400;color:var(--muted-2);font-size:var(--small)}
+.eco__item p{color:var(--muted);font-size:var(--small);margin:0}
+.eco__item a.src{font-size:var(--tiny);color:var(--accent);margin-top:auto}
+.eco__item a.src:hover{color:var(--accent-deep)}
+@media(max-width:860px){.eco{grid-template-columns:1fr}.eco__item{border-right:0;border-bottom:1px solid var(--border)}.eco__item:last-child{border-bottom:0}}
+
+/* Top bar: bigger on phones, where it is the first thing anyone sees */
+.topbar__nv b{font-weight:600}
+.topbar__pill{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#0a1a33;background:#76B900;border-radius:999px;padding:4px 8px}
+@media(max-width:560px){.topbar{font-size:.8125rem}.topbar__in{min-height:44px}.topbar__nv svg{width:24px;height:24px}}
+
+/* Partner logos inside the ecosystem cards */
+.eco__logo{height:38px;width:auto;display:block}
+.eco__award{display:flex;align-items:center;gap:var(--s3);padding:var(--s3);border:1px solid var(--border);border-radius:var(--r);background:var(--surface)}
+.eco__award img{width:44px;height:auto;flex:none;border-radius:2px}
+.eco__award span{font-size:var(--tiny);color:var(--muted);line-height:1.4}
+.eco__award b{display:block;color:var(--ink);font-weight:600}
+
+/* Scroll rise — runs at every width (app.css switches data-reveal off below 1000px) */
+.x-motion .rise{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease-out),transform .7s var(--ease-out);transition-delay:var(--rd,0ms)}
+.x-motion .rise.is-up{opacity:1;transform:none}
+
+/* Founder portraits with a tile-dissolve reveal */
+.person--photo{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.person--photo .person__body{padding:var(--s6)}
+.ftile{position:relative;margin:0;aspect-ratio:4/5;overflow:hidden;background:var(--panel)}
+.ftile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 14%;transition:transform 1.6s var(--ease-out),filter 1.2s var(--ease) .5s}
+.ftile[data-armed] img{transform:scale(1.12);filter:grayscale(1) contrast(1.05)}
+.ftile[data-armed].is-lit img{transform:scale(1);filter:none}
+.ftile__grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--cols,6),1fr);grid-template-rows:repeat(var(--rows,8),1fr);pointer-events:none}
+.ftile__grid i{background:var(--panel);box-shadow:inset 0 0 0 1px rgba(111,176,255,.07);transform:scale(1.04)}
+.ftile.is-lit .ftile__grid i{animation:tileOut .62s var(--ease-out) forwards;animation-delay:var(--td,0ms)}
+@keyframes tileOut{0%{opacity:1;transform:scale(1.04)}35%{opacity:1;background:#1e50a2;transform:scale(.96)}100%{opacity:0;transform:scale(.4) rotate(9deg)}}
+.ftile:after{content:"";position:absolute;left:0;right:0;top:-30%;height:30%;background:linear-gradient(180deg,transparent,rgba(111,176,255,.28),transparent);opacity:0;pointer-events:none}
+.ftile.is-lit:after{animation:scan 1.4s var(--ease) .9s forwards}
+@keyframes scan{0%{top:-30%;opacity:1}100%{top:100%;opacity:0}}
+.ftile__tag{position:absolute;left:var(--s4);bottom:var(--s4);z-index:2;font-family:var(--mono);font-size:11px;color:#fff;background:rgba(7,21,40,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:6px 10px;transition:opacity .5s var(--ease) 1.3s,transform .5s var(--ease) 1.3s}
+.ftile[data-armed] .ftile__tag{opacity:0;transform:translateY(6px)}
+.ftile[data-armed].is-lit .ftile__tag{opacity:1;transform:none}
+.ftile__hash{position:absolute;right:var(--s4);top:var(--s4);z-index:2;font-family:var(--mono);font-size:10px;color:#556885;opacity:0;transition:opacity .5s var(--ease) 1.5s}
+.ftile.is-lit .ftile__hash{opacity:.9}
+.person a.mail{display:inline-flex;align-items:center;gap:8px;font-size:var(--small);color:var(--accent);overflow-wrap:anywhere;margin:var(--s2) 0 var(--s3)}
+.person a.mail:hover{color:var(--accent-deep)}
+.person a.mail svg{width:15px;height:15px;flex:none}
+.person__links{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+
+/* Final CTA contact row */
+.final__mail{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px;margin-top:var(--s8);font-size:var(--small)}
+.final__mail a{color:var(--panel-muted);border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:2px;overflow-wrap:anywhere}
+.final__mail a:hover{color:#fff;border-color:#fff}
+@media(max-width:560px){.final .btn-row{flex-direction:column;align-items:stretch}.final .btn-row>*{width:100%;justify-content:center}}
+
+@media(prefers-reduced-motion:reduce){
+.x-motion .rise{opacity:1;transform:none;transition:none}
+.ftile img{transform:none;filter:none;transition:none}
+.ftile__grid{display:none}
+.ftile:after{display:none}
+.ftile__tag,.ftile__hash{opacity:1;transform:none;transition:none}
+}

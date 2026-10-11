@@ -129,7 +129,7 @@ export default function DemoPage() {
                 </a>
               </span>
             ))}{" "}
-            · Apache-2.0 · {SITE.company}
+            · SDK BUSL-1.1 · {SITE.company}
           </p>
         </div>
       </Container>

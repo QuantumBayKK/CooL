@@ -62,6 +62,24 @@ export default function ContactPage() {
                 </span>
               </a>
 
+              {CONTACT.founders.map((f) => (
+                <a
+                  key={f.email}
+                  href={`mailto:${f.email}`}
+                  className="flex items-start gap-4 bg-canvas py-4 transition-colors duration-[--duration-state] hover:bg-surface"
+                >
+                  <Mail className="mt-0.5 size-4 shrink-0 text-ink-subtle" strokeWidth={1.75} />
+                  <span className="min-w-0">
+                    <span className="block text-label uppercase text-ink-subtle">
+                      {f.name} · {f.role}
+                    </span>
+                    <span className="mt-1 block break-all text-sm text-ink">
+                      {f.email}
+                    </span>
+                  </span>
+                </a>
+              ))}
+
               <a
                 href={CONTACT.booking}
                 target="_blank"

@@ -176,8 +176,8 @@ verify → both must pass, independently`}
                 not have one and the architecture gives us no way to obtain one.
               </p>
               <div className="flex flex-wrap items-center gap-3">
-                <StatusBadge status="warn">
-                  Today this runs against a simulator
+                <StatusBadge status="ok">
+                  Validated on Phala Cloud Intel TDX
                 </StatusBadge>
                 <Link
                   href="/security#simulated"
