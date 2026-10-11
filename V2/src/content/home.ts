@@ -54,9 +54,9 @@ export const HERO_STATS: readonly {
     note: "Checked and reported separately — never averaged into one green tick.",
   },
   {
-    k: "5",
-    v: "real today",
-    note: "Attestation is simulated and witnessing is absent. Both are named below.",
+    k: "7",
+    v: "verified on Intel TDX",
+    note: "All seven pass on Phala Cloud confidential VMs. The limits of that evidence are named below.",
   },
   {
     k: "0",
@@ -173,10 +173,9 @@ export interface Domain {
 /**
  * Transcribed from `/security`, which is the upstream copy for this table.
  *
- * Five real, one simulated, one absent — and the two that do not pass sit in
- * the same table as the five that do, in reading order, not in a footnote. A
- * verdict grid whose author quietly omitted his own failures would be arguing
- * against the product's entire thesis on the product's own homepage.
+ * All seven verified on Phala Cloud Intel TDX. The caveats on the last two
+ * (CPU only; witness under the same account) sit in the same table, in reading
+ * order, not in a footnote.
  */
 export const DOMAINS: readonly Domain[] = [
   {
@@ -211,15 +210,15 @@ export const DOMAINS: readonly Domain[] = [
   },
   {
     name: "attestation",
-    verdict: "simulated",
+    verdict: "real",
     what: "Where the record was produced.",
-    how: "No TDX in the loop yet, so this domain reports simulated and can never report pass. The rule is in the verifier — nothing in any UI can reach it.",
+    how: "A raw Intel TDX quote from a Phala Cloud CVM via dstack, verified by Phala's attestation service and a local dcap-qvl check. MRTD/RTMR0–3 pinned; report_data binds the signing key. CPU TDX only.",
   },
   {
     name: "witnesses",
-    verdict: "absent",
+    verdict: "real",
     what: "An independent party saw the same log.",
-    how: "Not built. A log signed only by our keys is not tamper-evident against us, and no amount of hardware substitutes for a second signer.",
+    how: "A witness in its own Phala CVM, on another node, with its own enclave-sealed key, verifies before co-signing and refuses forks. Same account as the primary, so independent operation is not claimed.",
   },
 ];
 
@@ -285,7 +284,7 @@ export const LANDSCAPE: readonly LandscapeRow[] = [
     marks: ["no", "no", "no", "no"],
     cool: "partial",
     caveat:
-      "Partial, and it stays partial until hardware attestation is real. The record binds the model identity the customer's own pipeline reports; binding it to a vendor-rooted TEE quote is the next build, and the verifier reports that domain as simulated until it lands.",
+      "Partial. Hardware attestation is real on Phala Cloud Intel TDX: the quote proves which measured workload produced the record. It does not yet attest the model weights on a GPU — no confidential-GPU attestation is claimed.",
   },
   {
     capability: "Signatures built to outlast the retention period",

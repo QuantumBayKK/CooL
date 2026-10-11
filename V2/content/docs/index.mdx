@@ -39,11 +39,11 @@ Seven domains, each checked and reported separately.
 | `witnesses` | An independent party saw the same log |
 
 <Warning>
-Two of these do not pass today. `attestation` reports `simulated` because there
-is no hardware root in the loop yet, and `witnesses` reports `absent` because
-external co-signing is not built. Both rules live in the verifier, so no
-presentation layer can make them read as passing. See
-[the security model](/security#simulated).
+All seven have been verified on real Intel TDX hardware on Phala Cloud, with an
+attested witness running in a second CVM. A receipt sealed off-hardware — on a
+laptop or in a browser — still reports `attestation` as `simulated`, and that
+rule lives in the verifier, so no presentation layer can make it read as
+passing. See [the security model](/security#simulated) for the limits.
 </Warning>
 
 ## Where to go next

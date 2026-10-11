@@ -77,11 +77,12 @@ export default function DemoPage() {
             would need a server or a third-party API are labelled{" "}
             <code className="font-mono text-[0.8125rem]">SIMULATED</code> from
             the stage&apos;s own field rather than from copy, and the estate data
-            is synthetic. Hardware attestation reports{" "}
+            is synthetic. Hardware attestation is real on Phala Cloud Intel TDX,
+            but a browser cannot produce a TDX quote, so in this demo it reports{" "}
             <code className="font-mono text-[0.8125rem]">MOCK</code> and public
             anchoring <code className="font-mono text-[0.8125rem]">ABSENT</code>{" "}
-            because neither ships yet — the verifier will never mark them as
-            passing, and nothing in this UI can reach that rule.
+            — the verifier will never mark them as passing here, and nothing in
+            this UI can reach that rule.
           </>
         }
       />

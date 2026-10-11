@@ -53,7 +53,7 @@ const DESTINATIONS = [
   {
     href: "/security/readiness",
     title: "Readiness ladder",
-    body: "Exactly which rung the product is on, and what is still simulated.",
+    body: "Exactly which rung the product is on, and what is verified on hardware.",
   },
   {
     href: "/pricing",

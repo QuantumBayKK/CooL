@@ -37,9 +37,9 @@ const ROWS: readonly {
   },
   {
     party: "CooL, for log history",
-    removedBy: "External witnesses — NOT BUILT",
+    removedBy: "Third-party witnesses — not yet",
     status: "remaining",
-    note: "A log signed only by its operator is not tamper-evident against that operator. This is the honest gap, and it is Gate 2.",
+    note: "An attested witness runs in a separate CVM, but under the same account. Until another organisation runs one, this is the honest gap, and it is Gate 2.",
   },
   {
     party: "The hardware vendor",

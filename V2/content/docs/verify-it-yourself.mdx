@@ -38,9 +38,10 @@ A verifier that only ever says yes has told you nothing. Try each of these.
 cool verify ./tampered.json
 #    binding and signature both fail
 
-# 2. Demand a hardware root:
+# 2. Demand a hardware root of a receipt sealed on your laptop:
 cool verify ./change-receipt.json --require-hardware
 #    REFUSED: attestation is simulated
+#    (a receipt sealed on Phala Cloud Intel TDX passes this check)
 ```
 
 The second one is the important one. `--require-hardware` is a real option, and

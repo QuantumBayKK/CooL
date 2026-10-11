@@ -139,20 +139,30 @@ export const GATES = [
             done: true,
             note: "A receipt without a vendor-rooted quote is rejected outright, however many other domains pass.",
           },
+          {
+            label: "Hardware attestation on Phala Cloud Intel TDX",
+            done: true,
+            note: "All seven domains verified on real TDX CVMs: raw quotes verified by Phala's attestation service and by a local dcap-qvl check, MRTD/RTMR0–3 pinned, report_data bound to the signing key. Evidence is published in the cool-sdk repo.",
+          },
+          {
+            label: "Independent witness in its own CVM",
+            done: true,
+            note: "A second Phala CVM on a different node, with its own enclave-sealed key, verifies the log before co-signing and refuses forged heads and replaced logs.",
+          },
         ],
       },
       {
         title: "What is not real today",
         items: [
           {
-            label: "Hardware attestation is simulated",
+            label: "Witness run by a separate organisation",
             done: false,
-            note: "No TDX in the loop yet. The attestation domain reports `simulated` and can never report `pass` — that rule is in the verifier, not in the copy.",
+            note: "Both CVMs ran under one account, so key and process separation is shown — independent operation is not. Public-chain anchoring is also absent.",
           },
           {
-            label: "Public anchoring is absent",
+            label: "GPU attestation",
             done: false,
-            note: "The log is signed by our keys alone, which is not tamper-evident against us. Witnesses close this and they are not built.",
+            note: "The hardware runs are CPU Intel TDX. No confidential-GPU attestation is claimed.",
           },
           { label: "Capture is manual (CLI), not automatic", done: false },
           { label: "Single-node. No SSO, no on-prem, no certifications.", done: false },
@@ -206,8 +216,8 @@ export const GATES = [
         items: [
           {
             label: "Real attestation on Phala TDX",
-            done: false,
-            note: "Deploy to a real CVM so the two simulated domains flip to pass under a genuine Intel root via dcap-qvl — while receipts still label sim vs real honestly.",
+            done: true,
+            note: "Done. Deployed to real Phala Cloud CVMs; attestation and enclave pass under a genuine Intel root, checked with dcap-qvl. Receipts sealed off-hardware still label themselves simulated.",
           },
         ],
       },

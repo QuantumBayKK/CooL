@@ -74,7 +74,7 @@ export default function AboutPage() {
             <SectionHeader
               eyebrow="Honesty"
               title="We publish what does not work."
-              lead="Two of seven verification domains do not pass today, and both are named on the homepage rather than in a footnote. The readiness ladder below is public, and the build fails if the copy claims a rung above the one we are on."
+              lead="All seven verification domains are verified on Phala Cloud Intel TDX — and the limits of that evidence are published next to it, not in a footnote. The readiness ladder below is public, and the build fails if the copy claims a rung above the one we are on."
             />
             <div className="flex flex-col gap-6">
               <p className="max-w-[64ch] text-sm text-ink-muted">

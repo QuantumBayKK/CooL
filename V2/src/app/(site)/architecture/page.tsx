@@ -121,7 +121,7 @@ export default function ArchitecturePage() {
               {
                 label: "The log operator misbehaves",
                 value:
-                  "Detectable by an external witness — which is not built. Today, against a determined insider at CooL, the log alone is not sufficient. This is Gate 2 and it is not claimed.",
+                  "Detectable by a witness. One now runs in its own Phala CVM with its own enclave-sealed key and refuses forks — but under the same account, so a witness run by another organisation is still Gate 2 and not claimed.",
               },
               {
                 label: "A signing algorithm is broken",

@@ -91,17 +91,17 @@ export function PipelineDiagram() {
           runs on your machine
         </text>
 
-        {/* Attestation, honestly labelled. */}
+        {/* Attestation — real on Phala Cloud Intel TDX. */}
         <Box
           x={690}
           y={92}
           w={186}
           h={44}
           title="Attestation"
-          sub="simulated today"
-          tone="warn"
+          sub="Intel TDX · Phala"
+          tone="accent"
         />
-        <Arrow d="M 783 136 V 162" dashed />
+        <Arrow d="M 783 136 V 162" tone="accent" />
       </svg>
     </Figure>
   );

@@ -240,8 +240,8 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <div class="term__line dom-row" data-dom="inclusion"><span class="m">·</span> inclusion <b class="m">—</b></div>
 <div class="term__line dom-row" data-dom="consistency"><span class="m">·</span> consistency <b class="m">—</b></div>
 <div class="term__line dom-row" data-dom="witness"><span class="m">·</span> witness <b class="m">—</b></div>
-<div class="term__line dom-row" data-dom="attestation"><span class="m">·</span> attestation <b class="k">sim</b></div>
-<div class="term__line dom-row" data-dom="enclave"><span class="m">·</span> enclave <b class="k">sim</b></div>
+<div class="term__line dom-row" data-dom="attestation"><span class="m">·</span> attestation <b class="k">tdx</b></div>
+<div class="term__line dom-row" data-dom="enclave"><span class="m">·</span> enclave <b class="k">tdx</b></div>
 </div>
 <div class="term__line" id="stVerdict" style="margin-top:12px"><span class="m">awaiting verification</span></div>
 </div>
@@ -261,7 +261,7 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <div class="btn-row">
 <a href="#domains" class="btn btn--dark">Read the domains</a>
 </div>
-<p class="note" style="margin-top:24px">The browser signs with ECDSA P-256 because that is what browsers expose natively. Production seals with hybrid <span class="mono">ML-DSA-65 + Ed25519</span>. Attestation and enclave show <span class="mono">sim</span> here only because a browser cannot produce an Intel TDX quote — the SDK running on Phala Cloud does.</p>
+<p class="note" style="margin-top:24px">The browser signs with ECDSA P-256 because that is what browsers expose natively. Production seals with hybrid <span class="mono">ML-DSA-65 + Ed25519</span>. Attestation and enclave are marked <span class="mono">tdx</span> here: they need an Intel TDX quote, which a browser cannot produce. They run and pass on Phala Cloud.</p>
 </div>
 </div>
 </section>

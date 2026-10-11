@@ -161,11 +161,12 @@ function Roadmap() {
       <GateLadder gates={GATES} />
       <Card className="p-5">
         <p className="text-sm text-ink-muted">
-          The hardware items on Gate 1 are the ones no amount of engineering
-          here can close: they need a real Phala TDX deployment, and only a run
-          on real silicon flips those two domains from{" "}
+          The hardware item on Gate 1 is closed: CooL ran on real Phala Cloud
+          Intel TDX, and attestation and enclave moved from{" "}
           <code className="font-mono text-[0.8125rem]">simulated</code> to{" "}
-          <code className="font-mono text-[0.8125rem]">pass</code>.
+          <code className="font-mono text-[0.8125rem]">pass</code> under a
+          genuine Intel root. The raw quotes and tamper tests are published in
+          the cool-sdk repo.
         </p>
       </Card>
     </div>
@@ -322,10 +323,11 @@ const FAQ: readonly { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         Working: deterministic records, hybrid post-quantum signing, an RFC 6962
-        transparency log and an offline verifier. Not working: hardware
-        attestation (reported <code className="font-mono text-[0.8125rem]">simulated</code>)
-        and public anchoring (reported{" "}
-        <code className="font-mono text-[0.8125rem]">absent</code>). Both rules
+        transparency log, an offline verifier, and hardware attestation on Phala
+        Cloud Intel TDX — all seven domains verified on real CVMs, with an
+        attested witness in a second CVM. Not yet: a witness run by a separate
+        organisation, GPU attestation, and public anchoring (reported{" "}
+        <code className="font-mono text-[0.8125rem]">absent</code>). The rules
         are in the verifier, not the copy — you can check this yourself at{" "}
         <Link href="/verify" className="text-accent underline underline-offset-4">
           /verify

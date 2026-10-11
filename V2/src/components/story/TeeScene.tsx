@@ -149,8 +149,8 @@ export function TeeScene() {
               This is a browser, so there is no TDX here and the verifier says so — the
               attestation domain reports <code className="font-mono text-fog">simulated</code>,
               which is a distinct status from <code className="font-mono text-fog">pass</code> and
-              cannot be reached from the UI. Everything else on this page is real; this is the one
-              thing a laptop cannot be.
+              cannot be reached from the UI. On Phala Cloud Intel TDX the same code passes with a
+              real hardware quote; a browser is the one place it cannot.
             </p>
           </div>
           <div className="shrink-0 text-right">

@@ -58,7 +58,7 @@ export const FAQS: readonly Faq[] = [
   },
   {
     q: "What can CooL not prove yet?",
-    a: "Two things, and both are enforced in the verifier rather than in the marketing. Hardware attestation reports as simulated: this build has no vendor-rooted TEE quote, so it cannot prove which machine produced a record. And there is no independent witness co-signing the log, so consistency rests on our log alone. Run the verifier with --require-hardware against a record sealed a minute ago and it refuses. A demo that could only go green would prove nothing.",
+    a: "Hardware attestation is real: all seven domains have been verified on Phala Cloud Intel TDX, with the raw quotes and tamper tests published in the cool-sdk repo. What is not proven yet: a witness run by a separate organisation (ours runs in its own CVM, but under the same account), GPU attestation (the runs are CPU TDX), and public-chain anchoring. Records sealed in your browser are not hardware-backed, and the verifier with --require-hardware refuses them.",
   },
   {
     q: "Why should I believe any of this?",

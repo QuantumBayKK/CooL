@@ -24,8 +24,9 @@ count is measured rather than claimed.
 
 **CooL, for log history.** A transparency log signed only by its operator is
 tamper-evident against outsiders and *not* against the operator. Against a
-determined insider at CooL, today, the log alone is not sufficient. External
-witnesses close this and they are not built.
+determined insider at CooL, the log alone is not sufficient. An attested witness
+now runs in its own Phala CVM with a separate enclave-sealed key, but under the
+same account — a witness operated by another organisation closes this fully.
 
 **The hardware vendor.** A TEE attestation roots in Intel's signing key. If you
 do not trust the vendor, attestation proves nothing to you. No design removes

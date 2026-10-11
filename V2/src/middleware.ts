@@ -110,11 +110,13 @@ function contentSecurityPolicy(
   return [
     `default-src 'self'`,
     scriptSrc,
-    `style-src 'self' 'unsafe-inline'`,
+    // The static marketing pages in public/ load Instrument Serif and Inter from
+    // Google Fonts: the stylesheet from googleapis, the font files from gstatic.
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
     // `www.google-analytics.com` also serves the collection pixel on some
     // transports, which is an image load rather than a fetch.
     `img-src 'self' data: blob:${ga ? " https://www.google-analytics.com" : ""}`,
-    `font-src 'self' data:`,
+    `font-src 'self' data: https://fonts.gstatic.com`,
     // The portal talks to Supabase; nothing else is allowed out. In dev the
     // websocket for HMR is added.
     `connect-src 'self' ${supabase}${gaConnect} ${dev ? "ws: http://127.0.0.1:*" : ""}`,

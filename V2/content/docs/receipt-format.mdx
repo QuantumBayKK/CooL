@@ -60,7 +60,8 @@ the record is signed with, so "attested code" and "signing key" become one chain
 rather than two claims that have to be correlated by trusting somebody.
 
 <Warning>
-`mode` reads `simulated` in every build shipped today. It becomes `hardware`
-only when a genuine vendor-rooted quote is present, and the verifier will not
-report `pass` on this domain without one.
+`mode` reads `hardware` for receipts sealed inside a Phala Cloud Intel TDX CVM
+and `simulated` anywhere else. It becomes `hardware` only when a genuine
+vendor-rooted quote is present, and the verifier will not report `pass` on this
+domain without one.
 </Warning>
