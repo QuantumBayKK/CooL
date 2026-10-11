@@ -88,7 +88,7 @@ export default function Image() {
               display: "flex",
             }}
           >
-            Every AI change — documented, governed and provable. Automatically.
+            Every AI change — captured, sealed and verifiable offline.
           </div>
           <div
             style={{
@@ -99,7 +99,7 @@ export default function Image() {
               display: "flex",
             }}
           >
-            Weeks of manual compliance work, deleted. Costs down by up to 90%.
+            Post-quantum signatures · RFC 6962 log · 7/7 domains verified on Intel TDX via Phala.
           </div>
         </div>
 
@@ -113,10 +113,10 @@ export default function Image() {
           }}
         >
           <div style={{ fontSize: 21, color: "#8b949e", display: "flex" }}>
-            {SITE.company}
+            {SITE.company} · NVIDIA Inception member
           </div>
           <div style={{ fontSize: 21, color: "#3fb950", display: "flex" }}>
-            Verify it yourself — northwindcipher.com/demo
+            npm i -g cool-nwc · northwindcipher.com
           </div>
         </div>
       </div>

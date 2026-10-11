@@ -1,0 +1,6 @@
+Contact: mailto:kailoshkalimuthu@northwindcipher.com
+Contact: mailto:pranauvshrinaath@northwindcipher.com
+Expires: 2027-10-11T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://northwindcipher.com/.well-known/security.txt
+Policy: https://github.com/Northwind-Cipher/cool-sdk/blob/main/SECURITY.md

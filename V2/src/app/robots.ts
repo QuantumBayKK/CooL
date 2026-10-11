@@ -33,18 +33,51 @@ import { SITE } from "@/lib/site";
  *   · absence from the sitemap,
  *   · and, actually, authentication.
  */
+/**
+ * Crawlers that are welcomed by name. They are already covered by `*`; naming
+ * them is a statement of intent for the ones that look for their own group
+ * first, and it keeps the AI answer engines — which increasingly decide whether
+ * a company is "found" at all — explicitly in scope.
+ */
+const NAMED_CRAWLERS = [
+  "Googlebot",
+  "Googlebot-Image",
+  "Bingbot",
+  "DuckDuckBot",
+  "Applebot",
+  "YandexBot",
+  "Baiduspider",
+  "LinkedInBot",
+  "Twitterbot",
+  "facebookexternalhit",
+  "Slackbot",
+  "GPTBot",
+  "OAI-SearchBot",
+  "ChatGPT-User",
+  "ClaudeBot",
+  "Claude-SearchBot",
+  "Claude-User",
+  "PerplexityBot",
+  "Perplexity-User",
+  "Google-Extended",
+  "Applebot-Extended",
+  "CCBot",
+];
+
+/**
+ * Only `/api/` is disallowed: it returns JSON that would be indexed as
+ * gibberish. `/_next/static/` used to be disallowed too, which was wrong —
+ * Google renders pages with their JS and CSS, and blocking those files makes
+ * it see a broken page.
+ */
+const DISALLOW = ["/api/"];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        // Build assets waste crawl budget and never belong in an index. `/api/`
-        // returns JSON that would be indexed as gibberish.
-        disallow: ["/_next/static/chunks/", "/api/"],
-      },
+      { userAgent: "*", allow: "/", disallow: DISALLOW },
+      { userAgent: NAMED_CRAWLERS, allow: "/", disallow: DISALLOW },
     ],
     sitemap: `${SITE.url}/sitemap.xml`,
-    host: SITE.url,
   };
 }

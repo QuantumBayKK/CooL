@@ -72,6 +72,22 @@ const inter = Inter({
   display: "swap",
 });
 
+const ORG_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${SITE.url}/#organization`,
+  name: "Northwind Cipher",
+  legalName: SITE.company,
+  url: `${SITE.url}/`,
+  logo: `${SITE.url}/assets/logo-512.png`,
+  sameAs: ["https://github.com/Northwind-Cipher", SITE.repo, SITE.npm],
+  memberOf: {
+    "@type": "ProgramMembership",
+    programName: "NVIDIA Inception Program",
+    hostingOrganization: { "@type": "Organization", name: "NVIDIA" },
+  },
+}).replace(/</g, "\\u003c");
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
@@ -80,13 +96,47 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   applicationName: SITE.name,
-  authors: [{ name: SITE.company }],
+  authors: [{ name: SITE.company, url: SITE.url }],
+  creator: SITE.company,
+  publisher: SITE.company,
+  category: "technology",
+  keywords: [
+    "AI audit trail",
+    "AI governance",
+    "AI compliance",
+    "verifiable AI",
+    "tamper-evident logs",
+    "post-quantum signatures",
+    "ML-DSA-65",
+    "confidential computing",
+    "Intel TDX",
+    "Phala dstack",
+    "remote attestation",
+    "transparency log",
+    "RFC 6962",
+    "EU AI Act Article 12",
+    "NVIDIA Inception",
+    "Northwind Cipher",
+  ],
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/assets/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: "/assets/apple-touch-icon.png",
+  },
+  alternates: {
+    types: { "text/plain": "/llms.txt" },
+  },
+  formatDetection: { telephone: false },
   openGraph: {
     type: "website",
     siteName: SITE.name,
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
     url: "/",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
@@ -96,7 +146,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 
@@ -136,6 +192,12 @@ export default function RootLayout({
         >
           Skip to content
         </a>
+        {/* The organisation, on every app-rendered page. Same `@id` as the
+            static front door, so crawlers merge them into one entity. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: ORG_JSON_LD }}
+        />
         <Providers>{children}</Providers>
         {/* Renders nothing unless NEXT_PUBLIC_GA_ID is set. */}
         <Analytics />

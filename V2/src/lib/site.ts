@@ -193,7 +193,7 @@ export const FOOTER: readonly NavGroup[] = [
       { label: "Security model", href: "/security" },
       { label: "Readiness ladder", href: "/security/readiness" },
       { label: "Threat model", href: "/docs/threat-model" },
-      { label: "What is simulated", href: "/security#simulated" },
+      { label: "Limits of the evidence", href: "/security#simulated" },
     ],
   },
   {
