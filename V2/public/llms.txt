@@ -2,7 +2,7 @@
 
 > CooL is the black box for AI: a developer SDK, CLI and offline verifier that capture every change to an AI system (prompts, models, policies, tool grants), seal each one as a post-quantum signed, tamper-evident receipt in an append-only transparency log, and let anyone verify it offline, with no account and no trust in the vendor. Hardware attestation runs on Intel TDX through Phala dstack.
 
-Northwind Cipher Pvt. Ltd. (Coimbatore, India) builds CooL. Northwind Cipher is a member of the NVIDIA Inception Program.
+Northwind Cipher Pvt. Ltd. (also written NorthWind Cipher; Coimbatore, India; https://northwindcipher.com) builds CooL. Northwind Cipher is a member of the NVIDIA Inception Program.
 
 ## Key facts
 
@@ -17,7 +17,7 @@ Northwind Cipher Pvt. Ltd. (Coimbatore, India) builds CooL. Northwind Cipher is 
 
 ## Pages
 
-- [Home](https://northwindcipher.com/): product overview, verification domains, market, founders, FAQ
+- [Home](https://northwindcipher.com/): product overview, ecosystem (NVIDIA Inception, Phala, Edgeless Systems), verification domains, founders, FAQ
 - [Pricing](https://northwindcipher.com/pricing): free developer tier, plans, usage pricing; verifying is always free
 - [Studio](https://northwindcipher.com/studio): live in-browser change record you can seal, verify and tamper with
 - [Security model](https://northwindcipher.com/security): threat model, trust boundaries, what is and is not proven

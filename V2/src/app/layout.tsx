@@ -77,6 +77,12 @@ const ORG_JSON_LD = JSON.stringify({
   "@type": "Organization",
   "@id": `${SITE.url}/#organization`,
   name: "Northwind Cipher",
+  alternateName: [
+    "NorthWind Cipher",
+    "Northwind Cipher Pvt Ltd",
+    "NorthWind Cipher Pvt Ltd",
+    "Northwind Cipher CooL",
+  ],
   legalName: SITE.company,
   url: `${SITE.url}/`,
   logo: `${SITE.url}/assets/logo-512.png`,
@@ -91,8 +97,10 @@ const ORG_JSON_LD = JSON.stringify({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.name} — ${SITE.tagline}`,
-    template: `%s — ${SITE.name}`,
+    default: `Northwind Cipher — ${SITE.name}, ${SITE.tagline.toLowerCase()}`,
+    // The company name rides on every title so a search for "Northwind
+    // Cipher" matches any page, not only the front door.
+    template: `%s — ${SITE.name} by Northwind Cipher`,
   },
   description: SITE.description,
   applicationName: SITE.name,
@@ -132,15 +140,15 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false },
   openGraph: {
     type: "website",
-    siteName: SITE.name,
-    title: `${SITE.name} — ${SITE.tagline}`,
+    siteName: `${SITE.name} by Northwind Cipher`,
+    title: `Northwind Cipher — ${SITE.name}, ${SITE.tagline.toLowerCase()}`,
     description: SITE.description,
     url: "/",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE.name} — ${SITE.tagline}`,
+    title: `Northwind Cipher — ${SITE.name}, ${SITE.tagline.toLowerCase()}`,
     description: SITE.description,
   },
   robots: {

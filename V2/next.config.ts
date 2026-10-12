@@ -55,7 +55,23 @@ const nextConfig: NextConfig = {
    * costs nothing to honour and a 404 costs a reader.
    */
   async redirects() {
-    return [{ source: "/pipeline", destination: "/demo", permanent: true }];
+    return [
+      { source: "/pipeline", destination: "/demo", permanent: true },
+      // One origin. `www` served a full duplicate of every page; the canonical
+      // tags pointed at the apex, but a 308 consolidates the signal outright.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.northwindcipher.com" }],
+        destination: "https://northwindcipher.com/:path*",
+        permanent: true,
+      },
+      // The marketing pages were reachable at both `/x` and `/x.html`. The
+      // rewrites below serve the clean URL, so the `.html` form redirects to it.
+      // Redirects match only the incoming request, so these cannot loop with
+      // the rewrites.
+      { source: "/index.html", destination: "/", permanent: true },
+      { source: "/pricing.html", destination: "/pricing", permanent: true },
+    ];
   },
 
   /**
@@ -101,10 +117,8 @@ const nextConfig: NextConfig = {
    * do with the app's `src/`; tsconfig compiles only TypeScript, with `allowJs`
    * off, so nothing there is picked up by the type checker.)
    *
-   * `/pricing.html` needs no entry — the marketing pages link to each other by
-   * that exact name and `public/` serves it directly. `/pricing` is here so
-   * the older, cleaner URL that the sitemap and the site header already point
-   * at keeps resolving.
+   * `/pricing` is the one public address; `/pricing.html` 308s to it (see
+   * `redirects()`), and the marketing pages link to the clean URL.
    */
   async rewrites() {
     return [
