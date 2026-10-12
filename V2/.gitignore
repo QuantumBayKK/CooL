@@ -40,3 +40,4 @@ CLAUDE.md
 # The Studio was delivered as an archive; its contents are vendored into
 # public/studio/. The archive itself is not a build input.
 cool-recorder-studio.zip
+.env*

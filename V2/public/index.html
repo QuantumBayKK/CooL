@@ -60,7 +60,6 @@
 <a href="#product">Product</a>
 <a href="#verify">Verification</a>
 <a href="/pricing.html">Pricing</a>
-<a href="#market">Market</a>
 <a href="#team">Company</a>
 <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub</a>
 </nav>
@@ -77,8 +76,6 @@
 <a href="#verify">Verification</a>
 <a href="/pricing.html">Pricing</a>
 <a href="/studio">Studio</a>
-<a href="#market">Market</a>
-<a href="#compare">Compare</a>
 <a href="#team">Company</a>
 <a href="#faq">FAQ</a>
 <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub ↗</a>
@@ -190,7 +187,7 @@
 <a class="src" href="https://www.nvidia.com/en-us/startups/" target="_blank" rel="noopener">nvidia.com/startups ↗</a>
 </div>
 <div class="eco__item rise" style="--rd:90ms">
-<div class="eco__top"><span class="eco__mark">Phala <small>dstack</small></span><span class="badge badge--real">infrastructure</span></div>
+<div class="eco__top"><span class="eco__mark"><img class="eco__logo" src="/partners/phala.svg" alt="Phala" width="138" height="48" loading="lazy" /><small>dstack</small></span><span class="badge badge--real">infrastructure</span></div>
 <p>Phala provides the confidential-compute infrastructure CooL runs on: Intel TDX confidential VMs through dstack. All seven verification domains are verified on it.</p>
 <a class="src" href="https://github.com/Northwind-Cipher/cool-sdk/blob/main/artifacts/closure-verification-matrix.md" target="_blank" rel="noopener">Read the evidence ↗</a>
 </div>
@@ -506,104 +503,6 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 </div>
 </div>
 </section>
-<section class="band" id="market">
-<div class="wrap">
-<div class="head head--wide" data-reveal>
-<p class="eyebrow">Market</p>
-<h2 class="d2">Where the money for this is forming.</h2>
-</div>
-<div class="market">
-<figure class="rings" data-reveal aria-label="TAM 12 to 15 billion dollars, SAM 2 to 4 billion dollars, SOM 100 to 300 million dollars">
-<svg viewBox="0 0 460 460">
-<circle class="ring ring--tam" cx="230" cy="230" r="212"/>
-<circle class="ring ring--sam" cx="230" cy="230" r="136"/>
-<circle class="ring ring--som" cx="230" cy="230" r="78"/>
-<text class="ring-v" x="230" y="52">$12–15B</text>
-<text class="ring-l" x="230" y="70">TAM · BY 2030</text>
-<text class="ring-v" x="230" y="128">$2–4B</text>
-<text class="ring-l" x="230" y="146">SAM</text>
-<text class="ring-v" x="230" y="228">$100–300M</text>
-<text class="ring-l" x="230" y="246">SOM</text>
-</svg>
-</figure>
-<div data-reveal>
-<div class="mkt">
-<b><i class="dot dot--tam"></i> TAM · $12–15B by 2030</b>
-<p>AI governance and AI-operations software overall — everything enterprises buy to manage, monitor and document AI.</p>
-<span>How we get there: published category forecasts (Grand View Research; Next Move Strategy) at their 2030 horizon, expressed as a range rather than a point.</span>
-</div>
-<div class="mkt">
-<b><i class="dot dot--sam"></i> SAM · $2–4B</b>
-<p>Organisations running production AI in regulated sectors — banking, healthcare, insurance, legal, government — where a provable change record is a requirement, not a nicety.</p>
-<span>How we get there: the regulated, production-AI slice of that category — roughly a fifth to a quarter of TAM, which is where logging and audit obligations actually bind.</span>
-</div>
-<div class="mkt">
-<b><i class="dot dot--som"></i> SOM · $100–300M</b>
-<p>The portion CooL could credibly serve as the neutral evidence layer — not the whole governance suite.</p>
-<span>How we get there: a low single-digit share of SAM, reflecting that CooL sells one specific layer and expects to sit alongside GRC platforms rather than replace them.</span>
-</div>
-<p class="note" style="margin-top:24px">Estimates, not measured benchmarks. Demand today is loudest for records and logging; demand for the specifically cryptographic version is earlier-stage. Our bet is on which standard is already in place when it matures — and the roadmap owns that this is a bet on timing.</p>
-</div>
-</div>
-<div class="head head--wide" style="margin-top:120px" data-reveal>
-<p class="eyebrow">Position</p>
-<h2 class="d2">The unfair advantage</h2>
-</div>
-<div class="grid grid--3">
-<div class="card" data-reveal><p class="eyebrow" style="margin:0">01</p><h3 class="d3">Provider-neutral capture</h3><p class="support" style="font-size:.875rem">The record spans a real enterprise's messy multi-provider reality. A tool tied to one model vendor structurally cannot be the system of record.</p></div>
-<div class="card" data-reveal><p class="eyebrow" style="margin:0">02</p><h3 class="d3">Proof, not storage</h3><p class="support" style="font-size:.875rem">Everyone else keeps evidence in a database you have to trust. Ours verifies offline, with no account and no network.</p></div>
-<div class="card" data-reveal><p class="eyebrow" style="margin:0">03</p><h3 class="d3">Post-quantum from day one</h3><p class="support" style="font-size:.875rem">Hybrid ML-DSA-65 + Ed25519 means evidence sealed today still stands in ten years. Retrofitting that is a rewrite.</p></div>
-<div class="card" data-reveal><p class="eyebrow" style="margin:0">04</p><h3 class="d3">Credibility that checks out</h3><p class="support" style="font-size:.875rem">Published post-quantum research — ML-KEM mapped into IKEv2 in C with liboqs — plus TEE and distributed-systems depth. One click to verify, which is the point.</p></div>
-<div class="card" data-reveal><p class="eyebrow" style="margin:0">05</p><h3 class="d3">Timing and position</h3><p class="support" style="font-size:.875rem">The moat isn't a patent; the primitives are open standards. It's being the neutral standard already integrated when the requirements mature.</p></div>
-<div class="card" data-reveal><p class="eyebrow" style="margin:0">06</p><h3 class="d3">Honesty as architecture</h3><p class="support" style="font-size:.875rem">We publish the raw hardware evidence and its limits side by side. For a product whose promise is "verify it yourself," that is what makes every claim believable.</p></div>
-</div>
-</div>
-</section>
-<section class="band" id="compare">
-<div class="wrap">
-<div class="head head--wide" data-reveal>
-<p class="eyebrow">Landscape</p>
-<h2 class="d2">Everyone tracks AI. No one proves it.</h2>
-<p class="support">These are real, funded, useful companies. Most of them are things CooL sits under rather than replaces — the table is about one specific job, not overall merit.</p>
-</div>
-<div class="tablewrap" data-reveal>
-<table>
-<thead>
-<tr>
-<th>Capability</th>
-<th>AI observability<span>Langfuse, Datadog</span></th>
-<th>Governance / GRC<span>Credo AI, OneTrust</span></th>
-<th>Compliance automation<span>Vanta, Drata</span></th>
-<th>Build in-house</th>
-<th class="us">CooL</th>
-</tr>
-</thead>
-<tbody>
-<tr><td>Auto-captures every AI change</td><td class="p">partial</td><td class="n">no</td><td class="n">no</td><td class="p">manual</td><td class="y us">yes</td></tr>
-<tr><td>Tamper-evident, provable evidence</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="y us">yes</td></tr>
-<tr><td>Neutral across every provider</td><td class="n">no</td><td class="p">partial</td><td class="p">partial</td><td class="p">—</td><td class="y us">yes</td></tr>
-<tr><td>Verifiable with no account or network</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="y us">yes</td></tr>
-<tr><td>Hardware-attested runtime (Intel TDX)</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="y us">yes</td></tr>
-</tbody>
-</table>
-</div>
-<p class="note" style="margin-top:24px" data-reveal>The last row comes from running on Phala dstack — CPU Intel TDX today, no GPU attestation claimed. Confidential-compute platforms prove a single run — they are complementary, not competitors. CooL proves the ongoing history of change across many runs and many providers, and does not host inference.</p>
-</div>
-</section>
-<section class="band band--surface">
-<div class="wrap">
-<div class="head head--wide" data-reveal>
-<p class="eyebrow">Compliance</p>
-<h2 class="d2">What we hold, and what we don't.</h2>
-</div>
-<div class="cells" data-reveal>
-<div class="cell"><b>SOC 2 <span class="badge badge--sim" style="margin-left:6px">not held</span></b><p>CooL is designed to produce the evidence a SOC 2 audit asks for. It does not hold the certification today.</p></div>
-<div class="cell"><b>HIPAA <span class="badge badge--sim" style="margin-left:6px">not held</span></b><p>Same position. The architecture targets the evidence requirements; the attestation of compliance does not exist yet.</p></div>
-<div class="cell"><b>ISO 27001 <span class="badge badge--sim" style="margin-left:6px">not held</span></b><p>Planned alongside the enterprise packaging work, not before it.</p></div>
-<div class="cell"><b>Billing <span class="badge badge--sim" style="margin-left:6px">not live</span></b><p>Launch prices are published in the open on the <a href="/pricing.html" style="border-bottom:1px solid var(--border-2)">pricing page</a>, but hosted billing is not wired yet and no one is paying them.</p></div>
-</div>
-</div>
-</section>
 <section class="band" id="team">
 <div class="wrap">
 <div class="head head--wide rise">
@@ -657,48 +556,6 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 </article>
 </div>
 <p class="note rise" style="margin-top:24px">Nothing here is claimed beyond what is listed, and every line is one click from being checked. On a deep-tech team page, one exaggeration a reader can disprove poisons every true line next to it.</p>
-</div>
-</section>
-<section class="band">
-<div class="wrap">
-<div class="head head--wide" data-reveal>
-<p class="eyebrow">Roadmap</p>
-<h2 class="d2">What is built, what is next, and in what order.</h2>
-</div>
-<div data-reveal>
-<div class="phase">
-<span class="phase__n">01</span>
-<div>
-<h3>SDK and reference integrations</h3>
-<p><span class="mono">npm i -g cool-nwc</span> is live today, with source on <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener" style="border-bottom:1px solid var(--border-2)">GitHub</a>. Automatic capture and the reference integrations are the active build — making it genuinely easy to adopt and proving it works end to end.</p>
-</div>
-<span class="badge badge--real">building</span>
-</div>
-<div class="phase">
-<span class="phase__n">02</span>
-<div>
-<h3>Pilots with regulated-AI teams</h3>
-<p>Scoped deployments with design partners in the sectors that feel the pain, on the hardware tier already validated on Phala Cloud Intel TDX.</p>
-</div>
-<span class="badge badge--sim">next</span>
-</div>
-<div class="phase">
-<span class="phase__n">03</span>
-<div>
-<h3>The enterprise standard</h3>
-<p>Single-tenant and on-prem packaging, the security and certification work, and the org-wide licence motion. We do not hold SOC 2, HIPAA or ISO today — CooL is designed to produce the evidence those audits require.</p>
-</div>
-<span class="badge badge--sim">then</span>
-</div>
-<div class="phase" style="border-bottom:1px solid var(--border)">
-<span class="phase__n">04</span>
-<div>
-<h3>The control plane for enterprise AI</h3>
-<p>Long-term: every change, across every provider, documented, governed and provable. The layer every AI change flows through.</p>
-</div>
-<span class="badge badge--sim">vision</span>
-</div>
-</div>
 </div>
 </section>
 <section class="band" id="faq">
@@ -778,12 +635,10 @@ transparency log <span style="margin-left:auto" id="stSize">0 records</span>
 <a href="/pricing.html">Plans</a>
 <a href="/pricing.html#faq">Pricing FAQ</a>
 <a href="/pricing.html#sales">Enterprise</a>
-<a href="#compare">How we compare</a>
 </div>
 <div>
 <h4>Company</h4>
 <a href="#team">Founders</a>
-<a href="#market">Market</a>
 <a href="#faq">FAQ</a>
 <a href="https://cal.com/coolnwc" target="_blank" rel="noopener">Book a call ↗</a>
 </div>
