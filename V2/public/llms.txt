@@ -6,26 +6,27 @@ Northwind Cipher Pvt. Ltd. (also written NorthWind Cipher; Coimbatore, India; ht
 
 ## Key facts
 
-- Install: `npm i -g cool-nwc` (Node.js 20+). Source: https://github.com/Northwind-Cipher/cool-sdk (BUSL-1.1; cool-nwc 3.0.0 and earlier Apache-2.0).
+- Install: `npm i -g cool-nwc` (Node.js 20+). Library API (3.0.0): `import { CooL, verifyEvidence } from "cool-nwc"`. Source: https://github.com/Northwind-Cipher/cool-sdk (BUSL-1.1; cool-nwc 3.0.0 and earlier Apache-2.0).
 - Signatures: hybrid ML-DSA-65 (FIPS 204) + Ed25519 over canonical CBOR; SHA-256 commitments; sensitive values are salted hashes, never plaintext.
 - Log: RFC 6962 Merkle transparency log with signed tree heads, inclusion and consistency proofs.
 - Seven verification domains, reported separately: binding, signature, inclusion, consistency, witness, attestation, enclave.
 - All seven verified on real Intel TDX hardware on Phala Cloud: raw TDX quotes verified by Phala's attestation service and a local dcap-qvl check, MRTD/RTMR0-3 pinned, report_data bound to the signing key, an 11-row tamper matrix, and a workload-change test. Evidence: https://github.com/Northwind-Cipher/cool-sdk/blob/main/artifacts/closure-verification-matrix.md
-- Stated limits: CPU Intel TDX only (no GPU attestation claimed); the witness ran in a separate CVM under the same account (independent operation not claimed); no SOC 2, ISO 27001 or HIPAA certification is held.
+- Stated limits: CPU Intel TDX only (no GPU attestation claimed); development OS image; no quote-freshness check; the witness ran in a separate CVM under the same account (independent operation not claimed); public-chain anchoring not proven (anchor ABSENT in the hardware verdict); no SOC 2, ISO 27001 or HIPAA certification; billing not live; no paying customers yet.
 - CooL does not host or run models. It is provider-neutral and records what changed.
 - Ecosystem: NVIDIA Inception (member); Phala provides the confidential-compute infrastructure CooL runs on; working towards a collaboration with Edgeless Systems (WirtschaftsWoche Best of Technology 2026, makers of Contrast).
 
 ## Pages
 
-- [Home](https://northwindcipher.com/): product overview, ecosystem (NVIDIA Inception, Phala, Edgeless Systems), verification domains, founders, FAQ
-- [Pricing](https://northwindcipher.com/pricing): free developer tier, plans, usage pricing; verifying is always free
-- [Studio](https://northwindcipher.com/studio): live in-browser change record you can seal, verify and tamper with
-- [Security model](https://northwindcipher.com/security): threat model, trust boundaries, what is and is not proven
-- [Readiness](https://northwindcipher.com/security/readiness): the public gate ladder
-- [How CooL works](https://northwindcipher.com/technology)
-- [Architecture](https://northwindcipher.com/architecture)
-- [Verify a record](https://northwindcipher.com/verify)
-- [Demo](https://northwindcipher.com/demo)
+- [Home](https://northwindcipher.com/): what CooL is, the evidence pipeline, an in-browser verifier you can tamper with, evidence summary, comparison, developer quickstart, dated updates
+- [Verify](https://northwindcipher.com/verify): run the real cool.receipt.v1 verifier in the browser on published vectors, or drop your own receipt (never uploaded)
+- [Evidence](https://northwindcipher.com/evidence): seven-domain table from the Intel TDX runs, 11-row tamper matrix, workload-change test, reproduction steps
+- [Limits](https://northwindcipher.com/limits): everything CooL does not do or has not proven yet, with sources
+- [Developers](https://northwindcipher.com/developers): cool-nwc 3.0.0 quickstart, API, entry points, CLI
+- [Pricing](https://northwindcipher.com/pricing): free developer tier, plans, usage pricing; billing is not live; verifying is always free
+- [Team](https://northwindcipher.com/team): founders
+- [Design partners](https://northwindcipher.com/design-partners): pilot offer and honest expectations
+- [Security](https://northwindcipher.com/security): data flow, key handling, supply chain, responsible disclosure
+- [Studio](https://northwindcipher.com/studio): live in-browser change record
 - [Docs](https://northwindcipher.com/docs): [Quickstart](https://northwindcipher.com/docs/quickstart), [Verify it yourself](https://northwindcipher.com/docs/verify-it-yourself), [Receipt format](https://northwindcipher.com/docs/receipt-format), [Threat model](https://northwindcipher.com/docs/threat-model)
 
 ## Founders

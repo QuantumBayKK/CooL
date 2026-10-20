@@ -49,12 +49,12 @@ export const NAV: readonly (NavItem | NavGroup)[] = [
     items: [
       {
         label: "How CooL works",
-        href: "/technology",
+        href: "/#pipeline",
         description: "Capture, seal, verify — the whole pipeline in order.",
       },
       {
         label: "Architecture",
-        href: "/architecture",
+        href: "/security",
         description: "Where each part runs and which boundary it sits behind.",
       },
       {
@@ -86,7 +86,7 @@ export const NAV: readonly (NavItem | NavGroup)[] = [
   },
   { label: "Docs", href: "/docs" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Company", href: "/about" },
+  { label: "Company", href: "/team" },
 ] as const;
 
 /**
@@ -108,7 +108,7 @@ export const NAV: readonly (NavItem | NavGroup)[] = [
 // in `public/studio/` reached through a rewrite — so it never renders inside
 // this shell at all, and an entry for it would be a rule that can never fire.
 export const FULL_BLEED: readonly string[] = [
-  "/verify",
+  "/walkthrough",
   "/console",
   "/billboard",
 ];
@@ -116,8 +116,9 @@ export const FULL_BLEED: readonly string[] = [
 /**
  * Paths served as static HTML out of `public/` rather than by the app router.
  *
- * `/` and `/pricing` are the marketing site; `/studio` is the CooL Recorder.
- * Each is reached through a rewrite in `next.config.ts`, and this list is the
+ * `/studio` is the CooL Recorder, reached through a rewrite in
+ * `next.config.ts`. (`/` and `/pricing` used to be listed here; they are now
+ * real routes in the `(film)` group.) This list is the
  * other half of that arrangement — the half the React side needs to know
  * about.
  *
@@ -137,7 +138,7 @@ export const FULL_BLEED: readonly string[] = [
  * whole paths, not prefixes, because `/pricing` being static says nothing
  * about a future `/pricing/enterprise` that might be a real route.
  */
-export const STANDALONE: readonly string[] = ["/", "/pricing", "/studio"];
+export const STANDALONE: readonly string[] = ["/studio"];
 
 /**
  * True when `href` points at one of the static surfaces above.
@@ -169,8 +170,8 @@ export const FOOTER: readonly NavGroup[] = [
     label: "Product",
     items: [
       { label: "Run the demo", href: "/demo" },
-      { label: "How CooL works", href: "/technology" },
-      { label: "Architecture", href: "/architecture" },
+      { label: "How CooL works", href: "/#pipeline" },
+      { label: "Architecture", href: "/security" },
       { label: "Verify a record", href: "/verify" },
       { label: "Console", href: "/console" },
       { label: "Studio", href: "/studio" },
@@ -199,8 +200,8 @@ export const FOOTER: readonly NavGroup[] = [
   {
     label: "Company",
     items: [
-      { label: "About", href: "/about" },
-      { label: "Contact", href: "/contact" },
+      { label: "About", href: "/team" },
+      { label: "Contact", href: "/design-partners" },
       { label: "FAQ", href: "/#faq" },
       { label: "Privacy policy", href: "/privacy" },
       { label: "Investor access", href: "/investor" },
@@ -218,19 +219,20 @@ export const FOOTER: readonly NavGroup[] = [
  */
 export const ROUTES = [
   { path: "/", priority: 1, changeFrequency: "weekly" as const },
-  { path: "/technology", priority: 0.95, changeFrequency: "monthly" as const },
-  { path: "/architecture", priority: 0.9, changeFrequency: "monthly" as const },
-  { path: "/security", priority: 0.95, changeFrequency: "monthly" as const },
-  { path: "/security/readiness", priority: 0.85, changeFrequency: "weekly" as const },
   { path: "/verify", priority: 0.95, changeFrequency: "monthly" as const },
-  { path: "/console", priority: 0.8, changeFrequency: "monthly" as const },
-  { path: "/studio", priority: 0.8, changeFrequency: "monthly" as const },
-  { path: "/docs", priority: 0.9, changeFrequency: "weekly" as const },
+  { path: "/evidence", priority: 0.95, changeFrequency: "monthly" as const },
+  { path: "/limits", priority: 0.85, changeFrequency: "monthly" as const },
+  { path: "/developers", priority: 0.9, changeFrequency: "monthly" as const },
   { path: "/pricing", priority: 0.85, changeFrequency: "monthly" as const },
-  { path: "/demo", priority: 0.95, changeFrequency: "monthly" as const },
-  { path: "/about", priority: 0.7, changeFrequency: "monthly" as const },
-  { path: "/contact", priority: 0.7, changeFrequency: "monthly" as const },
+  { path: "/team", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/design-partners", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/security", priority: 0.9, changeFrequency: "monthly" as const },
+  { path: "/security/model", priority: 0.75, changeFrequency: "monthly" as const },
+  { path: "/security/readiness", priority: 0.75, changeFrequency: "weekly" as const },
+  { path: "/demo", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/walkthrough", priority: 0.7, changeFrequency: "monthly" as const },
+  { path: "/console", priority: 0.6, changeFrequency: "monthly" as const },
+  { path: "/studio", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/docs", priority: 0.85, changeFrequency: "weekly" as const },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" as const },
-  // `/thank-you` is deliberately absent: it is `noindex`, and submitting a
-  // noindex URL asks a crawler to index a page that refuses to be indexed.
 ] as const;

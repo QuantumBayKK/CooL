@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Abril_Fatface, Archivo, Inter } from "next/font/google";
-import { GeistMono } from "geist/font/mono";
+import localFont from "next/font/local";
 
 import "./globals.css";
 import { Providers } from "@/app/providers";
@@ -55,6 +55,9 @@ const archivo = Archivo({
   weight: ["500", "600", "700"],
   variable: "--font-archivo",
   display: "swap",
+  // Not preloaded: the film-led pages never render this face, and a preload
+  // on every route competed with their headline font for LCP bandwidth.
+  preload: false,
 });
 
 /** One weight exists, and one is all this should ever be used at. */
@@ -63,6 +66,9 @@ const abril = Abril_Fatface({
   weight: ["400"],
   variable: "--font-abril",
   display: "swap",
+  // Not preloaded: the film-led pages never render this face, and a preload
+  // on every route competed with their headline font for LCP bandwidth.
+  preload: false,
 });
 
 const inter = Inter({
@@ -70,6 +76,23 @@ const inter = Inter({
   weight: ["400", "500", "600"],
   variable: "--font-inter",
   display: "swap",
+  // Not preloaded: the film-led pages never render this face, and a preload
+  // on every route competed with their headline font for LCP bandwidth.
+  preload: false,
+});
+
+/**
+ * Geist Mono, defined here rather than imported from `geist/font/mono` so it
+ * can opt out of preloading (the package preloads 71 KB on every route,
+ * including the film-led pages that never use it).
+ */
+const GeistMono = localFont({
+  src: "../../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2",
+  variable: "--font-geist-mono",
+  adjustFontFallback: false,
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
+  weight: "100 900",
+  preload: false,
 });
 
 const ORG_JSON_LD = JSON.stringify({
