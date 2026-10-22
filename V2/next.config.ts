@@ -75,8 +75,7 @@ const nextConfig: NextConfig = {
       // 308s so inbound links and ranking carry over.
       { source: "/technology", destination: "/#pipeline", permanent: true },
       { source: "/architecture", destination: "/security", permanent: true },
-      { source: "/about", destination: "/team", permanent: true },
-      { source: "/contact", destination: "/design-partners", permanent: true },
+      { source: "/team", destination: "/about", permanent: true },
       { source: "/thank-you", destination: "/", permanent: true },
     ];
   },

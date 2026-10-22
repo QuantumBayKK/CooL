@@ -1,0 +1,41 @@
+---
+title: Gate CI on verification
+description: Fail a pipeline when any receipt does not verify — or when one is only simulated.
+section: Operations
+order: 2
+---
+
+`cool verify` exits non-zero on any failure, so it drops into any CI system as a
+plain step.
+
+## GitHub Actions
+
+```yaml
+- uses: actions/setup-node@v4
+  with:
+    node-version: 20
+- run: npm install -g cool-nwc
+- run: cool verify all
+```
+
+`cool verify all` checks every record in the project's `.cool/receipts/` and
+exits `1` if any fails.
+
+## Require real hardware
+
+Once your evidence is produced inside a confidential VM, make the pipeline
+refuse anything else:
+
+```yaml
+- run: cool verify all --require-hardware
+```
+
+## Hand an auditor one file
+
+```bash
+cool pack build --out audit.json
+cool pack verify audit.json
+```
+
+An audit pack is the artefact an auditor asks for, and they can verify it with
+the same open command, without an account.

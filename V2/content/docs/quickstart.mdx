@@ -1,11 +1,9 @@
 ---
 title: Quickstart
-description: Install the SDK, wire capture into an existing application, and seal your first record.
+description: Install cool-nwc, record your first piece of evidence, and verify it — in five minutes.
 section: Start here
 order: 2
 ---
-
-Five minutes from nothing to a record you can verify offline.
 
 ## Install
 
@@ -13,76 +11,55 @@ Five minutes from nothing to a record you can verify offline.
 npm install cool-nwc
 ```
 
-The CLI is the same package:
+Node 20 or later. ESM. TypeScript declarations included. No native build step,
+no postinstall scripts, no network calls at install or at runtime.
+
+For the `cool` command as well:
 
 ```bash
 npm install -g cool-nwc
-cool --help
 ```
 
-## Connect
-
-`CoolTee.connect` boots an evidence plane. On a laptop or in CI it runs against
-a simulator; in production you pass a `dstack` client and a pinned measurement
-instead.
+## Record and verify
 
 ```ts
-import { CoolTee } from "cool-nwc";
+import { CooL, verifyEvidence } from "cool-nwc";
 
-const cool = await CoolTee.connect({
-  app: { name: "refund-agent", imageDigest: process.env.IMAGE_DIGEST! },
-  backend: async ({ model, prompt, params }) => ({
-    output: await yourModel(model, prompt, params),
-  }),
+const cool = new CooL({ applicationId: "my-app" });
+
+const { evidence } = await cool.record({
+  type: "model.execution",
+  metadata: { model: "my-model", version: "1.0.0" },
+  // optional — commit to sensitive data without storing it
+  payloads: { input: "the request", output: "the response" },
 });
+
+const verdict = await verifyEvidence(evidence);
+console.log(verdict.ok);                       // true
+console.log(verdict.checks.signature.status);  // "pass"
 ```
 
-<Note>
-The `backend` function is your existing inference call, unchanged. CooL wraps it
-rather than replacing it, and it is never in the critical path — if the evidence
-plane is unavailable your completion still returns.
-</Note>
+`new CooL()` does no I/O. The first `record()` connects the evidence plane.
+With no `attestation.provider` it runs the **built-in simulator** — the same
+code path, clearly labelled `simulated` in every receipt, and never `pass` on a
+hardware-dependent domain.
 
-## Seal a change
+Metadata and every `payloads` value are committed as salted hashes and
+discarded: the receipt carries no plaintext.
 
-```ts
-await cool.change({
-  kind: "prompt",
-  ref: "billing/refund-agent#system",
-  before: previousPrompt,
-  after: nextPrompt,
-  actor: { id: "ci:github-actions", method: "oidc" },
-});
-```
-
-That call commits the change, binds a SHA-256 digest, signs with ML-DSA-65 and
-Ed25519, and appends an RFC 6962 leaf. It returns once the record is sealed.
-
-## Verify it
+## Try to break it
 
 ```bash
-cool verify .cool/receipts/latest.json --offline
+cool seal prompt billing/agent#system "Approve refunds up to $500."
+cool verify last
 ```
 
-## Going to production
+Now edit one character inside the receipt file in `.cool/receipts/` and run
+`cool verify last` again: `binding` and `signature` both fail, and the command
+exits non-zero.
 
-Two things change, and nothing else:
+## Next
 
-```ts
-const cool = await CoolTee.connect({
-  dstack: new HttpDstackClient({
-    endpoint: "/var/run/dstack.sock",
-    vendor: "intel-tdx",
-  }),
-  expectedMeasurement: PINNED_MEASUREMENT,
-  policy: {
-    expectedMeasurement: PINNED_MEASUREMENT,
-    allowSimulated: false,
-    requireVendor: ["intel-tdx"],
-  },
-});
-```
-
-There is no signing key to configure, and there cannot be one — it is derived
-inside the enclave from the measurement. That is exactly why CooL cannot forge
-your records.
+- [Verify it yourself](/docs/verify-it-yourself)
+- [SDK reference](/docs/sdk)
+- [Going to production](/docs/production)

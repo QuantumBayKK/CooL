@@ -1,45 +1,47 @@
 import Link from "next/link";
 
-import { BOOKING_URL, NPM_URL, REPO_URL } from "@/content/claims";
+import { NPM_URL, REPO_URL } from "@/content/claims";
 
 import { RecorderMark, Wordmark } from "./RecorderMark";
 
 const COLS: readonly { title: string; links: readonly { href: string; label: string; ext?: boolean }[] }[] = [
   {
-    title: "Product",
+    title: "Platform",
     links: [
-      { href: "/developers#receipt", label: "Receipts" },
-      { href: "/verify", label: "Verifier" },
-      { href: "/evidence#attestation", label: "Attestation" },
-      { href: "/evidence#log", label: "Transparency log" },
-      { href: "/pricing", label: "Pricing" },
-    ],
-  },
-  {
-    title: "Trust",
-    links: [
-      { href: "/evidence", label: "Evidence" },
-      { href: "/limits", label: "Limits" },
+      { href: "/platform-tour", label: "Platform tour" },
+      { href: "/deploy/phala", label: "Deploy on Phala" },
       { href: "/security", label: "Security" },
-      { href: "/security/readiness", label: "Readiness" },
+      { href: "/use-cases", label: "Use cases" },
+      { href: "/pricing", label: "Pricing" },
     ],
   },
   {
     title: "Developers",
     links: [
-      { href: "/developers", label: "Quickstart" },
       { href: "/docs", label: "Documentation" },
+      { href: "/docs/quickstart", label: "Quickstart" },
+      { href: "/docs/cli", label: "CLI reference" },
+      { href: "/verify", label: "Verifier" },
       { href: "/studio", label: "Studio" },
       { href: REPO_URL, label: "GitHub", ext: true },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      { href: "/blog", label: "Blog" },
+      { href: "/faq", label: "FAQ" },
+      { href: "/evidence", label: "Evidence" },
+      { href: "/limits", label: "Limits" },
       { href: NPM_URL, label: "npm", ext: true },
     ],
   },
   {
     title: "Company",
     links: [
-      { href: "/team", label: "About" },
+      { href: "/about", label: "About" },
       { href: "/design-partners", label: "Design partners" },
-      { href: BOOKING_URL, label: "Book a demo", ext: true },
+      { href: "/contact", label: "Book a demo" },
     ],
   },
   {

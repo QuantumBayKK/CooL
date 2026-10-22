@@ -1,0 +1,52 @@
+---
+title: Going to production
+description: Move from the simulator to Intel TDX on Phala Cloud, pin the image you reviewed, and refuse simulated evidence.
+section: Operations
+order: 1
+---
+
+Three things change. Point the SDK at the dstack guest agent inside your
+confidential VM, so quotes come from silicon instead of the simulator. Chain
+those quotes to Intel rather than merely reporting them. And pin the
+measurement of the image you reviewed.
+
+With a pin, a quote proves "the code we approved". Without one it proves "some
+TEE", which is a much weaker sentence. The pin lives in version control next to
+the code it pins, so updating it requires a human who looked at the diff.
+
+## Configure the client
+
+```ts
+import { CooL } from "cool-nwc";
+
+const cool = new CooL({
+  applicationId: "refund-agent",
+  attestation: { provider: "dstack" },          // or set $COOL_DSTACK_ENDPOINT
+  security: {
+    requireAttestation: true,
+    expectedMeasurement: PINNED_MEASUREMENT,    // the image you reviewed
+  },
+});
+```
+
+`attestation.endpoint` defaults to `$COOL_DSTACK_ENDPOINT`, then
+`/var/run/dstack.sock`.
+
+## Refuse simulated evidence everywhere
+
+Turn on `--require-hardware` in every check your pipeline runs:
+
+```bash
+cool verify all --require-hardware
+```
+
+From that point a simulated receipt is not acceptable evidence anywhere in your
+estate.
+
+## Where this has been run
+
+CooL's hardware path was verified on two Phala Cloud `tdx.small` CVMs: all seven
+domains, an 11-row tamper matrix and a workload-change test. See
+[Evidence](/evidence). The limits stated with that run apply: CPU Intel TDX
+only, a development OS image, attestation verification online through Phala's
+service, and no quote-freshness check — see [Limits](/limits).

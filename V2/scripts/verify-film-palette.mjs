@@ -75,8 +75,39 @@ for (const [fg, bg] of PAIRS) {
   if (!ok) fail++;
   console.log(`  ${ok ? "PASS" : "FAIL"}  ${fg.padEnd(11)} on ${bg.padEnd(11)} ${r.toFixed(2)}:1`);
 }
+// Dark theme: the same token names, overridden in film-extra.css.
+const extra = readFileSync(fileURLToPath(new URL("../src/app/(film)/film-extra.css", import.meta.url)), "utf8");
+const darkStart = extra.indexOf(':root[data-theme="dark"] .film {');
+const darkBlock = extra.slice(darkStart, extra.indexOf("}", darkStart));
+const darkTok = {
+  ...tok,
+  ...Object.fromEntries([...darkBlock.matchAll(/--([\w-]+):\s*(#[0-9a-f]{6})\b/gi)].map((m) => [m[1], m[2]])),
+};
+const DARK = [
+  ["ink", "bg"],
+  ["ink", "bg-2"],
+  ["ink-2", "bg"],
+  ["ink-2", "bg-2"],
+  ["ink-3", "bg"],
+  ["ink-3", "bg-2"],
+  ["brand", "bg"],
+  ["brand", "bg-2"],
+  ["#0b1220", "brand"],
+  ["on-dark", "dark"],
+  ["on-dark-2", "dark"],
+];
+console.log("\n  dark theme");
+for (const [fg, bg] of DARK) {
+  const a = fg.startsWith("#") ? fg : darkTok[fg];
+  const b = bg.startsWith("#") ? bg : darkTok[bg];
+  const r = ratio(a, b);
+  const ok = r >= 4.5;
+  if (!ok) fail++;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  ${fg.padEnd(11)} on ${bg.padEnd(11)} ${r.toFixed(2)}:1`);
+}
+
 if (fail) {
   console.error(`\n  ${fail} pair(s) below WCAG AA 4.5:1`);
   process.exit(1);
 }
-console.log(`\n  ${PAIRS.length}/${PAIRS.length} text pairs pass WCAG AA`);
+console.log(`\n  all ${PAIRS.length + DARK.length} text pairs (light + dark) pass WCAG AA`);

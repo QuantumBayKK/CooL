@@ -1,0 +1,21 @@
+---
+title: "Showing one field without showing the record"
+description: "Commitments are salted, and the salt is stored in the receipt."
+section: Concepts
+order: 8
+---
+
+Commitments are salted, and the salt is stored in the receipt. That is what makes selective disclosure possible: reveal the plaintext and its salt for one field, and anyone can recompute the commitment and compare.
+
+One field opens. The rest of the record stays closed, and no other record is affected — salts are per field and per record. Once disclosed, though, that field is disclosed permanently.
+
+This proves the value was committed, not that it was used. The rest of the record is what says it was used.
+
+## Related
+
+- `cool help disclose`
+- `cool help receipts`
+
+<Note>
+This page is the same text the CLI prints for `cool help disclosure` (cool-nwc 3.0.0).
+</Note>

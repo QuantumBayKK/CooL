@@ -1,0 +1,22 @@
+---
+title: "Attestation, and what it is not"
+description: "A confidential VM can produce a quote: a statement signed by the CPU saying 'this measurement is running, and here are 64 bytes it asked me to include."
+section: Concepts
+order: 6
+---
+
+A confidential VM can produce a quote: a statement signed by the CPU saying 'this measurement is running, and here are 64 bytes it asked me to include'. CooL spends those 64 bytes on a commitment to the public half of its signing key.
+
+That single decision is what ties the two halves together. A verifier recomputes the commitment from the receipt's own key directory: if it matches, the code that was attested is the code that holds the signing key.
+
+What a quote does not prove: that the output was correct, fair or safe. And on a machine with no TEE, the quote is produced by the built-in simulator under a CooL-held root — structurally complete, cryptographically real, and worth nothing as evidence of confidentiality. The verifier reports that as `simulated`, never as `pass`. `--require-hardware` refuses it outright.
+
+## Related
+
+- `cool help status`
+- `cool help attest`
+- `cool help verifier`
+
+<Note>
+This page is the same text the CLI prints for `cool help attestation` (cool-nwc 3.0.0).
+</Note>

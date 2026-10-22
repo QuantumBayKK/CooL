@@ -86,7 +86,7 @@ export const NAV: readonly (NavItem | NavGroup)[] = [
   },
   { label: "Docs", href: "/docs" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Company", href: "/team" },
+  { label: "Company", href: "/about" },
 ] as const;
 
 /**
@@ -200,7 +200,7 @@ export const FOOTER: readonly NavGroup[] = [
   {
     label: "Company",
     items: [
-      { label: "About", href: "/team" },
+      { label: "About", href: "/about" },
       { label: "Contact", href: "/design-partners" },
       { label: "FAQ", href: "/#faq" },
       { label: "Privacy policy", href: "/privacy" },
@@ -224,7 +224,13 @@ export const ROUTES = [
   { path: "/limits", priority: 0.85, changeFrequency: "monthly" as const },
   { path: "/developers", priority: 0.9, changeFrequency: "monthly" as const },
   { path: "/pricing", priority: 0.85, changeFrequency: "monthly" as const },
-  { path: "/team", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/about", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/platform-tour", priority: 0.9, changeFrequency: "monthly" as const },
+  { path: "/deploy/phala", priority: 0.85, changeFrequency: "monthly" as const },
+  { path: "/use-cases", priority: 0.85, changeFrequency: "monthly" as const },
+  { path: "/blog", priority: 0.75, changeFrequency: "weekly" as const },
+  { path: "/faq", priority: 0.75, changeFrequency: "monthly" as const },
+  { path: "/contact", priority: 0.7, changeFrequency: "yearly" as const },
   { path: "/design-partners", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/security", priority: 0.9, changeFrequency: "monthly" as const },
   { path: "/security/model", priority: 0.75, changeFrequency: "monthly" as const },

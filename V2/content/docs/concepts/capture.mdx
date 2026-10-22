@@ -1,0 +1,19 @@
+---
+title: "What CooL costs your application"
+description: "The SDK's capture call is an array push behind an async queue: measured p99 well under a millisecond on the caller's thread."
+section: Concepts
+order: 10
+---
+
+The SDK's capture call is an array push behind an async queue: measured p99 well under a millisecond on the caller's thread. It never awaits, never throws into your code, and never grows without bound — past its limit it drops the oldest events and counts them.
+
+If the evidence plane is unreachable, your request still succeeds. The loss shows up in `cool stats` and in your metrics, never in your latency. Fail-open toward the application, fail-closed toward the network: nothing is transmitted to an endpoint that has not attested.
+
+## Related
+
+- `cool help stats`
+- `cool help status`
+
+<Note>
+This page is the same text the CLI prints for `cool help capture` (cool-nwc 3.0.0).
+</Note>

@@ -1,0 +1,21 @@
+---
+title: "Why witnesses exist"
+description: "A log signed only by its operator proves the operator has not contradicted themselves."
+section: Concepts
+order: 5
+---
+
+A log signed only by its operator proves the operator has not contradicted themselves. It cannot prove they never showed a different tree to somebody else, because the same key can sign two different trees.
+
+A witness is anyone independent who signs the tree heads they saw. Once a witness has co-signed size 40, producing a different size-40 tree requires forging their signature too.
+
+CooL's own self-signature is shown on every tree head and NEVER counted as independent — the verifier has enforced that since v1. `cool witness cosign` is how the count becomes non-zero honestly.
+
+## Related
+
+- `cool help witness`
+- `cool help log-concept`
+
+<Note>
+This page is the same text the CLI prints for `cool help witnesses` (cool-nwc 3.0.0).
+</Note>

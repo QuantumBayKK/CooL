@@ -1,0 +1,44 @@
+---
+title: cool-nwc 3.0.0 — a smaller front door
+summary: The default import is now two things — CooL and verifyEvidence — with the advanced confidential-compute tier behind its own entry point.
+date: 2026-10-22
+author: Northwind Cipher
+source: registry.npmjs.org/cool-nwc · cool-nwc 3.0.0 README
+---
+
+cool-nwc 3.0.0 was published to npm on 11 September 2026. The headline change is the shape of the API: most
+applications need to record evidence and verify it, and the default entry point
+now says exactly that.
+
+```ts
+import { CooL, verifyEvidence } from "cool-nwc";
+
+const cool = new CooL({ applicationId: "my-app" });
+const { evidence } = await cool.record({ type: "model.execution" });
+const verdict = await verifyEvidence(evidence);
+```
+
+## Where everything else went
+
+| Import | Contents |
+| --- | --- |
+| `cool-nwc` | `CooL`, `verifyEvidence`, `formatVerdict`, typed errors, crypto primitives |
+| `cool-nwc/verify` | the standalone verifier only |
+| `cool-nwc/phala` | `CoolTee`, dstack clients, quote / anchor / witness / policy / disclosure |
+| `cool-nwc/node` | filesystem-backed log, unix-socket transport |
+| `cool-nwc/tee` | everything, in one import |
+
+## Unchanged on purpose
+
+- No network calls of its own and no telemetry.
+- No native build step and no postinstall scripts.
+- Five runtime dependencies.
+- The simulator still labels every receipt `simulated`, and the verifier still
+  never reports a simulated domain as `pass`.
+
+## Licence
+
+cool-nwc 3.0.0 and earlier were published under Apache-2.0. The current
+cool-sdk source is available under the Business Source License 1.1.
+
+Start with the [quickstart](/docs/quickstart) or the [SDK reference](/docs/sdk).

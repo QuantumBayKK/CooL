@@ -15,12 +15,20 @@ history; the pixel-film treatment was retired in Oct 2026.)
 | `/limits` | Every limitation from the claim registry, with source and check date |
 | `/developers` | cool-nwc 3.0.0 quickstart, API, entry points, CLI |
 | `/pricing` | Launch pricing; billing status; PLANNED markers on unbuilt features |
-| `/team` | Founders, ecosystem |
+| `/about` | Mission, company facts, founders, ecosystem (`/team` 308s here) |
+| `/platform-tour` | Capture → seal → log → attest → verify, with real CLI commands |
+| `/deploy/phala` | Running on Intel TDX via Phala dstack, with limits |
+| `/use-cases` | Where CooL fits — explicitly not customer stories |
+| `/docs/*` | MDX docs in `content/docs` (concepts and CLI reference generated from the cool-nwc 3.0.0 manual in `content/cli-manual.json`) |
+| `/blog`, `/blog/*` | MDX posts in `content/blog`, each with a `source` |
+| `/faq`, `/contact` | FAQ from the claim registry; booking link and emails, no form |
 | `/design-partners` | Pilot offer and expectations; booking link only, no form |
 | `/security` | Data flow, key handling, supply chain, disclosure |
 | 404 | `src/app/not-found.tsx` |
 
-Older surfaces keep their own shell: `/docs`, `/demo`, `/walkthrough`,
+Navbar mirrors the reference structure: announcement bar, Platform ▾ (tour, deploy, security), Docs, Use cases, Pricing, Resources ▾ (blog, FAQ, about), theme toggle (light/dark, saved), Studio, Book a demo.
+
+Older surfaces keep their own shell: `/demo`, `/walkthrough`,
 `/console`, `/studio`, `/security/model`, `/security/readiness`, `/privacy`,
 the investor room and admin. Retired routes 308: `/technology → /#pipeline`,
 `/architecture → /security`, `/about → /team`, `/contact → /design-partners`,

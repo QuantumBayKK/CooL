@@ -1,0 +1,76 @@
+---
+title: SDK reference
+description: The cool-nwc 3.0.0 API — CooL, record, verifyEvidence, options, entry points and errors.
+section: Reference
+order: 1
+---
+
+## Entry points
+
+| Import | Contents |
+| --- | --- |
+| `cool-nwc` | `CooL`, `verifyEvidence`, `formatVerdict`, typed errors, crypto primitives |
+| `cool-nwc/verify` | the standalone verifier only |
+| `cool-nwc/phala` | the advanced tier: `CoolTee`, dstack clients, quote / anchor / witness / policy / disclosure |
+| `cool-nwc/node` | filesystem-backed transparency log, unix-socket transport |
+| `cool-nwc/tee` | everything, in one import |
+
+## new CooL(options?)
+
+| Option | Type | Default |
+| --- | --- | --- |
+| `applicationId` | `string` | `"cool-app"` |
+| `attestation.provider` | `"local"` or `"dstack"` | `"local"` (or `"dstack"` if `$COOL_DSTACK_ENDPOINT` is set) |
+| `attestation.endpoint` | `string` | `$COOL_DSTACK_ENDPOINT`, then `/var/run/dstack.sock` |
+| `security.requireAttestation` | `boolean` | `false` |
+| `security.expectedMeasurement` | `Measurement` | none — pin the image you approved |
+
+`new CooL()` does no I/O. Also available: `cool.ready()`, `cool.flush()`,
+`cool.close()`, and the getters `cool.attestation` (RA-TLS transcript),
+`cool.keyDirectory`, `cool.environment`, `cool.evidence`.
+
+## cool.record(input)
+
+```ts
+const { evidence, recordId, executionId, digest } = await cool.record({
+  type: "model.execution",
+  executionId,   // optional
+  metadata,      // optional, committed as salted hashes
+  payloads,      // optional, committed as salted hashes and discarded
+  software,      // optional
+  gpu,           // optional
+});
+```
+
+## verifyEvidence(evidence, options?)
+
+Also available as `cool.verify(evidence, options?)`. Returns a structured
+verdict — never a bare boolean:
+
+```ts
+{
+  ok: false,
+  checks: { binding, signature, inclusion, witnesses, attestation, enclave, anchor },
+  reasons: ["signature: ML-DSA-65 did not verify …"],
+}
+```
+
+Each domain fails independently. `options.requireHardware` and
+`options.expectedMeasurement` turn simulator receipts and image mismatches into
+`ok: false`.
+
+## Errors
+
+Errors are typed — `CooLError` and its subclasses `ConfigurationError`,
+`DstackUnavailableError`, `AttestationRequiredError`, `AttestationError`,
+`EvidenceError`, `ClosedError` — each with a stable `code` and an `action`
+telling you what to do about it.
+
+## Cryptography
+
+Hybrid **ML-DSA-65** (FIPS 204) and **Ed25519** signatures — both must verify.
+SHA-256 commitments over canonical CBOR. An RFC 6962 Merkle transparency log
+with signed tree heads, inclusion and consistency proofs. The primitives are
+exported from the main entry point: `canonicalCbor`, `sha256Bytes`,
+`saltedCommit`, `hybridSign`, `hybridVerify`, `merkleRoot`, `inclusionProof`,
+`verifyInclusion`, `consistencyProof`, `verifyConsistency`, `MemoryLog`.

@@ -1,0 +1,25 @@
+---
+title: "What this tool is about"
+description: "CooL records what a system did and what was changed about it, in a way that someone who does not trust you can check."
+section: Concepts
+order: 1
+---
+
+CooL records what a system did and what was changed about it, in a way that someone who does not trust you can check. Two record types: an evidence record (an event type plus committed metadata and payloads) and a change (a prompt, a model version, a permission).
+
+Nothing sensitive is stored. Metadata, inputs, outputs and diffs are committed as salted hashes; the plaintext is hashed and discarded. A receipt can therefore be handed to a regulator without handing over a customer's data.
+
+Each record is signed with a key that is derived inside a confidential VM from the measurement of the code running there. Ship different code and the key changes. That is what makes 'the vendor cannot forge your evidence' a mechanism rather than a promise.
+
+Records are appended to a transparency log, so removing one later is detectable. And the verifier is offline: it needs the bytes and nothing else.
+
+## Related
+
+- `cool help receipts`
+- `cool help attestation`
+- `cool help log-concept`
+- `cool help verifier`
+
+<Note>
+This page is the same text the CLI prints for `cool help concepts` (cool-nwc 3.0.0).
+</Note>

@@ -17,17 +17,15 @@ Northwind Cipher Pvt. Ltd. (also written NorthWind Cipher; Coimbatore, India; ht
 
 ## Pages
 
-- [Home](https://northwindcipher.com/): what CooL is, the evidence pipeline, an in-browser verifier you can tamper with, evidence summary, comparison, developer quickstart, dated updates
-- [Verify](https://northwindcipher.com/verify): run the real cool.receipt.v1 verifier in the browser on published vectors, or drop your own receipt (never uploaded)
-- [Evidence](https://northwindcipher.com/evidence): seven-domain table from the Intel TDX runs, 11-row tamper matrix, workload-change test, reproduction steps
-- [Limits](https://northwindcipher.com/limits): everything CooL does not do or has not proven yet, with sources
-- [Developers](https://northwindcipher.com/developers): cool-nwc 3.0.0 quickstart, API, entry points, CLI
-- [Pricing](https://northwindcipher.com/pricing): free developer tier, plans, usage pricing; billing is not live; verifying is always free
-- [Team](https://northwindcipher.com/team): founders
-- [Design partners](https://northwindcipher.com/design-partners): pilot offer and honest expectations
-- [Security](https://northwindcipher.com/security): data flow, key handling, supply chain, responsible disclosure
-- [Studio](https://northwindcipher.com/studio): live in-browser change record
-- [Docs](https://northwindcipher.com/docs): [Quickstart](https://northwindcipher.com/docs/quickstart), [Verify it yourself](https://northwindcipher.com/docs/verify-it-yourself), [Receipt format](https://northwindcipher.com/docs/receipt-format), [Threat model](https://northwindcipher.com/docs/threat-model)
+- [Home](https://northwindcipher.com/): what CooL is, the hardware verification result, how it works, live verifier, evidence, FAQ
+- [Platform tour](https://northwindcipher.com/platform-tour): capture, seal, log, attest, verify — with the CLI commands
+- [Deploy on Phala](https://northwindcipher.com/deploy/phala): running CooL inside Intel TDX via dstack, and its limits
+- [Security](https://northwindcipher.com/security): data flow, key handling, supply chain, disclosure
+- [Docs](https://northwindcipher.com/docs): quickstart, concepts, SDK reference, CLI reference, production, CI
+- [Use cases](https://northwindcipher.com/use-cases): where verifiable AI change records matter (no customer case studies yet)
+- [Pricing](https://northwindcipher.com/pricing): launch prices; billing not live; verifying always free
+- [Blog](https://northwindcipher.com/blog) · [FAQ](https://northwindcipher.com/faq) · [About](https://northwindcipher.com/about) · [Contact](https://northwindcipher.com/contact)
+- [Verify](https://northwindcipher.com/verify) · [Evidence](https://northwindcipher.com/evidence) · [Limits](https://northwindcipher.com/limits)
 
 ## Founders
 

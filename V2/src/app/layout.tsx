@@ -204,13 +204,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // No `suppressHydrationWarning` on <html>: it was there only to excuse the
-  // theme script mutating the element before React attached. With that script
-  // gone the server and client trees agree exactly, and leaving the escape
-  // hatch in place would silence real hydration mismatches site-wide.
+  // `suppressHydrationWarning` on <html> only: the public site's pre-paint
+  // script (src/app/(film)/layout.tsx) sets data-theme on this element before
+  // React attaches, to avoid a theme flash. It covers this element's own
+  // attributes, not its children, so real mismatches elsewhere still surface.
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${archivo.variable} ${abril.variable} ${inter.variable} ${GeistMono.variable}`}
     >
       <body className="min-h-dvh bg-canvas text-ink antialiased">

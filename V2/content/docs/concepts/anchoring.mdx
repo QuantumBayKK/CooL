@@ -1,0 +1,24 @@
+---
+title: "Why anchor to Bitcoin"
+description: "Six of the seven domains are signatures, and a signature says 'someone holding this key asserts X'."
+section: Concepts
+order: 7
+---
+
+Six of the seven domains are signatures, and a signature says 'someone holding this key asserts X'. It does not say when. Whoever holds the key can produce one at any time, including about a past they would prefer — which is exactly the attack a transparency log is supposed to rule out.
+
+A block header cannot be backdated. Commit the tree head into one and the head provably existed before that block was mined, no matter who later obtains the key. That is the one property cryptography alone cannot give you.
+
+CooL uses OpenTimestamps: the head's root hash goes to four independently operated public calendars, which aggregate submissions into a single Bitcoin transaction about once an hour. The cost is nothing and the proof is a standard `.ots` file, so `cool anchor export` gives an auditor something they can check with the reference tool and a Bitcoin node, without running any CooL code.
+
+One submission covers every record in the log up to that size, because the head commits to all of them. Anchoring per-record would be thousands of transactions proving nothing extra.
+
+## Related
+
+- `cool help anchor`
+- `cool help log`
+- `cool help verifier`
+
+<Note>
+This page is the same text the CLI prints for `cool help anchoring` (cool-nwc 3.0.0).
+</Note>
