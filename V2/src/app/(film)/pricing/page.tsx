@@ -130,7 +130,7 @@ const FAQ = [
 export default function PricingPage() {
   return (
     <>
-      <PageHead label="[ Pricing ]" title="Start free. Pay only to seal." lead="Verifying is always free — offline, with no account, for anyone.">
+      <PageHead label="Pricing" title="Start free. Pay only to seal." lead="Verifying is always free — offline, with no account, for anyone.">
         <HudFrame index="Billing status" meta={<StatusChip status="ABSENT" />}>
           <p className="f-h3">{claim("billing")}</p>
           <p className="f-body f-small" style={{ marginTop: 10 }}>
@@ -140,7 +140,7 @@ export default function PricingPage() {
         </HudFrame>
       </PageHead>
 
-      <section className="f-section f-section--flush" style={{ paddingTop: 0 }} aria-label="Plans">
+      <section className="f-section f-section--flush" aria-label="Plans">
         <div className="f-wrap">
           <ul className="f-grid" style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {PLANS.map((p) => (
@@ -180,7 +180,7 @@ export default function PricingPage() {
         <div className="f-wrap">
           <SectionHead
             id="p-meter"
-            label="[ The meter ]"
+            label="The meter"
             title="One unit: a sealed change."
             lead="You are billed only for changes that successfully seal. One record, one unit."
           />
@@ -208,7 +208,7 @@ export default function PricingPage() {
           </div>
           <div className="f-grid" style={{ marginTop: 56 }}>
             <div className="f-span-6">
-              <h3 className="f-label">[ Volume discounts, applied automatically ]</h3>
+              <h3 className="f-label">Volume discounts, applied automatically</h3>
               <table className="f-table" style={{ marginTop: 16 }}>
                 <tbody>
                   {VOLUME.map(([v, p]) => (
@@ -231,7 +231,7 @@ export default function PricingPage() {
 
       <section className="f-section" aria-labelledby="p-bills">
         <div className="f-wrap">
-          <SectionHead id="p-bills" label="[ In practice ]" title="What a bill looks like." lead="Three shapes of usage, worked through. Verification is $0 in every one." />
+          <SectionHead id="p-bills" label="In practice" title="What a bill looks like." lead="Three shapes of usage, worked through. Verification is $0 in every one." />
           <div className="f-grid" style={{ marginTop: 48 }}>
             {BILLS.map((b) => (
               <HudFrame key={b.name} className="f-span-4 f-hud--fill">
@@ -262,7 +262,7 @@ export default function PricingPage() {
       <section className="f-section" aria-labelledby="p-faq">
         <div className="f-wrap f-grid">
           <h2 id="p-faq" className="f-label f-span-3">
-            [ Pricing questions ]
+            Pricing questions
           </h2>
           <div className="f-span-8">
             {FAQ.map(([q, a]) => (

@@ -1,41 +1,59 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BlackBoxHero } from "@/components/film/BlackBoxHero";
-import { CopyCommand } from "@/components/film/CopyCommand";
+import { CodeTabs } from "@/components/film/CodeTabs";
 import { Ecosystem } from "@/components/film/Ecosystem";
 import { EvidenceSequence } from "@/components/film/EvidenceSequence";
-import { FlightTape } from "@/components/film/FlightTape";
+import { Hero } from "@/components/film/Hero";
 import { HudFrame, StatusChip } from "@/components/film/HudFrame";
-import { RecorderSequence } from "@/components/film/RecorderSequence";
+import { Icon, IconTile } from "@/components/film/Icons";
 import { Reveal } from "@/components/film/Reveal";
 import { SectionHead } from "@/components/film/SectionHead";
-import { SplitFlapCounter } from "@/components/film/SplitFlapCounter";
 import { VerdictTerminal } from "@/components/film/VerdictTerminal";
 import { BOOKING_URL, CLAIMS, EVIDENCE_URL, claim } from "@/content/claims";
-import {
-  AUDIENCES,
-  COMPARISON,
-  FINAL,
-  PRODUCTS,
-  QUESTIONS,
-  STATEMENT,
-  UPDATES,
-} from "@/content/copy";
+import { AUDIENCES, COMPARISON, FAQ, PRODUCTS, QUESTIONS, STATEMENT, UPDATES } from "@/content/copy";
 
 export const metadata: Metadata = {
-  title: { absolute: "Northwind Cipher — CooL, the flight recorder for AI change" },
+  title: { absolute: "Northwind Cipher — CooL, verifiable records for AI change" },
   description:
-    "CooL by Northwind Cipher seals every AI change — prompts, models, policies, tool grants — as a hybrid post-quantum signed receipt anyone can verify offline. Verified on Intel TDX hardware via Phala Cloud.",
+    "CooL by Northwind Cipher seals every AI change — prompts, models, policies, tool grants — as a post-quantum signed receipt anyone can verify offline. Verified on Intel TDX hardware via Phala Cloud.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "Northwind Cipher — CooL, proof of what your AI did",
-    description: "Signed, verifiable receipts for AI changes. Run the verifier and try to break it.",
+    description: "Signed, offline-verifiable receipts for every change to your AI.",
     url: "/",
   },
 };
 
-const QUICKSTART = `import { CooL, verifyEvidence } from "cool-nwc";
+const STEPS = [
+  {
+    n: 1,
+    title: "Install",
+    body: "One package with the SDK, the CLI and the offline verifier. No postinstall scripts, five runtime dependencies.",
+    file: "terminal",
+    code: "$ npm i -g cool-nwc\n$ cool doctor\n# checks Node, web crypto, the dstack\n# socket, and a full round-trip",
+  },
+  {
+    n: 2,
+    title: "Record",
+    body: "Capture each change as it ships. Prompts and outputs are committed as salted hashes and discarded.",
+    file: "record.ts",
+    code: 'const { evidence } = await cool.record({\n  type: "model.execution",\n  metadata: { model: "my-model" },\n});',
+  },
+  {
+    n: 3,
+    title: "Verify",
+    body: "Anyone checks the receipt on their own machine — no account, no network. CI can gate on the exit code.",
+    file: "terminal",
+    code: "$ cool verify evidence.json\n  OK  binding      valid\n  OK  signature    valid\n  OK  inclusion    valid",
+  },
+] as const;
+
+const TABS = [
+  {
+    label: "TypeScript",
+    file: "quickstart.ts",
+    code: `import { CooL, verifyEvidence } from "cool-nwc";
 
 const cool = new CooL({ applicationId: "refund-agent" });
 
@@ -46,38 +64,76 @@ const { evidence } = await cool.record({
 });
 
 const verdict = await verifyEvidence(evidence);
-verdict.ok;                       // true
-verdict.checks.attestation.status; // "simulated" without hardware — never "pass"`;
+verdict.ok;                        // true
+verdict.checks.attestation.status; // "simulated" without hardware — never "pass"`,
+  },
+  {
+    label: "CLI",
+    file: "terminal",
+    code: `$ npm install -g cool-nwc
+$ cool walkthrough          # learn the model in ~3 minutes
+$ cool seal …               # seal a change
+$ cool records …            # search what you have
+$ cool verify evidence.json # offline; exits non-zero on any failure
+$ cool pack build …         # the artefact an auditor asks for`,
+  },
+  {
+    label: "Production (TDX)",
+    file: "production.ts",
+    code: `import { CooL } from "cool-nwc";
+
+const cool = new CooL({
+  applicationId: "refund-agent",
+  attestation: { provider: "dstack" },          // Intel TDX via Phala dstack
+  security: {
+    requireAttestation: true,
+    expectedMeasurement: PINNED_MEASUREMENT,    // the image you reviewed
+  },
+});`,
+  },
+] as const;
+
+const AUDIENCE_ICONS = ["code", "scale", "eye"] as const;
 
 export default function Home() {
   return (
     <>
-      <BlackBoxHero />
-      <FlightTape />
+      <Hero />
 
-      {/* 01 · statement */}
-      <section className="f-section f-section--flush" aria-labelledby="s-statement">
-        <div className="f-wrap">
-          <SectionHead id="s-statement" label={STATEMENT.label} title={STATEMENT.title} lead={STATEMENT.body} />
+      {/* trust strip */}
+      <div className="f-trust" role="region" aria-label="Standards and programmes">
+        <div className="f-wrap f-trust__in">
+          <p className="f-trust__label">Built on open standards and confidential hardware</p>
+          <div className="f-trust__items">
+            <span>
+              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#76B900" d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.493 3.374 6.493 3.374s-2.774 3.851-5.75 3.851c-.398 0-.787-.062-1.158-.185v-4.346c1.528.185 1.837.857 2.747 2.385l2.04-1.714s-1.492-1.952-4-1.952a6.016 6.016 0 0 0-.796.035m0-4.735v2.138l.424-.027c5.45-.185 9.01 4.47 9.01 4.47s-4.08 4.964-8.33 4.964c-.37 0-.733-.035-1.095-.097v1.325c.3.035.61.062.91.062 3.957 0 6.82-2.023 9.593-4.408.459.371 2.34 1.263 2.73 1.652-2.633 2.208-8.772 3.984-12.253 3.984-.335 0-.653-.018-.971-.053v1.864H24V4.063zm0 10.326v1.131c-3.657-.654-4.673-4.46-4.673-4.46s1.758-1.944 4.673-2.262v1.237H8.94c-1.528-.186-2.73 1.245-2.73 1.245s.68 2.412 2.739 3.11M2.456 10.9s2.164-3.197 6.5-3.533V6.201C4.153 6.59 0 10.653 0 10.653s2.35 6.802 8.948 7.42v-1.237c-4.84-.6-6.492-5.936-6.492-5.936z" />
+              </svg>
+              NVIDIA Inception
+            </span>
+            <span>
+              {/* eslint-disable-next-line @next/next/no-img-element -- static SVG logo */}
+              <img src="/partners/phala-white.svg" alt="Phala" width={69} height={24} />
+            </span>
+            <span>Intel TDX</span>
+            <span>ML-DSA-65 · FIPS 204</span>
+            <span>RFC 6962</span>
+          </div>
         </div>
-      </section>
+      </div>
 
-      {/* 02 · questions */}
-      <section className="f-section" aria-labelledby="s-questions">
+      {/* problem */}
+      <section className="f-section" aria-labelledby="s-q">
         <div className="f-wrap">
-          <SectionHead
-            id="s-questions"
-            label="[ 02 · Questions ]"
-            title="The questions that arrive after something goes wrong."
-          />
-          <ol className="f-cells" style={{ marginTop: 64, listStyle: "none", padding: 0 }}>
+          <SectionHead id="s-q" label="The problem" title={STATEMENT.title} lead={STATEMENT.body} />
+          <ol className="f-cells" style={{ marginTop: 48, listStyle: "none", padding: 0 }}>
             {QUESTIONS.map((q, i) => (
               <Reveal as="li" key={q.q}>
-                <p className="f-label">Q.{String(i + 1).padStart(2, "0")}</p>
-                <p className="f-h3" style={{ marginTop: 16 }}>
+                <p className="f-label">Question {i + 1}</p>
+                <p className="f-h3" style={{ marginTop: 12 }}>
                   {q.q}
                 </p>
-                <p className="f-body f-small" style={{ marginTop: 14 }}>
+                <p className="f-body f-small" style={{ marginTop: 10 }}>
                   {q.a}
                 </p>
               </Reveal>
@@ -86,20 +142,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 03 · product */}
-      <section className="f-section" aria-labelledby="s-product">
+      {/* product */}
+      <section className="f-section f-alt" aria-labelledby="s-product">
         <div className="f-wrap">
-          <SectionHead id="s-product" label="[ 03 · Product ]" title="Four parts. One record." />
-          <ul className="f-grid" style={{ marginTop: 64, listStyle: "none", padding: 0 }}>
+          <SectionHead
+            id="s-product"
+            label="Product"
+            title="Four parts. One record you can prove."
+            lead="Capture the change, seal it into a receipt, prove where it was made, and let anyone check it."
+          />
+          <ul className="f-grid" style={{ marginTop: 48, listStyle: "none", padding: 0 }}>
             {PRODUCTS.map((p) => (
-              <HudFrame as="li" key={p.id} index={p.index} className="f-span-3 f-hud--fill">
-                <Link href={p.href} className="f-stack" style={{ display: "block" }} data-impact="small">
+              <HudFrame as="li" key={p.id} className="f-span-3 f-hud--fill">
+                <Link href={p.href} style={{ display: "flex", flexDirection: "column", gap: 14, height: "100%" }}>
+                  <IconTile name={p.id} />
                   <span className="f-tile-name">{p.name}</span>
-                  <span className="f-body f-small" style={{ display: "block" }}>
-                    {p.body}
-                  </span>
-                  <span className="f-label" style={{ display: "block" }}>
-                    Open →
+                  <span className="f-body f-small">{p.body}</span>
+                  <span className="f-small" style={{ marginTop: "auto", color: "var(--brand)", fontWeight: 550 }}>
+                    Learn more →
                   </span>
                 </Link>
               </HudFrame>
@@ -108,109 +168,132 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sequence A */}
-      <RecorderSequence />
+      {/* how it works */}
+      <section className="f-section" aria-labelledby="s-how">
+        <div className="f-wrap">
+          <SectionHead id="s-how" label="How it works" title="From change to proof in three steps." center />
+          <ol className="f-steps" style={{ marginTop: 56, listStyle: "none", padding: 0 }}>
+            {STEPS.map((s) => (
+              <Reveal as="li" key={s.n} className="f-step">
+                <span className="f-step__n">{s.n}</span>
+                <h3 className="f-h3">{s.title}</h3>
+                <p className="f-body f-small">{s.body}</p>
+                <div className="f-term" style={{ marginTop: "auto" }}>
+                  <div className="f-term__bar">
+                    <span>{s.file}</span>
+                  </div>
+                  <pre className="f-term__body" style={{ margin: 0, minHeight: 132 }}>
+                    <code>{s.code}</code>
+                  </pre>
+                </div>
+              </Reveal>
+            ))}
+          </ol>
+        </div>
+      </section>
 
-      {/* 04 · how it works — Sequence B */}
-      <section id="pipeline" className="f-section" aria-labelledby="s-pipeline">
+      {/* pipeline */}
+      <section id="pipeline" className="f-section f-alt" aria-labelledby="s-pipeline">
         <div className="f-wrap">
           <SectionHead
             id="s-pipeline"
-            label="[ 04 · How it works ]"
-            title="Six stages, each one checkable."
-            lead="Scroll through the pipeline. Every stage maps to a verifier domain that can fail on its own — which is what makes a failure diagnostic instead of merely alarming."
+            label="Under the hood"
+            title="Six stages, each one independently checkable."
+            lead="Every stage maps to a verifier domain that can fail on its own — so a failure tells you exactly what broke."
           />
-          <div style={{ marginTop: 64 }}>
+          <div style={{ marginTop: 48 }}>
             <EvidenceSequence />
           </div>
         </div>
       </section>
 
-      {/* 05 · verifier — Sequence C, an inversion moment */}
+      {/* live verifier */}
       <section className="f-section f-invert" aria-labelledby="s-verify">
-        <div className="f-wrap">
-          <div className="f-grid" style={{ alignItems: "start" }}>
-            <div className="f-span-5 f-stack">
-              <p className="f-label">[ 05 · Verify it here ]</p>
-              <h2 id="s-verify" className="f-h2">
-                Don&apos;t trust us. Break a receipt.
-              </h2>
-              <p className="f-body">{claim("browserVerifier")}</p>
-              <p className="f-body">
-                Press <b>Tamper one byte</b>: one hex digit of one committed hash flips, the verifier runs again, and
-                the exact domains that break are shown. Nothing here is a canned result.
-              </p>
-              <p className="f-label">
-                <StatusChip status="MOCK" /> {claim("browserAttestationMock")}
-              </p>
-              <Link href="/verify" className="f-btn" data-impact="full">
+        <div className="f-wrap f-grid" style={{ alignItems: "center" }}>
+          <div className="f-span-5 f-stack">
+            <p className="f-label" style={{ color: "#a9c6f5" }}>
+              Try it
+            </p>
+            <h2 id="s-verify" className="f-h2">
+              Don&apos;t trust us. Break a receipt.
+            </h2>
+            <p className="f-body">{claim("browserVerifier")}</p>
+            <p className="f-body">
+              Press <b style={{ color: "#fff" }}>Tamper one byte</b>: one hex digit of one committed hash flips, the
+              verifier runs again, and the exact domains that break are shown. Nothing here is a canned result.
+            </p>
+            <p className="f-small" style={{ display: "flex", gap: 10, alignItems: "flex-start", color: "var(--on-dark-2)" }}>
+              <StatusChip status="MOCK" />
+              <span>{claim("browserAttestationMock")}</span>
+            </p>
+            <div className="f-btn-row">
+              <Link href="/verify" className="f-btn">
                 Verify your own receipt
               </Link>
             </div>
-            <div className="f-span-7">
-              <VerdictTerminal />
-            </div>
+          </div>
+          <div className="f-span-7">
+            <VerdictTerminal />
           </div>
         </div>
       </section>
 
-      {/* 06 · evidence studies */}
-      <section className="f-section f-section--flush" aria-labelledby="s-evidence">
+      {/* evidence */}
+      <section className="f-section" aria-labelledby="s-evidence">
         <div className="f-wrap">
           <SectionHead
             id="s-evidence"
-            label="[ 06 · Evidence ]"
+            label="Evidence"
             title="Measured on real hardware. Published with its limits."
             lead={
               <>
-                Two Phala Cloud Intel TDX confidential VMs, verified outside the enclave.{" "}
+                Two Phala Cloud Intel TDX confidential VMs, verified from outside the enclave.{" "}
                 <a className="f-link" href={EVIDENCE_URL} target="_blank" rel="noopener">
-                  Read the full matrix ↗
+                  Read the full matrix
                 </a>
+                .
               </>
             }
           />
-          <div className="f-cells" style={{ marginTop: 64 }}>
-            <Reveal>
-              <SplitFlapCounter value="7/7" label="Verification domains verified on Intel TDX" />
-            </Reveal>
-            <Reveal>
-              <SplitFlapCounter value="11" label="Tamper-matrix rows, each failing the expected domain" />
-            </Reveal>
-            <Reveal>
-              <SplitFlapCounter value="36/36" label="Consistency pairs verified against enclave-signed heads" />
-            </Reveal>
-            <Reveal>
-              <SplitFlapCounter value="119" label="Fixture tests passing, 0 skipped — software, not silicon" />
-            </Reveal>
+          <div className="f-cells" style={{ marginTop: 48 }}>
+            {[
+              ["7/7", "verification domains verified on Intel TDX"],
+              ["11", "tamper-matrix rows, each failing the expected domain"],
+              ["36/36", "consistency pairs verified against enclave-signed heads"],
+              ["119", "SDK fixture tests passing, 0 skipped"],
+            ].map(([v, l]) => (
+              <Reveal key={l}>
+                <p className="f-stat">{v}</p>
+                <p className="f-body f-small" style={{ marginTop: 10 }}>
+                  {l}
+                </p>
+              </Reveal>
+            ))}
           </div>
-          <div className="f-rows" style={{ marginTop: 48 }}>
+          <div className="f-rows" style={{ marginTop: 40 }}>
             {(["anchorAbsent", "cpuOnly", "witnessSameAccount", "quoteFreshness"] as const).map((id) => (
-              <div key={id} className="f-row">
-                <span className="f-label">Limit</span>
+              <div key={id} className="f-row" style={{ gridTemplateColumns: "minmax(0,1fr) auto" }}>
                 <p className="f-body">{CLAIMS[id].wording}</p>
                 <StatusChip status={CLAIMS[id].status} />
               </div>
             ))}
           </div>
-          <div className="f-btn-row" style={{ marginTop: 32 }}>
-            <Link href="/evidence" className="f-btn" data-impact="full">
+          <div className="f-btn-row" style={{ marginTop: 28 }}>
+            <Link href="/evidence" className="f-btn">
               All evidence
             </Link>
-            <Link href="/limits" className="f-btn f-btn--line" data-impact="small">
+            <Link href="/limits" className="f-btn f-btn--line">
               Every limit
             </Link>
           </div>
         </div>
       </section>
 
-      <FlightTape />
-
-      {/* 07 · comparison */}
-      <section className="f-section f-section--flush" aria-labelledby="s-compare">
+      {/* comparison */}
+      <section className="f-section f-alt" aria-labelledby="s-compare">
         <div className="f-wrap">
-          <SectionHead id="s-compare" label="[ 07 · Comparison ]" title={COMPARISON.title} />
-          <div className="f-tablewrap" style={{ marginTop: 64 }}>
+          <SectionHead id="s-compare" label="Why receipts" title={COMPARISON.title} />
+          <div className="f-tablewrap" style={{ marginTop: 40 }}>
             <table className="f-table">
               <thead>
                 <tr>
@@ -222,31 +305,37 @@ export default function Home() {
               <tbody>
                 {COMPARISON.rows.map(([q, a, b]) => (
                   <tr key={q}>
-                    <th scope="row" style={{ fontFamily: "var(--f-display)", fontSize: "0.9375rem", textTransform: "none", letterSpacing: 0, color: "inherit", fontWeight: 500 }}>
-                      {q}
-                    </th>
+                    <th scope="row">{q}</th>
                     <td>{a}</td>
-                    <td style={{ color: "var(--w)" }}>{b}</td>
+                    <td style={{ color: "var(--ink)", fontWeight: 550 }}>
+                      <span style={{ display: "inline-flex", gap: 8, alignItems: "flex-start" }}>
+                        <Icon name="check" className="f-btn__arrow" />
+                        {b}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="f-label" style={{ marginTop: 20 }}>
+          <p className="f-small f-muted" style={{ marginTop: 16 }}>
             {claim("notCorrectness")}
           </p>
         </div>
       </section>
 
-      {/* 08 · audiences */}
+      {/* audiences */}
       <section className="f-section" aria-labelledby="s-who">
         <div className="f-wrap">
-          <SectionHead id="s-who" label="[ 08 · Who it is for ]" title="Three people read the same receipt." />
-          <div className="f-grid" style={{ marginTop: 64 }}>
-            {AUDIENCES.map((a) => (
-              <HudFrame key={a.who} index={a.index.replace(/[[\]\s]/g, "")} className="f-span-4 f-hud--fill">
-                <h3 className="f-h3">{a.who}</h3>
-                <p className="f-body f-small" style={{ marginTop: 14 }}>
+          <SectionHead id="s-who" label="Who it is for" title="Three teams read the same receipt." center />
+          <div className="f-grid" style={{ marginTop: 48 }}>
+            {AUDIENCES.map((a, i) => (
+              <HudFrame key={a.who} className="f-span-4 f-hud--fill">
+                <IconTile name={AUDIENCE_ICONS[i] ?? "check"} />
+                <h3 className="f-h3" style={{ marginTop: 16 }}>
+                  {a.who}
+                </h3>
+                <p className="f-body f-small" style={{ marginTop: 8 }}>
                   {a.body}
                 </p>
               </HudFrame>
@@ -255,86 +344,105 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 09 · ecosystem */}
-      <section className="f-section" aria-labelledby="s-eco">
+      {/* ecosystem */}
+      <section className="f-section f-alt" aria-labelledby="s-eco">
         <div className="f-wrap">
-          <SectionHead id="s-eco" label="[ 09 · Ecosystem ]" title="Built on confidential computing." />
-          <div style={{ marginTop: 64 }}>
+          <SectionHead id="s-eco" label="Ecosystem" title="Built with the people building confidential AI." />
+          <div style={{ marginTop: 40 }}>
             <Ecosystem />
           </div>
         </div>
       </section>
 
-      {/* 10 · developers */}
+      {/* developers */}
       <section className="f-section" aria-labelledby="s-dev">
-        <div className="f-wrap">
-          <div className="f-grid" style={{ alignItems: "start" }}>
-            <div className="f-span-5 f-stack">
-              <p className="f-label">[ 10 · Developers ]</p>
-              <h2 id="s-dev" className="f-h2">
-                One package. Thirty seconds.
-              </h2>
-              <p className="f-body">
-                {claim("packageVersion")} {claim("runtimeDeps")} {claim("noTelemetry")}
-              </p>
-              <div className="f-btn-row">
-                <CopyCommand command="npm i -g cool-nwc" />
-                <Link href="/developers" className="f-btn f-btn--line" data-impact="small">
-                  Developer docs
-                </Link>
-              </div>
+        <div className="f-wrap f-grid" style={{ alignItems: "start" }}>
+          <div className="f-span-5 f-stack">
+            <p className="f-label" style={{ color: "var(--brand)" }}>
+              Developers
+            </p>
+            <h2 id="s-dev" className="f-h2">
+              One package. Two calls.
+            </h2>
+            <p className="f-body">
+              {claim("packageVersion")} {claim("noTelemetry")}
+            </p>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
+              {["TypeScript SDK, CLI and offline verifier", "Five runtime dependencies, no install scripts", "Typed errors with stable codes and actions"].map((t) => (
+                <li key={t} className="f-small" style={{ display: "flex", gap: 10, color: "var(--ink-2)" }}>
+                  <Icon name="check" className="f-btn__arrow" />
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <div className="f-btn-row">
+              <Link href="/developers" className="f-btn">
+                Read the docs
+              </Link>
+              <Link href="/verify" className="f-btn f-btn--line">
+                Try the verifier
+              </Link>
             </div>
-            <div className="f-span-7">
-              <div className="f-term">
-                <div className="f-term__bar">
-                  <span>quickstart.ts · cool-nwc 3.0.0</span>
-                  <span>from the published README</span>
-                </div>
-                <pre className="f-term__body" style={{ margin: 0, minHeight: 0 }}>
-                  <code>{QUICKSTART}</code>
-                </pre>
-              </div>
-            </div>
+          </div>
+          <div className="f-span-7">
+            <CodeTabs tabs={TABS} />
           </div>
         </div>
       </section>
 
-      {/* 11 · updates */}
+      {/* faq */}
+      <section className="f-section f-alt" aria-labelledby="s-faq">
+        <div className="f-wrap f-grid">
+          <div className="f-span-4">
+            <SectionHead id="s-faq" label="FAQ" title="Questions people ask twice." />
+          </div>
+          <div className="f-span-8 f-faq">
+            {FAQ.map((f) => (
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* updates */}
       <section className="f-section" aria-labelledby="s-updates">
         <div className="f-wrap">
-          <SectionHead id="s-updates" label="[ 11 · Log ]" title="Dated, and only what happened." />
-          <ol className="f-rows" style={{ marginTop: 64, listStyle: "none", padding: 0 }}>
+          <SectionHead id="s-updates" label="Changelog" title="Dated, and only what happened." />
+          <ol className="f-rows" style={{ marginTop: 40, listStyle: "none", padding: 0 }}>
             {UPDATES.map((u) => (
-              <li key={u.date + u.title} className="f-row">
-                <time className="f-label" dateTime={u.date}>
+              <li key={u.date + u.title} className="f-row" style={{ gridTemplateColumns: "8.5rem minmax(0,1fr)" }}>
+                <time className="f-label" dateTime={u.date} style={{ paddingTop: 3 }}>
                   {u.date}
                 </time>
-                <p className="f-body" style={{ color: "var(--w)" }}>
+                <p className="f-body" style={{ color: "var(--ink)" }}>
                   {u.title}
                 </p>
-                <span className="f-label">{u.source}</span>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* final */}
-      <section className="f-section f-invert" aria-labelledby="s-final">
-        <div className="f-wrap">
-          <p className="f-label">[ End of tape ]</p>
-          <h2 id="s-final" className="f-display" style={{ marginTop: 24, fontSize: "clamp(2.75rem, 1rem + 6vw, 8rem)" }}>
-            {FINAL.title}
-          </h2>
-          <p className="f-lead" style={{ marginTop: 28 }}>
-            {FINAL.body}
-          </p>
-          <div className="f-btn-row" style={{ marginTop: 40 }}>
-            <Link href="/verify" className="f-btn" data-impact="full">
-              Run the verifier
+      {/* cta */}
+      <section className="f-section f-invert" aria-labelledby="s-cta">
+        <div className="f-wrap f-grid" style={{ alignItems: "center" }}>
+          <div className="f-span-7">
+            <h2 id="s-cta" className="f-h1">
+              Run the verifier. Then try to break it.
+            </h2>
+            <p className="f-lead" style={{ marginTop: 16 }}>
+              Everything on this site that can be checked, can be checked by you.
+            </p>
+          </div>
+          <div className="f-span-5 f-btn-row" style={{ justifyContent: "flex-end" }}>
+            <Link href="/verify" className="f-btn">
+              Verify a receipt
             </Link>
-            <a href={BOOKING_URL} target="_blank" rel="noopener" className="f-btn f-btn--line" data-impact="small">
-              Book a call ↗
+            <a href={BOOKING_URL} target="_blank" rel="noopener" className="f-btn f-btn--line">
+              Book a demo
             </a>
           </div>
         </div>

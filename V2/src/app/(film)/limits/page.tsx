@@ -26,14 +26,14 @@ export default function LimitsPage() {
   return (
     <>
       <PageHead
-        label={`[ Limits · last reviewed ${REVIEWED} ]`}
+        label={`Limits · last reviewed ${REVIEWED}`}
         title="What this does not prove."
         lead="Limitations get the same type size as strengths. Every line below links to the source it was checked against."
       />
       {GROUPS.map((g) => (
         <section key={g.title} className="f-section" aria-label={g.title}>
           <div className="f-wrap f-grid">
-            <h2 className="f-label f-span-3">[ {g.title} ]</h2>
+            <h2 className="f-label f-span-3">{g.title}</h2>
             <div className="f-span-8 f-rows">
               {g.ids.map((id) => {
                 const c = CLAIMS[id];

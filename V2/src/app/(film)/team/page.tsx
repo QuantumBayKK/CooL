@@ -17,11 +17,11 @@ export default function TeamPage() {
   return (
     <>
       <PageHead
-        label="[ Team · Northwind Cipher Pvt. Ltd. ]"
+        label="Team · Northwind Cipher Pvt. Ltd."
         title="Applied post-quantum cryptography, and confidential compute."
         lead="Two founders, Coimbatore, India. Nothing below is claimed beyond what is listed, and every line is one click from being checked."
       />
-      <section className="f-section f-section--flush" style={{ paddingTop: 0 }} aria-label="Founders">
+      <section className="f-section f-section--flush" aria-label="Founders">
         <div className="f-wrap f-grid">
           {FOUNDERS.map((f) => (
             <article key={f.name} className="f-span-6 f-stack">
@@ -29,7 +29,7 @@ export default function TeamPage() {
                 <Image src={f.photo} alt={f.name} width={f.w} height={f.h} sizes="(max-width: 1000px) 100vw, 50vw" />
               </figure>
               <p className="f-label">
-                [ {f.role} · {f.tag} ]
+                {f.role} · {f.focus}
               </p>
               <h2 className="f-h2">{f.name}</h2>
               <p className="f-body">{f.focus}</p>
@@ -55,7 +55,7 @@ export default function TeamPage() {
       </section>
       <section className="f-section" aria-labelledby="t-eco">
         <div className="f-wrap">
-          <SectionHead id="t-eco" label="[ Programmes & infrastructure ]" title="Who we build alongside." />
+          <SectionHead id="t-eco" label="Programmes & infrastructure" title="Who we build alongside." />
           <div style={{ marginTop: 48 }}>
             <Ecosystem />
           </div>

@@ -1,10 +1,18 @@
-/** The small flight-recorder mark: a ribbed box with a locator beacon. */
+/** The CooL mark: a sealed record — a rounded box with a check. */
 export function RecorderMark({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.5" shapeRendering="crispEdges" aria-hidden="true">
-      <rect x="2" y="5" width="18" height="14" />
-      <path d="M6 5v14M10 5v14M14 5v14" />
-      <rect x="16" y="1" width="3" height="4" fill="currentColor" stroke="none" />
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="6" fill="currentColor" />
+      <path d="M7.5 12.5l3 3 6-6.5" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+/** Wordmark: “CooL” with “by Northwind Cipher”. */
+export function Wordmark() {
+  return (
+    <span className="f-brand__word">
+      CooL <small>by Northwind Cipher</small>
+    </span>
   );
 }

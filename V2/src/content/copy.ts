@@ -9,15 +9,42 @@
 import { claim } from "./claims";
 
 export const HERO = {
-  kicker: "[ CooL · the flight recorder for AI change ]",
-  line1: "Proof of what your AI did.",
-  line2: "Not a promise.",
-  support: "Signed, verifiable receipts for AI changes.",
+  eyebrow: "Verifiable records for AI change",
+  title: "Proof of what your AI did. Not a promise.",
+  lead: "CooL seals every change to your AI — prompts, models, policies, tool grants — into a signed receipt that anyone can verify offline, without trusting us.",
   install: "npm i -g cool-nwc",
+  points: ["Post-quantum signatures", "RFC 6962 transparency log", "Verified on Intel TDX"],
 } as const;
 
+export const FAQ: readonly { q: string; a: string }[] = [
+  {
+    q: "What does CooL actually record?",
+    a: "A change to the behaviour of an AI system: an edited prompt, a swapped model, a changed policy, a granted tool. Each one is serialised deterministically, committed as salted hashes, hybrid-signed and appended to a transparency log. It records the change, not your users' data.",
+  },
+  {
+    q: "What does “verifiable offline” mean in practice?",
+    a: "You run the verifier on your own machine with the network switched off. It recomputes the digest, checks both signatures, checks the inclusion path and the log's consistency. Nothing of ours is contacted, so nothing of ours has to be trusted.",
+  },
+  {
+    q: "What hardware does attestation run on?",
+    a: "Intel TDX confidential VMs on Phala Cloud, through dstack. All seven domains were verified on that hardware, with raw quotes and tamper tests published. CPU TDX only; no GPU attestation is claimed.",
+  },
+  {
+    q: "Does CooL run or host my model?",
+    a: "No. Your model runs wherever it already runs. CooL sits beside it and records what changed — a system of record tied to one vendor could not be neutral.",
+  },
+  {
+    q: "Why post-quantum signatures now?",
+    a: "Evidence has a long shelf life. A record kept for a seven-year retention obligation has to survive the whole seven years. Hybrid ML-DSA-65 + Ed25519 holds if either scheme is broken.",
+  },
+  {
+    q: "Can I use it today?",
+    a: "Yes. npm i -g cool-nwc installs the SDK and verifier. Paid billing is not live yet; the developer tier and the verifier are free.",
+  },
+];
+
 export const STATEMENT = {
-  label: "[ 01 · Statement ]",
+  label: "01 · Statement",
   title: "When an AI system changes, someone will ask what changed.",
   body: "A prompt is edited, a model is swapped, a tool is granted. CooL seals each change the moment it ships — committed, hybrid-signed, appended to a transparency log — so the answer later is a receipt anyone can check, not a recollection someone has to trust.",
 } as const;
@@ -61,10 +88,10 @@ export const PRODUCTS = [
 ] as const;
 
 export const RECORDER_STEPS = [
-  { at: 0, label: "[ A · 01 ]", title: "Something changed.", body: "A model, a prompt, a policy, a permission." },
-  { at: 0.3, label: "[ A · 02 ]", title: "It was recorded as it shipped.", body: "Not written up afterwards. Captured at the moment of change." },
-  { at: 0.58, label: "[ A · 03 ]", title: "Sealed into a receipt.", body: "Committed, signed with ML-DSA-65 and Ed25519, appended to the log." },
-  { at: 0.82, label: "[ A · 04 ]", title: "Checkable by anyone.", body: "The recorder is ours. The verdict is yours." },
+  { at: 0, label: "A · 01", title: "Something changed.", body: "A model, a prompt, a policy, a permission." },
+  { at: 0.3, label: "A · 02", title: "It was recorded as it shipped.", body: "Not written up afterwards. Captured at the moment of change." },
+  { at: 0.58, label: "A · 03", title: "Sealed into a receipt.", body: "Committed, signed with ML-DSA-65 and Ed25519, appended to the log." },
+  { at: 0.82, label: "A · 04", title: "Checkable by anyone.", body: "The recorder is ours. The verdict is yours." },
 ] as const;
 
 export type StageStatus = "REAL" | "SIMULATED";
@@ -87,7 +114,7 @@ export const PIPELINE: readonly {
 export const PIPELINE_NOTE = claim("simulatorLabel");
 
 export const COMPARISON = {
-  label: "[ 05 · Comparison ]",
+  label: "05 · Comparison",
   title: "A log you keep, or a receipt anyone can check.",
   rows: [
     ["Who can check it", "Whoever has database access", "Anyone with the file and the open verifier"],
@@ -100,17 +127,17 @@ export const COMPARISON = {
 
 export const AUDIENCES = [
   {
-    index: "[ ENG ]",
+    index: "ENG",
     who: "Engineering",
     body: "One call or one CLI command in the release path. Receipts are a side effect of shipping, not a task after it.",
   },
   {
-    index: "[ RISK ]",
+    index: "RISK",
     who: "Risk & compliance",
     body: "Evidence produced continuously instead of assembled by hand. An audit becomes an export.",
   },
   {
-    index: "[ AUDIT ]",
+    index: "AUDIT",
     who: "Auditors",
     body: "A verifier that runs on your machine, with the network off. You never have to take our word for it.",
   },

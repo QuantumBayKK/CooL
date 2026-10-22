@@ -37,7 +37,7 @@ export default function DesignPartnersPage() {
   return (
     <>
       <PageHead
-        label="[ Design partners ]"
+        label="Design partners"
         title="Pilot it with the people who built it."
         lead="We are looking for a small number of teams running production AI in regulated settings."
       >
@@ -54,10 +54,10 @@ export default function DesignPartnersPage() {
         </p>
       </PageHead>
 
-      <section className="f-section f-section--flush" style={{ paddingTop: 0 }} aria-labelledby="dp-get">
+      <section className="f-section f-section--flush" aria-labelledby="dp-get">
         <div className="f-wrap f-grid">
           <h2 id="dp-get" className="f-label f-span-3">
-            [ What a pilot includes ]
+            What a pilot includes
           </h2>
           <ol className="f-span-8 f-rows" style={{ listStyle: "none", padding: 0 }}>
             {GET.map((g, i) => (
@@ -72,7 +72,7 @@ export default function DesignPartnersPage() {
 
       <section className="f-section" aria-labelledby="dp-expect">
         <div className="f-wrap">
-          <SectionHead id="dp-expect" label="[ Truthful expectations ]" title="What you should know before the call." />
+          <SectionHead id="dp-expect" label="Truthful expectations" title="What you should know before the call." />
           <div className="f-grid" style={{ marginTop: 48 }}>
             {EXPECT.map(([t, d]) => (
               <HudFrame key={t} className="f-span-4 f-hud--fill" meta={<StatusChip status="ABSENT" />}>
@@ -88,7 +88,7 @@ export default function DesignPartnersPage() {
 
       <section className="f-section f-invert" aria-labelledby="dp-steps">
         <div className="f-wrap">
-          <SectionHead id="dp-steps" label="[ How it runs ]" title="Four steps." />
+          <SectionHead id="dp-steps" label="How it runs" title="Four steps." />
           <div className="f-cells" style={{ marginTop: 48 }}>
             {STEPS.map(([n, t, d]) => (
               <div key={n}>

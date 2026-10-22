@@ -62,7 +62,7 @@ export function EvidenceSequence() {
           return (
             <li key={s.id} className="f-pipe__stage" data-lit={on}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                <span className="f-label">[ B · {String(i + 1).padStart(2, "0")} ]</span>
+                <span className="f-step__n" style={{ width: 28, height: 28, fontSize: "0.8125rem" }}>{i + 1}</span>
                 <StatusChip status={s.status} />
               </div>
               <h3 className="f-h3">{s.name}</h3>
@@ -81,11 +81,9 @@ export function EvidenceSequence() {
           );
         })}
       </ol>
-      <p className="f-label" style={{ marginTop: 20 }}>
-        <span className="f-chip f-chip--simulated" style={{ marginRight: 10 }}>
-          Simulated
-        </span>
-        {PIPELINE_NOTE}
+      <p className="f-small f-muted" style={{ marginTop: 20, display: "flex", gap: 10, alignItems: "flex-start" }}>
+        <span className="f-chip f-chip--simulated">Simulated</span>
+        <span>{PIPELINE_NOTE}</span>
       </p>
     </div>
   );

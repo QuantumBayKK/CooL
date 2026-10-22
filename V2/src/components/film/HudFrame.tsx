@@ -20,7 +20,7 @@ export function HudFrame({
       <span className="f-hud__c" aria-hidden="true" />
       {(index || meta) && (
         <div className="f-hud__head">
-          {index && <span className="f-label">[ {index} ]</span>}
+          {index && <span className="f-label">{index}</span>}
           {meta}
         </div>
       )}
@@ -30,6 +30,6 @@ export function HudFrame({
 }
 
 export function StatusChip({ status }: { status: string }) {
-  const s = status.toLowerCase();
+  const s = status.toLowerCase().replace(/\s+/g, "-");
   return <span className={`f-chip f-chip--${s}`}>{status}</span>;
 }

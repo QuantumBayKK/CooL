@@ -30,12 +30,12 @@ export default function VerifyPage() {
   return (
     <>
       <PageHead
-        label="[ Verify ]"
+        label="Verify"
         title="Check a receipt yourself."
         lead={`${claim("browserVerifier")} ${claim("browserAttestationMock")}`}
       />
 
-      <section className="f-section f-section--flush" style={{ paddingTop: 0 }} aria-label="Verifier">
+      <section className="f-section f-section--flush" aria-label="Verifier">
         <div className="f-wrap">
           <ReceiptDrop />
         </div>
@@ -44,7 +44,7 @@ export default function VerifyPage() {
       <section className="f-section" aria-labelledby="v-scope">
         <div className="f-wrap f-grid">
           <div className="f-span-6">
-            <p className="f-label">[ Checked in this browser ]</p>
+            <p className="f-label">Checked in this browser</p>
             <h2 id="v-scope" className="f-h3" style={{ marginTop: 14 }}>
               What runs here
             </h2>
@@ -59,7 +59,7 @@ export default function VerifyPage() {
             </div>
           </div>
           <div className="f-span-6">
-            <p className="f-label">[ Not proven here ]</p>
+            <p className="f-label">Not proven here</p>
             <h2 className="f-h3" style={{ marginTop: 14 }}>
               What this page cannot tell you
             </h2>
@@ -79,7 +79,7 @@ export default function VerifyPage() {
       <section className="f-section" aria-labelledby="v-cli">
         <div className="f-wrap f-grid">
           <div className="f-span-6 f-stack">
-            <p className="f-label">[ Offline, on your machine ]</p>
+            <p className="f-label">Offline, on your machine</p>
             <h2 id="v-cli" className="f-h2">
               Or use the CLI.
             </h2>

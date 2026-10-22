@@ -63,7 +63,7 @@ const CLI = [
 export default function DevelopersPage() {
   return (
     <>
-      <PageHead label="[ Developers ]" title="Record. Verify. Gate CI on it." lead={`${claim("packageVersion")} ${claim("noInstallScripts")}`}>
+      <PageHead label="Developers" title="Record. Verify. Gate CI on it." lead={`${claim("packageVersion")} ${claim("noInstallScripts")}`}>
         <div className="f-btn-row">
           <CopyCommand command="npm install cool-nwc" />
           <a href={NPM_URL} target="_blank" rel="noopener" className="f-btn f-btn--line" data-impact="small">
@@ -75,10 +75,10 @@ export default function DevelopersPage() {
         </div>
       </PageHead>
 
-      <section className="f-section f-section--flush" style={{ paddingTop: 0 }} aria-labelledby="d-quick">
+      <section className="f-section f-section--flush" aria-labelledby="d-quick">
         <div className="f-wrap f-grid" style={{ alignItems: "start" }}>
           <div className="f-span-5 f-stack">
-            <p className="f-label">[ 30-second quickstart ]</p>
+            <p className="f-label">30-second quickstart</p>
             <h2 id="d-quick" className="f-h2">
               Two calls.
             </h2>
@@ -102,7 +102,7 @@ export default function DevelopersPage() {
 
       <section className="f-section" aria-labelledby="d-api">
         <div className="f-wrap">
-          <SectionHead id="d-api" label="[ API ]" title="new CooL(options?)" />
+          <SectionHead id="d-api" label="API" title="new CooL(options?)" />
           <div className="f-tablewrap" style={{ marginTop: 48 }}>
             <table className="f-table">
               <thead>
@@ -152,7 +152,7 @@ export default function DevelopersPage() {
 
       <section className="f-section" aria-labelledby="d-entry">
         <div className="f-wrap">
-          <SectionHead id="d-entry" label="[ Entry points ]" title="Import only what you need." />
+          <SectionHead id="d-entry" label="Entry points" title="Import only what you need." />
           <div className="f-rows" style={{ marginTop: 48 }}>
             {ENTRY.map(([i, c]) => (
               <div key={i} className="f-row" style={{ gridTemplateColumns: "16rem minmax(0,1fr)" }}>
@@ -166,7 +166,7 @@ export default function DevelopersPage() {
 
       <section className="f-section" aria-labelledby="d-cli">
         <div className="f-wrap">
-          <SectionHead id="d-cli" label="[ The cool command ]" title="npm install -g cool-nwc" />
+          <SectionHead id="d-cli" label="The cool command" title="npm install -g cool-nwc" />
           <div className="f-rows" style={{ marginTop: 48 }}>
             {CLI.map(([c, d]) => (
               <div key={c} className="f-row" style={{ gridTemplateColumns: "18rem minmax(0,1fr)" }}>
@@ -180,7 +180,7 @@ export default function DevelopersPage() {
 
       <section id="receipt" className="f-section" aria-labelledby="d-docs">
         <div className="f-wrap">
-          <SectionHead id="d-docs" label="[ Specification ]" title="Receipt format and threat model." />
+          <SectionHead id="d-docs" label="Specification" title="Receipt format and threat model." />
           <div className="f-grid" style={{ marginTop: 48 }}>
             {[
               ["/docs/receipt-format", "Receipt format", "Every field of cool.receipt.v1, canonicalisation and commitments."],

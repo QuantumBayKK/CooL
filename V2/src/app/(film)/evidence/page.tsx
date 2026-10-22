@@ -88,7 +88,7 @@ export default function EvidencePage() {
   return (
     <>
       <PageHead
-        label="[ Evidence ]"
+        label="Evidence"
         title="Seven domains. Real hardware. Raw files."
         lead={claim("domainsSeven")}
       >
@@ -102,10 +102,10 @@ export default function EvidencePage() {
         </div>
       </PageHead>
 
-      <section className="f-section f-section--flush" style={{ paddingTop: 0 }} aria-labelledby="e-domains">
+      <section className="f-section f-section--flush" aria-labelledby="e-domains">
         <div className="f-wrap">
           <h2 id="e-domains" className="f-label" style={{ marginBottom: 20 }}>
-            [ Domain table · two Phala Cloud tdx.small CVMs · US-WEST-1 ]
+            Domain table · two Phala Cloud tdx.small CVMs · US-WEST-1
           </h2>
           <div className="f-tablewrap">
             <table className="f-table">
@@ -148,7 +148,7 @@ export default function EvidencePage() {
 
       <section className="f-section" aria-labelledby="e-tamper">
         <div className="f-wrap">
-          <SectionHead id="e-tamper" label="[ Tamper matrix ]" title="Eleven single-field changes. Eleven failures." lead={claim("tamperMatrix")} />
+          <SectionHead id="e-tamper" label="Tamper matrix" title="Eleven single-field changes. Eleven failures." lead={claim("tamperMatrix")} />
           <ol className="f-cells" style={{ marginTop: 56, listStyle: "none", padding: 0 }}>
             {TAMPER.map((t, i) => (
               <li key={t}>
@@ -167,7 +167,7 @@ export default function EvidencePage() {
 
       <section className="f-section" aria-labelledby="e-workload">
         <div className="f-wrap">
-          <SectionHead id="e-workload" label="[ Workload change ]" title="Change the code, and the measurement says so." lead={claim("workloadChange")} />
+          <SectionHead id="e-workload" label="Workload change" title="Change the code, and the measurement says so." lead={claim("workloadChange")} />
           <div className="f-tablewrap" style={{ marginTop: 56 }}>
             <table className="f-table">
               <thead>
@@ -196,7 +196,7 @@ export default function EvidencePage() {
 
       <section id="attestation" className="f-section" aria-labelledby="e-limits">
         <div className="f-wrap">
-          <SectionHead id="e-limits" label="[ Stated with the evidence ]" title="What these runs do not show." />
+          <SectionHead id="e-limits" label="Stated with the evidence" title="What these runs do not show." />
           <div className="f-rows" style={{ marginTop: 56 }}>
             {(["cpuOnly", "devImage", "quoteFreshness", "witnessSameAccount", "manifestUnsigned", "fixtureTests"] as const).map((id) => (
               <div key={id} className="f-row">
@@ -215,7 +215,7 @@ export default function EvidencePage() {
       <section className="f-section f-invert" aria-labelledby="e-repro">
         <div className="f-wrap f-grid">
           <div className="f-span-6 f-stack">
-            <p className="f-label">[ Reproduce ]</p>
+            <p className="f-label">Reproduce</p>
             <h2 id="e-repro" className="f-h2">
               Re-run the verification yourself.
             </h2>

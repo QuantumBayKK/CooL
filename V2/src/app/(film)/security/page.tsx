@@ -50,15 +50,15 @@ export default function SecurityPage() {
   return (
     <>
       <PageHead
-        label="[ Security ]"
+        label="Security"
         title="Keys, data, and what never leaves."
         lead={`${claim("saltedCommitments")} ${claim("noTelemetry")}`}
       />
 
-      <section className="f-section f-section--flush" style={{ paddingTop: 0 }} aria-labelledby="s-flow">
+      <section className="f-section f-section--flush" aria-labelledby="s-flow">
         <div className="f-wrap">
           <h2 id="s-flow" className="f-label" style={{ marginBottom: 20 }}>
-            [ Data flow ]
+            Data flow
           </h2>
           <ol className="f-pipe" style={{ listStyle: "none", padding: 0, margin: 0, gridTemplateColumns: "repeat(5, minmax(0,1fr))" }}>
             {FLOW.map(([t, d], i) => (
@@ -77,7 +77,7 @@ export default function SecurityPage() {
 
       <section className="f-section" aria-labelledby="s-keys">
         <div className="f-wrap">
-          <SectionHead id="s-keys" label="[ Key handling ]" title="On hardware, there is no signing key to steal." />
+          <SectionHead id="s-keys" label="Key handling" title="On hardware, there is no signing key to steal." />
           <div className="f-grid" style={{ marginTop: 48 }}>
             {KEYS.map((k) => (
               <HudFrame key={k.t} className="f-span-4 f-hud--fill" meta={<StatusChip status={k.s} />}>
@@ -93,7 +93,7 @@ export default function SecurityPage() {
 
       <section className="f-section" aria-labelledby="s-supply">
         <div className="f-wrap">
-          <SectionHead id="s-supply" label="[ Supply chain ]" title="Small, inspectable, no install scripts." />
+          <SectionHead id="s-supply" label="Supply chain" title="Small, inspectable, no install scripts." />
           <div className="f-rows" style={{ marginTop: 48 }}>
             {(["runtimeDeps", "noInstallScripts", "noTelemetry", "packageVersion", "licence"] as const).map((id) => (
               <div key={id} className="f-row">
@@ -120,7 +120,7 @@ export default function SecurityPage() {
       <section className="f-section" aria-labelledby="s-inv">
         <div className="f-wrap f-grid">
           <h2 id="s-inv" className="f-label f-span-3">
-            [ Invariants the test suite enforces ]
+            Invariants the test suite enforces
           </h2>
           <ol className="f-span-8 f-rows" style={{ listStyle: "none", padding: 0 }}>
             {INVARIANTS.map((v, i) => (
@@ -136,7 +136,7 @@ export default function SecurityPage() {
       <section className="f-section f-invert" aria-labelledby="s-disc">
         <div className="f-wrap f-grid">
           <div className="f-span-6 f-stack">
-            <p className="f-label">[ Responsible disclosure ]</p>
+            <p className="f-label">Responsible disclosure</p>
             <h2 id="s-disc" className="f-h2">
               Found something? Tell us privately.
             </h2>
