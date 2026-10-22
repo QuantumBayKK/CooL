@@ -6,8 +6,15 @@ browser, and a private investor room behind single-use invite codes.
 ```bash
 npm install
 npm run dev          # http://localhost:3002
-npm run verify:all   # typecheck + palette + claims + tests
+npm run verify:all   # typecheck + palette + mono + claims + tests
 ```
+
+The public pages (`/`, `/verify`, `/evidence`, `/limits`, `/developers`,
+`/pricing`, `/team`, `/design-partners`, `/security`) are the film-led site in
+`src/app/(film)` — routes, claim registry workflow, claim ledger, footage
+pipeline and known limitations are documented in
+[docs/FILM-SITE.md](docs/FILM-SITE.md). No environment variables are needed
+for those pages.
 
 The portal needs a database. Docker and the Supabase CLI, then:
 

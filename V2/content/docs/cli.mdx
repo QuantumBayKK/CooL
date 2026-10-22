@@ -1,0 +1,346 @@
+---
+title: CLI reference
+description: Every cool command, its options and worked examples, from the manual that ships with cool-nwc 3.0.0.
+section: Reference
+order: 2
+---
+
+`npm install -g cool-nwc` puts `cool` on your PATH. Run `cool help &lt;command&gt;` for the same text in your terminal.
+
+| Command | Does |
+| --- | --- |
+| `cool walkthrough` | learn the whole model by doing it, in about three minutes |
+| `cool status` | the enclave, the key, the channel, the log |
+| `cool seal <kind> <ref> [text]` | capture and seal a change record |
+| `cool verify [file\|last\|all]` | run the offline verifier |
+| `cool records [--kind …] [--ref …] [--env …]` | search the evidence in this project |
+| `cool policy [test <kind> <ref>]` | show the governance rules, or test one against them |
+| `cool disclose <record> <field> <value>` | open one committed field, proving it matches |
+| `cool witness [cosign\|list]` | independent co-signatures on the log |
+| `cool anchor [submit\|upgrade\|verify\|export\|status]` | commit the tree head to Bitcoin |
+| `cool pack [build\|verify <file>]` | build or check an audit pack |
+| `cool compliance` | obligations, and what evidence covers them |
+| `cool ui [folder]` | watch a real project in a browser console |
+| `cool attest` | the quote and the measurement registers |
+| `cool log` | the transparency log's state |
+| `cool stats` | volume, verdicts, capture cost |
+| `cool update [version]` | upgrade in place |
+| `cool doctor` | what this environment can and cannot prove |
+| `cool help [command\|topic]` | this manual |
+
+## cool walkthrough
+
+```bash
+cool walkthrough
+```
+
+A paced, interactive tour. It seals a real record, verifies it, breaks it, shows the policy engine refusing something, opens one committed field without revealing the rest, and ends with an audit pack. Everything it does is real and stays in this directory afterwards.
+
+```bash
+$ cool walkthrough
+# start it; press Enter between steps
+```
+
+## cool status
+
+```bash
+cool status
+```
+
+What this environment can currently prove. Shows the silicon and mode, the measurement registers the signing key was derived from, every step of the RA-TLS handshake, and how many records are in the log.
+
+```bash
+$ cool status
+# the full picture
+$ cool status --json
+# machine-readable, for a health check
+```
+
+## cool seal
+
+```bash
+cool seal <kind> <ref> [text]
+```
+
+Records a change to an AI system — a prompt edit, a model bump, a widened agent permission. The plaintext is committed as a salted hash and discarded; the record is signed with the enclave-derived key and appended to the transparency log. If a policy is configured, its decision is evaluated here and sealed with the change.
+
+| Option | Effect |
+| --- | --- |
+| `--approvers a@x,b@x` | who signed off; the policy weighs these |
+| `--risk 0.9` | a risk signal from your own model, 0–1 |
+| `--label tier:high` | repeatable; policies can match on labels |
+
+```bash
+$ cool seal prompt billing/agent#system "Approve refunds up to $500."
+# seal a production prompt change
+$ cool seal model credit/underwriting#scorer "deepseek-v4-pro" --approvers a@x,b@x
+# supply approvers so the policy can approve rather than escalate
+$ COOL_ENV=prod cool seal params kyc#model '{"temperature":0.2}'
+# seal into production
+```
+
+## cool verify
+
+```bash
+cool verify [file|last|all]
+```
+
+Checks a receipt the way a stranger would: recompute the commitment, verify both signatures, walk the Merkle path to the signed tree head, and confirm the enclave quote attests the very key that signed. Exits non-zero on any failure, which is what a pipeline gates on. Needs no enclave and no network.
+
+| Option | Effect |
+| --- | --- |
+| `--require-hardware` | a simulated attestation is no longer acceptable |
+| `--json` | the verdict as JSON |
+
+```bash
+$ cool verify last
+# the most recent record in this project
+$ cool verify all
+# every record; exit 1 if any fails
+$ cool verify ./receipt.json --require-hardware
+# refuse anything not backed by real silicon
+```
+
+## cool records
+
+```bash
+cool records [--kind …] [--ref …] [--env …]
+```
+
+Filter and list sealed records. The questions this answers are the ones that come up in practice: what changed in production last week, what did this actor touch, what went out without a human.
+
+| Option | Effect |
+| --- | --- |
+| `--kind <k>` | prompt, model, params, policy, dataset, agent-permission, tool |
+| `--ref <text>` | substring of the change ref or model id |
+| `--env <name>` | environment, e.g. prod |
+| `--actor <text>` | substring of the actor id |
+| `--decision <d>` | approved, auto-approved, rejected |
+| `--limit <n>` | cap the output |
+
+```bash
+$ cool records
+# everything, newest first
+$ cool records --kind prompt --env prod
+# production prompt changes
+$ cool records --actor ci: --decision rejected
+# what CI tried that policy refused
+```
+
+## cool policy
+
+```bash
+cool policy [test <kind> <ref>]
+```
+
+Policy is evaluated inside the enclave and its verdict is sealed with the change, so an approval cannot be edited afterwards. This prints the active rule set with the reasoning behind each rule, and can dry-run a hypothetical change through it.
+
+| Option | Effect |
+| --- | --- |
+| `--approvers a@x,b@x` | test with sign-off |
+| `--risk 0.9` | test with a risk signal |
+
+```bash
+$ cool policy
+# the active rules and what they exist for
+$ cool policy test agent-permission support/copilot#tools --env prod
+# what would happen if this were sealed now
+```
+
+## cool disclose
+
+```bash
+cool disclose <record> <field> <value>
+```
+
+A receipt commits to prompts and diffs as salted hashes, so it can be published. When somebody needs to see the actual text, this produces a disclosure: the plaintext plus its salt, which anyone can check against the sealed commitment. One field opens; everything else stays closed.
+
+| Option | Effect |
+| --- | --- |
+| `--out <file>` | write the disclosure instead of printing it |
+| `--check <file>` | verify a disclosure against its receipt |
+
+```bash
+$ cool disclose last change.after "Approve refunds up to $500."
+# prove what the prompt said
+$ cool disclose <id> input --out disclosure.json
+# write it to a file to send on
+$ cool disclose --check disclosure.json
+# verify one you were given
+```
+
+## cool witness
+
+```bash
+cool witness [cosign|list]
+```
+
+A log signed only by its operator proves they have not contradicted themselves. A witness — anyone else — co-signs the tree heads they saw, which is what makes the witnesses domain something other than 'absent'. This can generate a witness key, co-sign the current head, and attach statements to receipts.
+
+```bash
+$ cool witness cosign --key auditor
+# co-sign the current tree head
+$ cool witness list
+# who has co-signed what is on disk
+```
+
+## cool anchor
+
+```bash
+cool anchor [submit|upgrade|verify|export|status]
+```
+
+Every other proof in a receipt is a signature, and a signature can be made at any time by whoever holds the key — including later, about a past they would prefer. A Bitcoin block header cannot be backdated. `submit` hands the current head to four independent public calendars; an hour or so later `upgrade` collects the block they aggregated it into; `verify` recomputes the commitment and checks it against the block's merkle root. Until that last step succeeds the domain reads `pending`, never `pass`.
+
+```bash
+$ cool anchor submit
+# timestamp the current head — free, no key needed
+$ cool anchor upgrade
+# collect the Bitcoin block once aggregated
+$ cool anchor verify
+# check the commitment against the block header
+$ cool anchor export head.ots
+# write a proof anyone can check with `ots`
+```
+
+## cool pack
+
+```bash
+cool pack [build|verify <file>]
+```
+
+One self-contained file with every receipt, the keys to check them, the pinned measurement and the clause mapping. `pack verify` re-derives everything rather than trusting the pack's own summary — it is meant to be checked by someone who does not trust you.
+
+```bash
+$ cool pack build --out audit.json
+# produce the pack
+$ cool pack verify audit.json
+# check every record in it
+```
+
+## cool compliance
+
+```bash
+cool compliance
+```
+
+Maps EU AI Act, DPDP, ISO 42001, SOC 2 and RBI clauses onto the receipt fields that satisfy them, and counts the records behind each. Coverage is computed, never asserted: an obligation with no evidence reports zero and says what would fix it.
+
+```bash
+$ cool compliance
+# the coverage table
+$ cool compliance --gaps
+# only what is uncovered
+```
+
+## cool ui
+
+```bash
+cool ui [folder]
+```
+
+Opens a folder, seeds a baseline from git so the first change is a real diff, and seals every save into the project's own on-disk log. The console it serves is the same one the website demonstrates, with the two things a demo cannot have: your files and your hardware. Records land in .cool/receipts and the tree in .cool/log, so history survives a restart. Bound to loopback — it can seal records and read your source, so it is not meant to be reachable from anywhere else.
+
+| Option | Effect |
+| --- | --- |
+| `--port <n>` | listen somewhere other than 4319 |
+| `--host <addr>` | bind address; defaults to 127.0.0.1 |
+| `--env <name>` | environment recorded on each change (default: COOL_ENV or dev) |
+| `--no-open` | do not launch a browser |
+
+```bash
+$ cool ui
+# watch the current folder
+$ cool ui ./agents --env prod
+# watch a subfolder, record it as production
+$ cool ui --host 0.0.0.0 --no-open
+# inside a CVM, behind the gateway
+```
+
+## cool attest
+
+```bash
+cool attest
+```
+
+Prints the attestation this environment can produce: quote format, root of trust, TCB status, the 64 bytes bound into report_data, and all five measurement registers. On a laptop this is the simulator, and it says so.
+
+```bash
+$ cool attest
+# the full quote body
+```
+
+## cool log
+
+```bash
+cool log
+```
+
+Tree size, current root, the last signed tree head, and where the log lives on disk. One tree per project, appended to across runs — which is what makes ordering and completeness provable rather than a claim.
+
+```bash
+$ cool log
+# size, root, checkpoint
+$ cool log --consistency 12
+# prove the tree only grew since size 12
+```
+
+## cool stats
+
+```bash
+cool stats
+```
+
+What a platform team asks for: how many records, how many verify, how much the capture path costs on the caller's thread, and how many events were dropped. The cost figures are measured on this machine, not quoted from a datasheet.
+
+```bash
+$ cool stats
+# the analytics panel
+```
+
+## cool update
+
+```bash
+cool update [version]
+```
+
+Checks the registry and installs the newer release over the top. One command instead of uninstall-then-reinstall, which on Windows leaves the `cool` shim behind and produces a confusing EEXIST on the next attempt. It shells out to `npm install -g` rather than replacing itself, so nothing happens that you could not have typed.
+
+```bash
+$ cool update
+# upgrade to the latest release
+$ cool update --check
+# exit 1 if an update exists; for CI
+$ cool update 2.4.0
+# install an exact version
+```
+
+## cool doctor
+
+```bash
+cool doctor
+```
+
+Checks Node, WebCrypto, whether a dstack endpoint and a quote verifier are configured, that the channel opens, and that a seal-and-verify round trip is clean. Exits non-zero when something is missing, including the honest case of a laptop with no confidential VM.
+
+```bash
+$ cool doctor
+# run every check
+```
+
+## cool help
+
+```bash
+cool help [command|topic]
+```
+
+With no argument, the command list and the concept index. With a command, its full documentation and examples. With a topic, the explanation behind it.
+
+```bash
+$ cool help verify
+# everything about one command
+$ cool help attestation
+# the concept, not the command
+$ cool help concepts
+# the topic index
+```

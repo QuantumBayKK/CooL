@@ -1,0 +1,21 @@
+---
+title: "What a receipt contains"
+description: "A receipt is one JSON document with five parts: the signed record, its binding hash, an inclusion proof, the attestation, and the public keys needed t."
+section: Concepts
+order: 2
+---
+
+A receipt is one JSON document with five parts: the signed record, its binding hash, an inclusion proof, the attestation, and the public keys needed to check all of it. Self-contained on purpose — an auditor should not need an account.
+
+The record's core includes the commitments, the model or change details, the time, and the runtime block: which silicon, which mode, which measurement, and the digest of the enclave quote. Hashing the core produces the binding hash; both signatures cover the core AND that hash.
+
+Because the quote's digest is inside the signed core, a valid quote from a different enclave cannot be stapled onto a record afterwards — the enclave domain catches it. Try it: `cool walkthrough` does exactly that.
+
+## Related
+
+- `cool help verifier`
+- `cool help disclosure`
+
+<Note>
+This page is the same text the CLI prints for `cool help receipts` (cool-nwc 3.0.0).
+</Note>

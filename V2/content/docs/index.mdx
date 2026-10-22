@@ -1,54 +1,54 @@
 ---
 title: Documentation
-description: Install the SDK, seal a record, and verify it offline with a verifier we do not control.
+description: Record every change to your AI as a signed receipt, and verify it offline with a verifier you run yourself.
 section: Start here
 order: 1
 ---
 
 CooL seals every change to an AI system — a prompt edit, a model swap, a
-permission grant — as a signed, tamper-evident record. This documentation covers
-producing those records and, more importantly, checking them.
+policy change, a granted tool — as a signed, tamper-evident record in a
+transparency log. These docs cover producing those records and, more
+importantly, checking them.
 
-## Start with verification, not with capture
+## Start with verification
 
-Most integration guides begin by telling you how to send them data. This one
-begins with how to check what comes back, because that is the only part that
-determines whether any of the rest is worth doing.
+The verifier is the part that decides whether anything else is worth doing,
+so start there.
 
 ```bash
 npm install -g cool-nwc
-cool verify ./change-receipt.json --offline
+cool walkthrough   # the whole model, by doing it, in about three minutes
 ```
 
-If you do not have a receipt yet, produce one in your browser at
-[/verify](/verify) and download it. The verifier that runs on that page and the
-one you just installed are the same implementation.
+Then try the in-browser verifier at [/verify](/verify): it runs the real
+`cool.receipt.v1` verifier on published conformance vectors and lets you tamper
+with one byte to watch the exact domains fail.
 
 ## What the verifier reports
 
-Seven domains, each checked and reported separately.
+A verdict is never a single yes/no. Each domain is checked and reported on its
+own, so a failure tells you what broke.
 
 | Domain | Proves |
-|---|---|
-| `canonical` | The record serialises deterministically |
-| `binding` | The digest matches the record |
-| `signature` | ML-DSA-65 and Ed25519 both verify |
-| `inclusion` | The record is in the log where it claims |
-| `consistency` | The log only ever grew |
-| `attestation` | Where the record was produced |
-| `witnesses` | An independent party saw the same log |
+| --- | --- |
+| `binding` | The record still hashes to the digest that was signed |
+| `signature` | ML-DSA-65 and Ed25519 both verify over that digest |
+| `inclusion` | The record is in the log under a signed tree head |
+| `witnesses` | Independent parties co-signed the same log head |
+| `attestation` | A TEE quote attests the key that signed |
+| `enclave` | The measured image matches the pin you approved |
+| `anchor` | The tree head was committed to a public chain |
 
-<Warning>
-All seven have been verified on real Intel TDX hardware on Phala Cloud, with an
-attested witness running in a second CVM. A receipt sealed off-hardware — on a
-laptop or in a browser — still reports `attestation` as `simulated`, and that
-rule lives in the verifier, so no presentation layer can make it read as
-passing. See [the security model](/security#simulated) for the limits.
-</Warning>
+<Note>
+Off hardware — on a laptop, in CI, in a browser — the SDK runs a simulator and
+the hardware-dependent domains report `simulated`, never `pass`. That rule lives
+in the verifier. See [Limits](/limits) for what is and is not proven today.
+</Note>
 
 ## Where to go next
 
-- [Quickstart](/docs/quickstart) — from install to a sealed record in five minutes
+- [Quickstart](/docs/quickstart) — install, record, verify in five minutes
 - [Verify it yourself](/docs/verify-it-yourself) — check a record without trusting us
-- [Receipt format](/docs/receipt-format) — what a record contains, field by field
-- [Threat model](/docs/threat-model) — who you still have to trust
+- [The seven domains](/docs/concepts/verification-domains) — what each check means
+- [SDK reference](/docs/sdk) and [CLI reference](/docs/cli)
+- [Going to production](/docs/production) — Intel TDX on Phala Cloud

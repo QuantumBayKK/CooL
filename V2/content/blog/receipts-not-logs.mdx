@@ -1,0 +1,44 @@
+---
+title: Why receipts, not logs
+summary: A log is a record someone keeps. A receipt is a record anyone can check. For AI systems that change weekly, the difference decides who has to be trusted.
+date: 2026-10-22
+author: Northwind Cipher
+source: product design note
+---
+
+Every team running AI in production already has logs. So why another record?
+
+Because a log answers "what does our database say happened?", and the question
+that arrives after an incident is different: "can you prove what was live, and
+that nobody changed the record since?"
+
+## A log you keep
+
+A log sits in a database your team controls. Whoever has write access can edit
+it, and an edit looks exactly like the original. A deleted row leaves no gap.
+Anyone checking it has to trust whoever runs it.
+
+## A receipt anyone can check
+
+A CooL receipt is built so that checking it does not require trusting us, or
+you:
+
+- The change is serialised deterministically and committed as salted hashes,
+  so sensitive content never leaves your environment.
+- The commitment is signed twice — ML-DSA-65 and Ed25519 — so it survives the
+  failure of either scheme.
+- The record is appended to an RFC 6962 transparency log. Inclusion proofs show
+  it is there; consistency proofs show the log only ever grew.
+- On confidential hardware, a TEE quote binds the measured code to the key that
+  signed.
+
+Edit one byte and binding and signature fail. Remove an entry and consistency
+fails. And the verifier runs offline, on the checker's own machine.
+
+## What a receipt does not do
+
+It records what happened. It does not say whether the model's output was
+correct, fair, safe or compliant — that judgement stays with the people
+reading the evidence. A receipt makes sure they are reading the real thing.
+
+Try it: [break a receipt in your browser](/verify).

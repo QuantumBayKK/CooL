@@ -1,0 +1,57 @@
+---
+title: All seven verification domains, on real Intel TDX hardware
+summary: We ran CooL on two Phala Cloud confidential VMs and verified every domain from outside the enclave — with negative controls, a tamper matrix and the limits stated alongside.
+date: 2026-10-22
+author: Northwind Cipher
+source: cool-sdk artifacts/closure-verification-matrix.md
+---
+
+In October 2026 we published the hardware evidence for CooL. A verifier that only ever runs against a simulator has told you how the
+software behaves, not what the silicon does. So we put CooL on real hardware:
+two Phala Cloud `tdx.small` confidential VMs — one running the primary
+transparency log, one running a witness — and verified every domain from
+outside the CVMs.
+
+## What was verified
+
+| Domain | How it was checked |
+| --- | --- |
+| Binding | Canonical CBOR recomputed outside the SDK verifier |
+| Signature | ML-DSA-65 and Ed25519 each verified over the exact signed bytes |
+| Inclusion | Every root recomputed with an independent RFC 6962 implementation |
+| Consistency | 36 of 36 pairs verified against enclave-signed heads |
+| Witness | A separate CVM verified all receipts and heads before co-signing |
+| Attestation | Raw TDX quotes parsed; report_data binds the signing key |
+| Enclave | MRTD and RTMR0–3 match the pinned measurement |
+
+Each domain also has a negative control: flip a byte, forge a head, swap a
+pin — and the expected domain fails.
+
+## The tamper matrix
+
+Eleven single-field changes — the binding hash, record metadata, both
+signatures, the tree root, a forged signed tree head, the audit path, a forged
+witness signature, a wrong quote, wrong report_data, and altered quote bytes.
+Every row comes back `ok: false` with the expected domain failing.
+
+## Change the code, and the measurement says so
+
+Deploying a second image changed RTMR3 and nothing else. A receipt from the new
+image was rejected against the old pin and accepted against its own — and the
+earlier witnessed receipt still verified after the new deployment.
+
+## What this run does not show
+
+We publish the limits with the evidence, not after it:
+
+- CPU Intel TDX only — no GPU attestation is claimed.
+- A development OS image was used.
+- Attestation verification is online through Phala's service; there is no
+  quote-freshness check.
+- The witness ran in a separate CVM, node and key, but from the same Phala
+  account — operation by a different organisation is not demonstrated.
+- The public-chain anchor domain reported absent.
+- The evidence manifest is unsigned.
+
+The full matrix, raw quotes and the script that re-verifies everything are in
+the cool-sdk repository. See [Evidence](/evidence) for how to reproduce it.

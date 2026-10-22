@@ -1,0 +1,21 @@
+---
+title: "Policy, and where it runs"
+description: "An approval that can be edited afterwards is not an approval."
+section: Concepts
+order: 9
+---
+
+An approval that can be edited afterwards is not an approval. So policy is evaluated inside the enclave at the moment of sealing, and the decision — plus the rule that produced it and a hash of the whole rule set — is covered by the same signature as the change.
+
+Rules are plain data: match on kind, environment, ref, actor method, approver count, labels or a risk signal, and decide auto-approved, approved, escalate or rejected. The strictest matching rule wins, so a permissive rule added later cannot quietly override a restrictive one.
+
+The default set fails safe: nothing in production without two approvers, widening an agent's permissions never automatic, and anything unmatched escalates rather than sliding through. `cool policy` prints it with the reasoning attached.
+
+## Related
+
+- `cool help policy`
+- `cool help compliance`
+
+<Note>
+This page is the same text the CLI prints for `cool help governance` (cool-nwc 3.0.0).
+</Note>

@@ -1,0 +1,21 @@
+---
+title: "The transparency log"
+description: "Every record's binding digest is appended to an RFC 6962 Merkle tree."
+section: Concepts
+order: 4
+---
+
+Every record's binding digest is appended to an RFC 6962 Merkle tree. A receipt carries the audit path from its leaf to the root, plus a signed tree head — so 'this record was in the log at size N' is checkable arithmetic.
+
+One tree per project, kept in `.cool/log/` and appended to across runs. That matters more than it sounds: a hundred separate trees of size one prove nothing about ordering or completeness, which is most of what a log is for.
+
+`cool log --consistency <older size>` produces the proof that the tree only ever grew. Hand that, plus an older tree head somebody kept, and they can check that nothing was removed in between.
+
+## Related
+
+- `cool help witnesses`
+- `cool help log`
+
+<Note>
+This page is the same text the CLI prints for `cool help log-concept` (cool-nwc 3.0.0).
+</Note>

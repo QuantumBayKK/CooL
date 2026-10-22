@@ -1,0 +1,30 @@
+---
+title: "The seven domains"
+description: "binding — the record's contents match its commitment."
+section: Concepts
+order: 3
+---
+
+binding — the record's contents match its commitment. Pure arithmetic.
+
+signature — ML-DSA-65 and Ed25519 both verify over core‖binding. Both, always: one post-quantum, one classical.
+
+inclusion — the leaf is in the log under a validly signed tree head.
+
+witnesses — independent co-signatures. A self-signature is displayed and never counted.
+
+attestation — the quote chains to a hardware root. `pass` only with a real verifier and a real root; `simulated` for the simulator; `absent` when a hardware quote is present but unverifiable here.
+
+enclave — the quote, the measurement and the signing key are one chain. This is the domain that makes a quote mean something about THIS record.
+
+anchor — the tree head is committed into a Bitcoin block. `pass` only once the commitment has been recomputed and matched against a real block header; `pending` between submission and aggregation, and whenever no header source was consulted.
+
+## Related
+
+- `cool help verify`
+- `cool help attestation`
+- `cool help anchoring`
+
+<Note>
+This page is the same text the CLI prints for `cool help verifier` (cool-nwc 3.0.0).
+</Note>

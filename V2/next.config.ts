@@ -71,6 +71,12 @@ const nextConfig: NextConfig = {
       // the rewrites.
       { source: "/index.html", destination: "/", permanent: true },
       { source: "/pricing.html", destination: "/pricing", permanent: true },
+      // The film-led rebuild (Oct 2026) folded these pages into new homes.
+      // 308s so inbound links and ranking carry over.
+      { source: "/technology", destination: "/#pipeline", permanent: true },
+      { source: "/architecture", destination: "/security", permanent: true },
+      { source: "/team", destination: "/about", permanent: true },
+      { source: "/thank-you", destination: "/", permanent: true },
     ];
   },
 
@@ -96,36 +102,12 @@ const nextConfig: NextConfig = {
    * The absolute path in the HTML is load-bearing; see the comment there.
    */
   /**
-   * The pages a visitor arrives on are hand-written static HTML, not React.
-   *
-   * `/` and `/pricing` are the Northwind Cipher marketing site, vendored into
-   * `public/` from the build that was signed off. `/studio` is the CooL
-   * Recorder. None of the three is a route the app router owns, and all three
-   * are addresses that existed before this change — so each gets a rewrite
-   * rather than a redirect, and the address bar never shows the `.html`.
-   *
-   * These are `afterFiles` rewrites (the plain-array form). They fire only
-   * once the router and `public/` have both declined the request, which means
-   * adding a real route at any of these paths later would silently take
-   * precedence instead of colliding.
-   *
-   * The marketing pages keep their upstream asset paths — `/src/app.css`,
-   * `/src/app.js`, `/assets/*.svg` — and those files are vendored at exactly
-   * those locations under `public/`. That is deliberate: it means the CSS and
-   * JS are byte-identical to the source build and re-syncing from upstream is
-   * a copy, not a patch. (`public/src` is a URL namespace and has nothing to
-   * do with the app's `src/`; tsconfig compiles only TypeScript, with `allowJs`
-   * off, so nothing there is picked up by the type checker.)
-   *
-   * `/pricing` is the one public address; `/pricing.html` 308s to it (see
-   * `redirects()`), and the marketing pages link to the clean URL.
+   * `/` and `/pricing` used to be rewrites onto hand-written HTML in public/.
+   * They are now real routes in the `(film)` group, so only the studio rewrite
+   * remains. `/index.html` and `/pricing.html` 308 to the clean URLs above.
    */
   async rewrites() {
-    return [
-      { source: "/", destination: "/index.html" },
-      { source: "/pricing", destination: "/pricing.html" },
-      { source: "/studio", destination: "/studio/index.html" },
-    ];
+    return [{ source: "/studio", destination: "/studio/index.html" }];
   },
 
   // `poweredByHeader` advertises the framework and version to anyone reading

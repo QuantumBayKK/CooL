@@ -8,63 +8,47 @@ order: 3
 The claim this product makes is that you do not have to trust us. This page is
 how you test that claim rather than accept it.
 
-## Get a receipt we did not hand you directly
+## In the browser
 
-Open [/verify](/verify) and let the page seal a record in your browser, then
-download it. The cryptography runs on your machine — the receipt is produced
-locally, not fetched.
+Open [/verify](/verify). It runs the real `cool.receipt.v1` verifier against the
+published conformance vectors in [/cool-vectors](/cool-vectors/index.json).
+Press **Tamper one byte** to flip one hex digit of a committed hash and watch the
+exact domains fail; **Restore** re-verifies the original. You can also drop your
+own receipt file — it is read locally and never uploaded.
 
-## Check it on a machine with no network
+## On your own machine
 
 ```bash
 npm install -g cool-nwc
-
-# disconnect, then:
-cool verify ./change-receipt.json --offline
+cool verify ./receipt.json
 ```
 
-The verifier makes no network calls. On the website that claim is measured
-rather than asserted: for the duration of a verify run the page replaces
-`fetch`, `XMLHttpRequest.open`, `WebSocket`, `EventSource` and `sendBeacon` with
-counting wrappers and then prints the counter. The zero you see is a
-measurement.
+`cool verify` needs no enclave, no account and no network. It recomputes the
+commitment, verifies both signatures, walks the Merkle path to the signed tree
+head, and confirms the enclave quote attests the very key that signed. It exits
+non-zero on any failure, which is what a pipeline gates on.
 
-## Now make it fail
+## Make it fail
 
-A verifier that only ever says yes has told you nothing. Try each of these.
+A verifier that only ever says yes has told you nothing.
 
 ```bash
-# 1. Edit one byte of the record body, then:
+# 1. Edit one byte of the record, then:
 cool verify ./tampered.json
 #    binding and signature both fail
 
-# 2. Demand a hardware root of a receipt sealed on your laptop:
-cool verify ./change-receipt.json --require-hardware
-#    REFUSED: attestation is simulated
-#    (a receipt sealed on Phala Cloud Intel TDX passes this check)
+# 2. Demand a hardware root for a receipt sealed on your laptop:
+cool verify ./receipt.json --require-hardware
+#    rejected: attestation is simulated
 ```
 
-The second one is the important one. `--require-hardware` is a real option, and
-a receipt without a vendor-rooted quote is rejected outright however many other
-domains pass.
+`--require-hardware` makes a simulated attestation unacceptable. A receipt
+sealed inside Intel TDX on Phala Cloud passes it; one sealed off hardware does
+not, however many other domains pass.
 
-<Warning>
-That refusal is the correct behaviour today and it will keep happening until a
-real Phala TDX deployment is in the loop. A build that returned `pass` here
-would mean the gate was not being enforced.
-</Warning>
+## Check our hardware evidence
 
-## Check the implementation against the spec
-
-The browser build of the SDK differs from upstream in exactly one file —
-`codec.ts`, whose hex and base64 helpers were rewritten off Node's `Buffer` onto
-`btoa`/`atob`. That deviation is proven byte-transparent rather than asserted:
-
-```bash
-npm run verify:sdk
-```
-
-It mints a receipt, tampers with it, confirms rejection on both domains, then
-verifies the published `cool-spec` conformance vectors — produced by the
-upstream Node implementation — under the browser-safe code, and confirms every
-tampered vector is rejected.
+The Phala Cloud Intel TDX runs — raw quotes, receipts, verifier outputs and an
+11-row tamper matrix — are published in the cool-sdk repository, with a script
+that re-verifies every domain from those files. See [Evidence](/evidence) for
+the summary and the reproduction commands.
