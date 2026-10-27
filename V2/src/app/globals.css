@@ -800,13 +800,22 @@
    with no dark theme to flip to, that was pure payload on every code block.
    ═══════════════════════════════════════════════════════════════════════════ */
 /* Documentation: a quiet, native-feeling reading surface with compact navigation. */
-.docs-shell { min-height: 70vh; background: color-mix(in srgb, var(--surface) 42%, var(--canvas)); }
+.docs-shell {
+  --accent: #0071e3;
+  --accent-hover: #005bb5;
+  --accent-wash: #eff6ff;
+  min-height: 70vh;
+  background: color-mix(in srgb, var(--surface) 42%, var(--canvas));
+}
 .docs-frame { align-items: flex-start; }
 .docs-nav { width: 100%; padding: 0.75rem 0 0; }
 .docs-content { min-width: 0; padding: 1.75rem 0 4rem; }
 .docs-nav input[type="search"] { border-radius: 0.8rem; background: var(--canvas); }
+.docs-nav a { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease; }
+.docs-nav nav[aria-label="Documentation"] a:hover { transform: translateX(2px); }
+.docs-nav nav[aria-label="Documentation"] a[aria-current="page"] { border-radius: 0 0.5rem 0.5rem 0; background: var(--accent-wash); color: var(--accent); }
 .docs-tree { display: none; }
-.docs-tree-open { display: block; animation: docs-reveal 180ms ease-out both; }
+.docs-tree-open { display: block; transform-origin: top; animation: docs-reveal 220ms cubic-bezier(.2,.75,.25,1) both; }
 .docs-browse-toggle { min-height: 3.25rem; }
 .docs-reading { width: 100%; max-width: 64rem; margin-inline: auto; }
 .docs-article { min-width: 0; }
@@ -825,7 +834,8 @@
 .docs-mobile-toc[open] summary span:last-child { transform: rotate(180deg); }
 .docs-mobile-toc summary span:last-child { transition: transform 180ms ease; }
 .docs-mobile-toc nav { display: grid; gap: 0.15rem; padding: 0 0.6rem 0.65rem; }
-.docs-mobile-toc nav a { border-radius: 0.55rem; padding: 0.55rem 0.5rem; color: var(--ink-muted); }
+.docs-mobile-toc nav a { border-left: 2px solid transparent; border-radius: 0.4rem; padding: 0.55rem 0.5rem; color: var(--ink-muted); transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease, padding-left 160ms ease; }
+.docs-mobile-toc nav a:hover { border-left-color: var(--accent); padding-left: 0.75rem; }
 .docs-mobile-toc nav a:hover { background: var(--surface); color: var(--ink); }
 .docs-mobile-toc nav a.is-subheading { padding-left: 1.25rem; }
 .docs-footer { margin-top: 3.5rem; border-top: 1px solid var(--line); padding-top: 1.5rem; }
@@ -833,7 +843,7 @@
 .docs-link-mark { color: var(--accent); font-size: 1rem; }
 .docs-backlink-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-top: 0.9rem; }
 .docs-backlink, .docs-page-link { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; min-width: 0; border: 1px solid var(--line); border-radius: 0.85rem; background: var(--canvas); padding: 0.85rem 0.95rem; transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease; }
-.docs-backlink:hover, .docs-page-link:hover { transform: translateY(-2px); border-color: var(--line-strong); box-shadow: 0 8px 24px rgb(17 24 39 / 6%); }
+.docs-backlink:hover, .docs-page-link:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); box-shadow: 0 10px 26px color-mix(in srgb, var(--accent) 10%, transparent); }
 .docs-backlink-section, .docs-backlink-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .docs-backlink-section, .docs-page-direction { color: var(--ink-subtle); font-size: 0.68rem; }
 .docs-backlink-title, .docs-page-link > span:last-child { margin-top: 0.2rem; color: var(--ink); font-size: 0.83rem; font-weight: 550; }
@@ -843,7 +853,7 @@
 .docs-page-link { display: grid; align-content: center; min-height: 4.2rem; }
 .docs-page-link > span:last-child { overflow-wrap: anywhere; }
 .docs-page-next { text-align: right; }
-@keyframes docs-reveal { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes docs-reveal { from { opacity: 0; transform: translateY(-7px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (min-width: 1024px) {
   .docs-nav { width: 16rem; flex: 0 0 16rem; box-sizing: border-box; padding-top: 2.5rem; padding-right: 1.5rem; border-right: 1px solid var(--line); }
   .docs-content { padding: 3rem 0 5rem 0.25rem; }
@@ -862,8 +872,8 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .docs-tree-open { animation: none; }
-  .docs-backlink, .docs-page-link, .docs-link-arrow, .docs-mobile-toc summary span:last-child { transition: none; }
-  .docs-backlink:hover, .docs-page-link:hover { transform: none; }
+  .docs-nav a, .docs-backlink, .docs-page-link, .docs-link-arrow, .docs-mobile-toc summary span:last-child, .docs-mobile-toc nav a { transition: none; }
+  .docs-nav nav[aria-label="Documentation"] a:hover, .docs-backlink:hover, .docs-page-link:hover { transform: none; }
 }
 
 pre.shiki {
