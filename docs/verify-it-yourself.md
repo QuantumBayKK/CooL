@@ -1,0 +1,84 @@
+# Verify it yourself
+
+*Reproduce a CooL record and check it without trusting CooL, the network, or this website.*
+
+The claim this product makes is that you do not have to trust us. This page is
+how you test that claim rather than accept it.
+
+## Get a receipt we did not hand you directly
+
+Open [/verify](https://northwindcipher.com/verify) and let the page seal a record in your browser, then
+download it. The cryptography runs on your machine — the receipt is produced
+locally, not fetched.
+
+## Check it on a machine with no network
+
+```bash
+npm install -g cool-nwc
+
+# disconnect, then:
+cool verify ./change-receipt.json
+```
+
+The verifier makes no network calls. On the website that claim is measured
+rather than asserted: for the duration of a verify run the page replaces
+`fetch`, `XMLHttpRequest.open`, `WebSocket`, `EventSource` and `sendBeacon` with
+counting wrappers and then prints the counter. The zero you see is a
+measurement.
+
+## Now make it fail
+
+A verifier that only ever says yes has told you nothing. Try each of these.
+
+```bash
+# 1. Edit one byte of the record body, then:
+cool verify ./tampered.json
+#    binding and signature both fail
+
+# 2. Demand a hardware root of a receipt sealed on your laptop:
+cool verify ./change-receipt.json --require-hardware
+#    REFUSED: attestation is simulated
+#    (a receipt sealed on Phala Cloud Intel TDX passes this check)
+```
+
+The second one is the important one. `--require-hardware` is a real option, and
+a receipt without a vendor-rooted quote is rejected outright however many other
+domains pass.
+
+> [!IMPORTANT]
+> That refusal is the correct behaviour today and it will keep happening until a
+> real Phala TDX deployment is in the loop. A build that returned `pass` here
+> would mean the gate was not being enforced.
+
+## Check the implementation against the spec
+
+The browser build of the SDK differs from upstream in exactly one file —
+`codec.ts`, whose hex and base64 helpers were rewritten off Node's `Buffer` onto
+`btoa`/`atob`. That deviation is proven byte-transparent rather than asserted:
+
+```bash
+npm run verify:sdk
+```
+
+It mints a receipt, tampers with it, confirms rejection on both domains, then
+verifies the published `cool-spec` conformance vectors — produced by the
+upstream Node implementation — under the browser-safe code, and confirms every
+tampered vector is rejected.
+
+## Reproduce the whole chain from source
+
+The deeper version of "verify it yourself" is not trusting the published
+package either. The SDK is Apache-2.0 at
+[github.com/KenidoesCode/cool-sdk](https://github.com/KenidoesCode/cool-sdk):
+clone it, build it yourself, and seal a record with your own build rather
+than the one on npm.
+
+```bash
+git clone https://github.com/KenidoesCode/cool-sdk.git
+cd cool-sdk && npm install && npm run build
+node ./dist/cli/index.js seal prompt local#test "reproduced locally"
+```
+
+If that receipt verifies against the same conformance vectors as the
+published package, the published package is not doing anything your own
+build cannot do — which is the actual claim "offline-verifiable" is making.

@@ -75,6 +75,23 @@ const components = {
       <div className="mt-2.5 text-sm text-ink-muted">{children}</div>
     </aside>
   ),
+  // A link grid for a landing page's "where to go next" — reuses the same
+  // bordered, shadowless cell pattern as the architecture page's topology
+  // grid (`rule-grid`-shaped: hairlines from a `gap-px bg-line` track rather
+  // than a card component), so a docs index doesn't invent a second visual
+  // language for "here are some things you can click".
+  Grid: ({ children }: { children?: React.ReactNode }) => (
+    <div className="my-8 grid gap-px bg-line sm:grid-cols-2">{children}</div>
+  ),
+  CardLink: ({ href, title, desc }: { href: string; title: string; desc: string }) => (
+    <Link
+      href={href}
+      className="group block bg-canvas p-5 transition-colors duration-[--duration-state] ease-[--ease-out] hover:bg-surface"
+    >
+      <span className="text-sm font-semibold text-ink">{title}</span>
+      <span className="mt-1 block text-sm text-ink-muted">{desc}</span>
+    </Link>
+  ),
 };
 
 export default async function DocPage({

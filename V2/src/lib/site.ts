@@ -183,7 +183,7 @@ export const FOOTER: readonly NavGroup[] = [
       { label: "Documentation", href: "/docs" },
       { label: "Quickstart", href: "/docs/quickstart" },
       { label: "Verify it yourself", href: "/docs/verify-it-yourself" },
-      { label: "Receipt format", href: "/docs/receipt-format" },
+      { label: "Receipt spec", href: "/docs/receipt-format" },
       { label: "SDK on npm", href: SITE.npm },
     ],
   },

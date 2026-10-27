@@ -1,6 +1,6 @@
 ---
 title: Verify it yourself
-description: Check a CooL record without trusting CooL, the network, or this website.
+description: Reproduce a CooL record and check it without trusting CooL, the network, or this website.
 section: Start here
 order: 3
 ---
@@ -20,7 +20,7 @@ locally, not fetched.
 npm install -g cool-nwc
 
 # disconnect, then:
-cool verify ./change-receipt.json --offline
+cool verify ./change-receipt.json
 ```
 
 The verifier makes no network calls. On the website that claim is measured
@@ -68,3 +68,21 @@ It mints a receipt, tampers with it, confirms rejection on both domains, then
 verifies the published `cool-spec` conformance vectors — produced by the
 upstream Node implementation — under the browser-safe code, and confirms every
 tampered vector is rejected.
+
+## Reproduce the whole chain from source
+
+The deeper version of "verify it yourself" is not trusting the published
+package either. The SDK is Apache-2.0 at
+[github.com/KenidoesCode/cool-sdk](https://github.com/KenidoesCode/cool-sdk):
+clone it, build it yourself, and seal a record with your own build rather
+than the one on npm.
+
+```bash
+git clone https://github.com/KenidoesCode/cool-sdk.git
+cd cool-sdk && npm install && npm run build
+node ./dist/cli/index.js seal prompt local#test "reproduced locally"
+```
+
+If that receipt verifies against the same conformance vectors as the
+published package, the published package is not doing anything your own
+build cannot do — which is the actual claim "offline-verifiable" is making.

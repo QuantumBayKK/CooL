@@ -41,11 +41,16 @@ them doing it, and was never intended to.
 |---|---|
 | Edit a record after sealing | `binding` and `signature` both fail |
 | Re-sign with a different key | `signature` fails against the pinned key |
-| Staple a quote from another image | `attestation` fails — the quote digest is inside the signature |
-| Redeploy from a patched image | A different key is derived; the old pin no longer verifies |
+| Staple a quote from another image onto a record | `enclave` fails — the quote's `report_data` commits to a different signing key |
+| Redeploy from a patched image | A different key is derived inside the enclave; the old pin no longer verifies |
 | Drop a record from the log | `inclusion` fails for that record |
-| Rewrite log history | `consistency` fails between tree heads |
-| Insider at CooL rewrites the whole log | **Not detected today.** Needs witnesses. |
+| Rewrite log history | `cool log --consistency <n>` fails between the old and new tree heads |
+| Insider at CooL rewrites the whole log, including history before any witness co-signed | **Not detected today.** Needs an organisationally independent witness. |
+| Backdate a tree head by signing it later and claiming an earlier time | **Not detected without a Bitcoin anchor.** A signature alone never proves *when* — see [anchoring](/docs/witness#anchoring-to-bitcoin). |
+
+See the [verifier reference](/docs/verifier-reference) for what each of the
+seven domains — `binding`, `signature`, `inclusion`, `witnesses`,
+`attestation`, `enclave`, `anchor` — actually recomputes.
 
 ## Failure model
 

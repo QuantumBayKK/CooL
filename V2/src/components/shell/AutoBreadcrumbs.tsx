@@ -69,6 +69,14 @@ function labelRegistry(): Record<string, string> {
   map["/thank-you"] ??= "Thanks";
   map["/pipeline"] ??= "The pipeline";
 
+  // Doc titles `titleCase` would get wrong from the slug alone — either a
+  // word it cannot know how to capitalise (CLI, FAQ) or a title longer than
+  // the slug ("…guide").
+  map["/docs/cli-reference"] ??= "CLI reference";
+  map["/docs/license-faq"] ??= "Licence FAQ";
+  map["/docs/attestation"] ??= "Attestation guide";
+  map["/docs/witness"] ??= "Witness guide";
+
   return map;
 }
 

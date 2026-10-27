@@ -61,7 +61,7 @@ Ed25519, and appends an RFC 6962 leaf. It returns once the record is sealed.
 ## Verify it
 
 ```bash
-cool verify .cool/receipts/latest.json --offline
+cool verify .cool/receipts/latest.json
 ```
 
 ## Going to production
@@ -86,3 +86,9 @@ const cool = await CoolTee.connect({
 There is no signing key to configure, and there cannot be one — it is derived
 inside the enclave from the measurement. That is exactly why CooL cannot forge
 your records.
+
+## Next
+
+- [Architecture](/docs/architecture) — where each part actually runs, and the one trust boundary that matters
+- [CLI reference](/docs/cli-reference) — every `cool` command, flags and examples
+- [Threat model](/docs/threat-model) — who you still have to trust

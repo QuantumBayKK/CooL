@@ -19,6 +19,7 @@
     "verify:sdk": "tsx scripts/verify-sdk.ts",
     "verify:tee": "tsx scripts/verify-tee.ts",
     "verify:all": "npm run typecheck && npm run verify:validator && npm run verify:palette && npm run verify:claims && npm run test",
+    "docs:mirror": "node scripts/generate-docs-mirror.mjs",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",

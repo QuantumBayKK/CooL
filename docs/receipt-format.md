@@ -1,0 +1,179 @@
+# Receipt spec
+
+*The cool.receipt.v2 schema, field by field — what each one commits to and what breaks if it is wrong.*
+
+A receipt is not a log line. It is one self-contained JSON document, and every
+field in it carries its own proof obligation — an auditor should not need an
+account, a database lookup, or us.
+
+This page documents `cool.receipt.v2`, the schema a record takes on when the
+evidence engine runs inside a TEE. It is additive over `cool.receipt.v1`: a v1
+receipt is the same shape with `attestation.mode` hard-coded to `mock`, because
+the v1 SDK has no hardware path at all.
+
+## Top-level shape
+
+```json
+{
+  "schema": "cool.receipt.v2",
+  "record": {},
+  "binding_hash": "mh:sha256:...",
+  "inclusion": {},
+  "sth": {},
+  "attestation": {},
+  "anchor": null,
+  "key_directory": {}
+}
+```
+
+`inclusion`, `sth` and `anchor` are nullable. A receipt sealed before the log
+entry is confirmed, or before a Bitcoin anchor exists, is still a complete,
+checkable document — the verifier reports the corresponding domain as `absent`
+rather than refusing to parse it.
+
+## record
+
+The signed payload: a core plus its detached signature.
+
+```json
+{
+  "schema": "cool.change.v2",
+  "record_id": "...",
+  "time": { "issued_at": "...", "seq": 41 },
+  "change": {},
+  "runtime": {},
+  "signature": {}
+}
+```
+
+`schema` is one of two values — `cool.change.v2` for a prompt, model, policy or
+permission edit, or `cool.inference.v2` for a model call. Both share the same
+envelope, signing rules, log, and verifier; a single transparency log covers
+"what the system did" and "what we changed about it".
+
+**`change`** (change records only) is the substance: `kind`, a stable `ref`
+like `billing/refund-agent#system`, the `environment`, salted commitments
+`before_hash`/`after_hash`/`diff_hash` with their salts, the `actor`, and the
+`approval` the policy engine attached, if any.
+
+> [!NOTE]
+> Prompts, diffs and model inputs are never stored in plaintext. Each is a salted
+> SHA-256 commitment — `hash` plus `salt` — so a receipt can be published or
+> handed to a regulator without handing over what it describes.
+> [`cool disclose`](cli-reference.md#disclose) opens one field at a time, on
+> request, by revealing its salt.
+
+**`runtime`** is where v2 earns its name: `tee_vendor`, `mode`
+(`mock` / `simulated` / `hardware`), the `enclave_measurement` (MRTD + four
+RTMRs) if one exists, and a hash of the attached quote. It is inside the
+signed core — an attacker cannot relabel a record as "produced in a TEE" after
+the fact without breaking the signature.
+
+**`signature`** is a hybrid block, required on every record:
+
+```text
+message = canonicalCBOR(core)
+
+  ml_dsa  = ML-DSA-65(message, sk_pq)     — FIPS 204, post-quantum
+  ed25519 = Ed25519(message, sk_ed)       — classical
+```
+
+Both must verify. A break in either family alone does not forge a record —
+that is the entire reason it is two signatures rather than one.
+
+`core` is serialised as deterministic CBOR (CDE, RFC 8949 §4.2). Determinism is
+load-bearing: two independent implementations must produce byte-identical
+output, or `binding_hash` below means nothing. `npm run verify:sdk` checks this
+against published conformance vectors.
+
+## binding_hash
+
+`mh:sha256:...` — a multihash-tagged SHA-256 over the canonical CBOR of
+`record`'s core. Alter one byte of the record and this stops matching, which is
+what the `binding` verifier domain checks.
+
+## inclusion + sth
+
+```json
+"inclusion": { "leaf_index": 40, "tree_size": 41, "audit_path": ["mh:sha256:...", "..."] },
+"sth": { "log_id": "...", "tree_size": 41, "root_hash": "mh:sha256:...", "timestamp": "...", "signature": {}, "witnesses": [] }
+```
+
+`inclusion` is an RFC 6962 audit path from this record's leaf to a tree root.
+`sth` is the Signed Tree Head that root resolves to, plus any witness
+co-signatures attached to it. Together they prove "this record was in the log
+at size N", as arithmetic rather than as an assertion — see the
+[verifier reference](verifier-reference.md#inclusion) for exactly what gets
+recomputed.
+
+`sth.witnesses` entries carry an `external` flag. CooL's own signature on its
+own tree head is always present and always `external: false` — the verifier
+has never counted a self-signature toward independence. See the
+[witness guide](witness.md).
+
+## attestation
+
+```json
+{
+  "mode": "simulated",
+  "note": "...",
+  "quote": { "format": "dstack.tdx.v4", "root": "intel-dcap", "body": {}, "signature": null, "raw": "base64:..." },
+  "expected_measurement": null,
+  "key_binding": "mh:sha256:..."
+}
+```
+
+`quote.body.report_data` is the 64 bytes CooL spends on a commitment to the
+public half of its own signing key. A verifier recomputes that commitment from
+`key_directory` below; if it matches, the code that was attested is the code
+that holds the signing key — which is what the `enclave` domain checks and
+`binding`/`signature` alone cannot.
+
+On real silicon, `quote.raw` carries the vendor-native quote bytes and
+`quote.signature` is null — those bytes are checked against Intel DCAP / AMD
+KDS collateral by a quote verifier, not by us. In the simulator the
+relationship inverts: `raw` is null and `signature` is the simulator's own
+hybrid signature over the quote body.
+
+> [!IMPORTANT]
+> `mode` reads `hardware` only for a genuine vendor-rooted quote, checked by a
+> real quote verifier — today that means a receipt sealed inside a Phala Cloud
+> Intel TDX CVM. Everywhere else it reads `simulated`: a structurally real quote
+> under a CooL-held root (`cool-sim-root`), which is useful for CI and worth
+> nothing as evidence of confidentiality. The verifier enforces the distinction;
+> no presentation layer can make `simulated` read as `pass`, and `--require-hardware`
+> refuses it outright. See [limits](limits.md).
+
+## anchor
+
+```json
+{
+  "kind": "opentimestamps",
+  "chain": "bitcoin",
+  "target": "mh:sha256:...",
+  "tree_size": 41,
+  "proof": "base64:...",
+  "calendars": ["alice.btc.calendar.opentimestamps.org", "..."],
+  "submitted_at": "...",
+  "heights": []
+}
+```
+
+`null` until `cool anchor submit` has run for this tree size. `proof` is a
+detached `.ots` file, base64-encoded and byte-identical to what the reference
+`ots` tool writes — an auditor can extract it and check it against a Bitcoin
+node without running any CooL code. `heights` is empty until the calendars
+have aggregated the submission into a mined block; until then the `anchor`
+domain reads `pending`, never `pass`. See
+[anchoring, in the witness guide](witness.md#anchoring-to-bitcoin).
+
+## key_directory
+
+```json
+{ "<key_id>": { "ml_dsa_pub": "base64:...", "ed25519_pub": "base64:..." } }
+```
+
+The public half of every signing key this receipt needs, carried in the
+receipt itself so a verifier never has to fetch a key from anywhere. A
+verifier may override this with its own trusted directory (`--trust-key`) when
+it does not want to take a receipt's word for which key it was signed with.

@@ -17,7 +17,7 @@ determines whether any of the rest is worth doing.
 
 ```bash
 npm install -g cool-nwc
-cool verify ./change-receipt.json --offline
+cool verify ./change-receipt.json   # makes no network calls — see /docs/verify-it-yourself
 ```
 
 If you do not have a receipt yet, produce one in your browser at
@@ -26,29 +26,49 @@ one you just installed are the same implementation.
 
 ## What the verifier reports
 
-Seven domains, each checked and reported separately.
+Seven domains, each checked and reported separately — full detail in the
+[verifier reference](/docs/verifier-reference).
 
 | Domain | Proves |
 |---|---|
-| `canonical` | The record serialises deterministically |
-| `binding` | The digest matches the record |
+| `binding` | The record's contents match its commitment |
 | `signature` | ML-DSA-65 and Ed25519 both verify |
 | `inclusion` | The record is in the log where it claims |
-| `consistency` | The log only ever grew |
-| `attestation` | Where the record was produced |
 | `witnesses` | An independent party saw the same log |
+| `attestation` | The quote chains to a real hardware root — or says it doesn't |
+| `enclave` | The attested code is the code holding the signing key |
+| `anchor` | The tree head is committed into a Bitcoin block |
 
 <Warning>
 All seven have been verified on real Intel TDX hardware on Phala Cloud, with an
 attested witness running in a second CVM. A receipt sealed off-hardware — on a
 laptop or in a browser — still reports `attestation` as `simulated`, and that
 rule lives in the verifier, so no presentation layer can make it read as
-passing. See [the security model](/security#simulated) for the limits.
+passing. See [limits](/docs/limits) for exactly what is and is not real today.
 </Warning>
 
-## Where to go next
+## Start here
 
-- [Quickstart](/docs/quickstart) — from install to a sealed record in five minutes
-- [Verify it yourself](/docs/verify-it-yourself) — check a record without trusting us
-- [Receipt format](/docs/receipt-format) — what a record contains, field by field
-- [Threat model](/docs/threat-model) — who you still have to trust
+<Grid>
+<CardLink href="/docs/quickstart" title="Quickstart" desc="Install, wire capture into an app, and seal your first record — five minutes." />
+<CardLink href="/docs/verify-it-yourself" title="Verify it yourself" desc="Reproduce a record and check it without trusting CooL, the network, or this site." />
+<CardLink href="/docs/architecture" title="Architecture" desc="Where each part actually runs today, and the one trust boundary that matters." />
+<CardLink href="/docs/threat-model" title="Threat model" desc="Who is removed from the trust set, who is still in it, and why." />
+</Grid>
+
+## Reference
+
+<Grid>
+<CardLink href="/docs/receipt-format" title="Receipt spec" desc="The cool.receipt.v2 schema, field by field." />
+<CardLink href="/docs/verifier-reference" title="Verifier reference" desc="The seven domains, every status they can report, and how ok is computed." />
+<CardLink href="/docs/cli-reference" title="CLI reference" desc="Every cool command, flags and worked examples." />
+<CardLink href="/docs/attestation" title="Attestation guide" desc="What a TEE quote proves, what it doesn't, and where it runs today." />
+<CardLink href="/docs/witness" title="Witness guide" desc="Why a log signed only by its operator isn't enough — witnesses and Bitcoin anchoring." />
+</Grid>
+
+## Operations
+
+<Grid>
+<CardLink href="/docs/limits" title="Limits" desc="What is real today, what is planned, and which gate each gap belongs to." />
+<CardLink href="/docs/license-faq" title="Licence FAQ" desc="What is Apache-2.0, what is not, and where the boundary sits." />
+</Grid>

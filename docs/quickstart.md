@@ -1,0 +1,90 @@
+# Quickstart
+
+*Install the SDK, wire capture into an existing application, and seal your first record.*
+
+Five minutes from nothing to a record you can verify offline.
+
+## Install
+
+```bash
+npm install cool-nwc
+```
+
+The CLI is the same package:
+
+```bash
+npm install -g cool-nwc
+cool --help
+```
+
+## Connect
+
+`CoolTee.connect` boots an evidence plane. On a laptop or in CI it runs against
+a simulator; in production you pass a `dstack` client and a pinned measurement
+instead.
+
+```ts
+import { CoolTee } from "cool-nwc";
+
+const cool = await CoolTee.connect({
+  app: { name: "refund-agent", imageDigest: process.env.IMAGE_DIGEST! },
+  backend: async ({ model, prompt, params }) => ({
+    output: await yourModel(model, prompt, params),
+  }),
+});
+```
+
+> [!NOTE]
+> The `backend` function is your existing inference call, unchanged. CooL wraps it
+> rather than replacing it, and it is never in the critical path — if the evidence
+> plane is unavailable your completion still returns.
+
+## Seal a change
+
+```ts
+await cool.change({
+  kind: "prompt",
+  ref: "billing/refund-agent#system",
+  before: previousPrompt,
+  after: nextPrompt,
+  actor: { id: "ci:github-actions", method: "oidc" },
+});
+```
+
+That call commits the change, binds a SHA-256 digest, signs with ML-DSA-65 and
+Ed25519, and appends an RFC 6962 leaf. It returns once the record is sealed.
+
+## Verify it
+
+```bash
+cool verify .cool/receipts/latest.json
+```
+
+## Going to production
+
+Two things change, and nothing else:
+
+```ts
+const cool = await CoolTee.connect({
+  dstack: new HttpDstackClient({
+    endpoint: "/var/run/dstack.sock",
+    vendor: "intel-tdx",
+  }),
+  expectedMeasurement: PINNED_MEASUREMENT,
+  policy: {
+    expectedMeasurement: PINNED_MEASUREMENT,
+    allowSimulated: false,
+    requireVendor: ["intel-tdx"],
+  },
+});
+```
+
+There is no signing key to configure, and there cannot be one — it is derived
+inside the enclave from the measurement. That is exactly why CooL cannot forge
+your records.
+
+## Next
+
+- [Architecture](architecture.md) — where each part actually runs, and the one trust boundary that matters
+- [CLI reference](cli-reference.md) — every `cool` command, flags and examples
+- [Threat model](threat-model.md) — who you still have to trust
