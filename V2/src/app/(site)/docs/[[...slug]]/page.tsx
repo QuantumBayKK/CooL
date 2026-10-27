@@ -102,21 +102,53 @@ export default async function DocPage({
   const { slug } = await params;
   const doc = getDoc((slug ?? []).join("/"));
   if (!doc) notFound();
+  const docs = allDocs();
+  const currentIndex = docs.findIndex((item) => item.slug === doc.slug);
+  const previous = docs[currentIndex - 1];
+  const next = docs[currentIndex + 1];
+  const targetHref = doc.slug ? `/docs/${doc.slug}` : "/docs";
+  const backlinks = docs
+    .filter((item) => item.slug !== doc.slug && (item.body.includes(`](${targetHref})`) || item.body.includes(`](${targetHref}#`)))
+    .slice(0, 4);
 
   return (
-    <div className="flex flex-col gap-10 xl:flex-row xl:gap-12">
-      <article className="min-w-0 flex-1">
-        <p className="text-label uppercase text-ink-subtle">{doc.section}</p>
-        <h1 className="mt-3 text-h1">{doc.title}</h1>
+    <div className="docs-reading flex flex-col gap-10 xl:flex-row xl:gap-12">
+      <article className="docs-article min-w-0 flex-1">
+        <div className="docs-eyebrow"><span>{doc.section}</span><span aria-hidden>·</span><span>Documentation</span></div>
+        <h1 className="docs-title">{doc.title}</h1>
         {doc.description && (
-          <p className="mt-3 max-w-prose text-lead text-ink-muted">
+          <p className="docs-description max-w-prose text-lead text-ink-muted">
             {doc.description}
           </p>
         )}
 
-        <div className="prose-cool mt-10">
+        <div className="prose-cool docs-prose">
           <MDXRemote source={doc.body} components={components} />
         </div>
+
+        {(backlinks.length > 0 || previous || next) && (
+          <footer className="docs-footer">
+            {backlinks.length > 0 && (
+              <section aria-labelledby="docs-backlinks-title" className="docs-backlinks">
+                <div className="docs-footer-heading"><span className="docs-link-mark" aria-hidden>↗</span><h2 id="docs-backlinks-title">Linked from</h2></div>
+                <div className="docs-backlink-list">
+                  {backlinks.map((item) => (
+                    <Link className="docs-backlink" href={item.slug ? `/docs/${item.slug}` : "/docs"} key={item.slug}>
+                      <span><span className="docs-backlink-section">{item.section}</span><span className="docs-backlink-title">{item.title}</span></span>
+                      <span aria-hidden className="docs-link-arrow">↗</span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+            {(previous || next) && (
+              <nav className="docs-pagination" aria-label="More documentation">
+                {previous ? <Link href={previous.slug ? `/docs/${previous.slug}` : "/docs"} className="docs-page-link docs-page-prev"><span className="docs-page-direction">← Previous</span><span>{previous.title}</span></Link> : <span />}
+                {next ? <Link href={next.slug ? `/docs/${next.slug}` : "/docs"} className="docs-page-link docs-page-next"><span className="docs-page-direction">Next →</span><span>{next.title}</span></Link> : <span />}
+              </nav>
+            )}
+          </footer>
+        )}
       </article>
 
       {/* ── on this page ────────────────────────────────────────────────
@@ -126,7 +158,7 @@ export default async function DocPage({
       {doc.headings.length > 2 && (
         <nav
           aria-label="On this page"
-          className="hidden w-[13rem] shrink-0 xl:block"
+          className="docs-toc hidden w-[13rem] shrink-0 xl:block"
         >
           <div className="sticky top-24">
             <p className="text-label uppercase text-ink-subtle">On this page</p>
@@ -135,7 +167,7 @@ export default async function DocPage({
                 <li key={h.id} className={h.level === 3 ? "pl-3" : undefined}>
                   <Link
                     href={`#${h.id}`}
-                    className="block text-xs text-ink-muted hover:text-ink"
+                    className="docs-toc-link block text-xs text-ink-muted hover:text-ink"
                   >
                     {h.text}
                   </Link>
@@ -144,6 +176,15 @@ export default async function DocPage({
             </ul>
           </div>
         </nav>
+      )}
+
+      {doc.headings.length > 2 && (
+        <details className="docs-mobile-toc">
+          <summary><span>On this page</span><span aria-hidden>⌄</span></summary>
+          <nav aria-label="On this page">
+            {doc.headings.map((heading) => <Link key={heading.id} href={`#${heading.id}`} className={heading.level === 3 ? "is-subheading" : undefined}>{heading.text}</Link>)}
+          </nav>
+        </details>
       )}
     </div>
   );

@@ -30,6 +30,7 @@ export function DocsNav({
 }) {
   const pathname = usePathname();
   const [query, setQuery] = useState("");
+  const [browseOpen, setBrowseOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const engine = useMemo(() => {
@@ -73,7 +74,7 @@ export function DocsNav({
   }, []);
 
   return (
-    <aside className="lg:sticky lg:top-16 lg:h-[calc(100dvh-4rem)] lg:w-[16rem] lg:shrink-0 lg:overflow-y-auto lg:py-10">
+    <aside className="docs-nav lg:sticky lg:top-16 lg:h-[calc(100dvh-4rem)] lg:w-[16rem] lg:shrink-0 lg:overflow-y-auto lg:py-10">
       <div className="border-b border-line py-4 lg:border-0 lg:py-0">
         {/* ── search ──────────────────────────────────────────────────── */}
         <div className="relative">
@@ -152,36 +153,50 @@ export function DocsNav({
 
       {/* ── tree ──────────────────────────────────────────────────────── */}
       {query.trim().length < 2 && (
-        <nav aria-label="Documentation" className="flex flex-col gap-6 py-6 lg:pt-8">
-          {sections.map(({ section, docs }) => (
-            <div key={section}>
-              <h2 className="text-label uppercase text-ink-subtle">{section}</h2>
-              <ul className="mt-2 flex flex-col">
-                {docs.map((doc) => {
-                  const href = doc.slug ? `/docs/${doc.slug}` : "/docs";
-                  const active = pathname === href;
-                  return (
-                    <li key={doc.slug}>
-                      <Link
-                        href={href}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "block border-l px-3 py-1.5 text-sm",
-                          "transition-colors duration-[--duration-state] ease-[--ease-out]",
-                          active
-                            ? "border-accent text-ink"
-                            : "border-line text-ink-muted hover:border-line-strong hover:text-ink",
-                        )}
-                      >
-                        {doc.title}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </nav>
+        <>
+        <button
+          type="button"
+          className="docs-browse-toggle mt-3 flex w-full items-center justify-between rounded-xl border border-line bg-canvas px-3.5 py-3 text-left text-sm text-ink lg:hidden"
+          aria-expanded={browseOpen}
+          onClick={() => setBrowseOpen((value) => !value)}
+        >
+          <span><span className="block text-[11px] text-ink-subtle">Browse documentation</span><span className="mt-0.5 block font-medium">{sections.flatMap((s) => s.docs).find((doc) => pathname === (doc.slug ? `/docs/${doc.slug}` : "/docs"))?.title ?? "All guides"}</span></span>
+          <span aria-hidden className={cn("text-ink-subtle transition-transform duration-200", browseOpen && "rotate-180")}>⌄</span>
+        </button>
+        <div className={cn("docs-tree", browseOpen && "docs-tree-open")}>
+          <nav aria-label="Documentation" className="flex flex-col gap-6 py-6 lg:pt-8">
+            {sections.map(({ section, docs }) => (
+              <div key={section}>
+                <h2 className="text-label uppercase text-ink-subtle">{section}</h2>
+                <ul className="mt-2 flex flex-col">
+                  {docs.map((doc) => {
+                    const href = doc.slug ? `/docs/${doc.slug}` : "/docs";
+                    const active = pathname === href;
+                    return (
+                      <li key={doc.slug}>
+                        <Link
+                          href={href}
+                          aria-current={active ? "page" : undefined}
+                          onClick={() => setBrowseOpen(false)}
+                          className={cn(
+                            "block border-l px-3 py-1.5 text-sm",
+                            "transition-colors duration-[--duration-state] ease-[--ease-out]",
+                            active
+                              ? "border-accent text-ink"
+                              : "border-line text-ink-muted hover:border-line-strong hover:text-ink",
+                          )}
+                        >
+                          {doc.title}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </nav>
+        </div>
+        </>
       )}
     </aside>
   );

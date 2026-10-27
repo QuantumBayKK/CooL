@@ -17,10 +17,10 @@ export default function DocsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="container-page">
-      <div className="flex flex-col lg:flex-row lg:gap-12">
+    <div className="docs-shell">
+      <div className="container-page docs-frame flex flex-col lg:flex-row lg:gap-12">
         <DocsNav sections={docSections()} index={searchIndex()} />
-        <div className="min-w-0 flex-1 py-10 lg:py-14">{children}</div>
+        <div className="docs-content min-w-0 flex-1">{children}</div>
       </div>
     </div>
   );
