@@ -57,3 +57,9 @@ count itself written as a signed entry. Loss is recorded, never silent.
 
 RA-TLS is the opposite direction: fail-closed toward the network. A measurement
 mismatch means the channel never opens and nothing is transmitted.
+
+## Next
+
+- [Limits](limits.md) — which of the gaps above are actively being closed, and in which gate
+- [Witness guide](witness.md) — the mechanism that closes the "insider rewrites the log" gap
+- [Verifier reference](verifier-reference.md) — the seven checks this page's attacks map onto

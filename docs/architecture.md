@@ -71,3 +71,9 @@ the current hand-rolled tree), and managed multi-tenant/BYOC/on-prem
 deployment — is the Gate 2 and Gate 3 target, not what ships today. See
 [limits](limits.md) for exactly what that gap is, item by item, rather
 than a target architecture described in the present tense.
+
+## Next
+
+- [Threat model](threat-model.md) — who the trust boundary above still leaves you trusting
+- [CLI reference](cli-reference.md) — every command that runs inside this architecture
+- [Limits](limits.md) — what's real today versus what this page's roadmap section describes

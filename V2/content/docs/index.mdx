@@ -6,8 +6,29 @@ order: 1
 ---
 
 CooL seals every change to an AI system — a prompt edit, a model swap, a
-permission grant — as a signed, tamper-evident record. This documentation covers
-producing those records and, more importantly, checking them.
+permission grant — as a signed, tamper-evident record called a **receipt**.
+This documentation covers producing those records and, more importantly,
+checking them.
+
+## New here? Start with these three
+
+<Grid>
+<CardLink href="/docs/quickstart" title="1 · Quickstart" desc="Install the SDK, seal your first record, and verify it — five minutes, start to finish." />
+<CardLink href="/docs/verify-it-yourself" title="2 · Verify it yourself" desc="Check that record without taking CooL's word for anything, including the network." />
+<CardLink href="/docs/architecture" title="3 · Architecture" desc="A five-minute map of where everything runs, before the reference pages below assume you know it." />
+</Grid>
+
+## Five words you'll see everywhere
+
+Reference pages below use these without redefining them each time.
+
+| Term | In one sentence |
+|---|---|
+| **Receipt** | The JSON document CooL produces for one change or one inference — see the [receipt spec](/docs/receipt-format). |
+| **TEE** | *Trusted execution environment* — a confidential VM that can cryptographically prove what code is running inside it. |
+| **Attestation** | The TEE's signed statement of what code is running — see the [attestation guide](/docs/attestation). |
+| **Transparency log** | An append-only, tamper-evident history of every receipt. Removing an old entry is detectable. |
+| **Witness** | An independent party who co-signs the log's history, so CooL alone can't rewrite it — see the [witness guide](/docs/witness). |
 
 ## Start with verification, not with capture
 
@@ -47,16 +68,9 @@ rule lives in the verifier, so no presentation layer can make it read as
 passing. See [limits](/docs/limits) for exactly what is and is not real today.
 </Warning>
 
-## Start here
-
-<Grid>
-<CardLink href="/docs/quickstart" title="Quickstart" desc="Install, wire capture into an app, and seal your first record — five minutes." />
-<CardLink href="/docs/verify-it-yourself" title="Verify it yourself" desc="Reproduce a record and check it without trusting CooL, the network, or this site." />
-<CardLink href="/docs/architecture" title="Architecture" desc="Where each part actually runs today, and the one trust boundary that matters." />
-<CardLink href="/docs/threat-model" title="Threat model" desc="Who is removed from the trust set, who is still in it, and why." />
-</Grid>
-
 ## Reference
+
+For when you know what you're looking for.
 
 <Grid>
 <CardLink href="/docs/receipt-format" title="Receipt spec" desc="The cool.receipt.v2 schema, field by field." />
@@ -64,6 +78,7 @@ passing. See [limits](/docs/limits) for exactly what is and is not real today.
 <CardLink href="/docs/cli-reference" title="CLI reference" desc="Every cool command, flags and worked examples." />
 <CardLink href="/docs/attestation" title="Attestation guide" desc="What a TEE quote proves, what it doesn't, and where it runs today." />
 <CardLink href="/docs/witness" title="Witness guide" desc="Why a log signed only by its operator isn't enough — witnesses and Bitcoin anchoring." />
+<CardLink href="/docs/threat-model" title="Threat model" desc="Who is removed from the trust set, who is still in it, and why." />
 </Grid>
 
 ## Operations

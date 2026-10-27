@@ -3,8 +3,27 @@
 *Install the SDK, seal a record, and verify it offline with a verifier we do not control.*
 
 CooL seals every change to an AI system — a prompt edit, a model swap, a
-permission grant — as a signed, tamper-evident record. This documentation covers
-producing those records and, more importantly, checking them.
+permission grant — as a signed, tamper-evident record called a **receipt**.
+This documentation covers producing those records and, more importantly,
+checking them.
+
+## New here? Start with these three
+
+- **[1 · Quickstart](quickstart.md)** — Install the SDK, seal your first record, and verify it — five minutes, start to finish.
+- **[2 · Verify it yourself](verify-it-yourself.md)** — Check that record without taking CooL's word for anything, including the network.
+- **[3 · Architecture](architecture.md)** — A five-minute map of where everything runs, before the reference pages below assume you know it.
+
+## Five words you'll see everywhere
+
+Reference pages below use these without redefining them each time.
+
+| Term | In one sentence |
+|---|---|
+| **Receipt** | The JSON document CooL produces for one change or one inference — see the [receipt spec](receipt-format.md). |
+| **TEE** | *Trusted execution environment* — a confidential VM that can cryptographically prove what code is running inside it. |
+| **Attestation** | The TEE's signed statement of what code is running — see the [attestation guide](attestation.md). |
+| **Transparency log** | An append-only, tamper-evident history of every receipt. Removing an old entry is detectable. |
+| **Witness** | An independent party who co-signs the log's history, so CooL alone can't rewrite it — see the [witness guide](witness.md). |
 
 ## Start with verification, not with capture
 
@@ -43,20 +62,16 @@ Seven domains, each checked and reported separately — full detail in the
 > rule lives in the verifier, so no presentation layer can make it read as
 > passing. See [limits](limits.md) for exactly what is and is not real today.
 
-## Start here
-
-- **[Quickstart](quickstart.md)** — Install, wire capture into an app, and seal your first record — five minutes.
-- **[Verify it yourself](verify-it-yourself.md)** — Reproduce a record and check it without trusting CooL, the network, or this site.
-- **[Architecture](architecture.md)** — Where each part actually runs today, and the one trust boundary that matters.
-- **[Threat model](threat-model.md)** — Who is removed from the trust set, who is still in it, and why.
-
 ## Reference
+
+For when you know what you're looking for.
 
 - **[Receipt spec](receipt-format.md)** — The cool.receipt.v2 schema, field by field.
 - **[Verifier reference](verifier-reference.md)** — The seven domains, every status they can report, and how ok is computed.
 - **[CLI reference](cli-reference.md)** — Every cool command, flags and worked examples.
 - **[Attestation guide](attestation.md)** — What a TEE quote proves, what it doesn't, and where it runs today.
 - **[Witness guide](witness.md)** — Why a log signed only by its operator isn't enough — witnesses and Bitcoin anchoring.
+- **[Threat model](threat-model.md)** — Who is removed from the trust set, who is still in it, and why.
 
 ## Operations
 

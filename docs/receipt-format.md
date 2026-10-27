@@ -177,3 +177,9 @@ The public half of every signing key this receipt needs, carried in the
 receipt itself so a verifier never has to fetch a key from anywhere. A
 verifier may override this with its own trusted directory (`--trust-key`) when
 it does not want to take a receipt's word for which key it was signed with.
+
+## Next
+
+- [Verifier reference](verifier-reference.md) — what gets recomputed from each of these fields
+- [Attestation guide](attestation.md) — the `attestation` block, in depth
+- [CLI reference](cli-reference.md) — `seal`, `verify`, and `disclose`, which produce and read this schema

@@ -67,3 +67,9 @@ transactions proving nothing extra.
 Until `cool anchor upgrade` and `verify` complete against a real block, the
 `anchor` domain reads `pending`, never `pass` — a receipt is never allowed to
 claim a timestamp it has not actually received.
+
+## Next
+
+- [Threat model](threat-model.md) — the specific attacks witnesses and anchoring each close
+- [Verifier reference](verifier-reference.md) — how `witnesses` and `anchor` fit into an overall `pass`
+- [Limits](limits.md) — why today's witness proves process separation but not organisational independence

@@ -90,3 +90,9 @@ without one configured, a real hardware quote verifies as `absent`, not
 image that was reviewed: without a pin, a quote proves "some TEE"; with one,
 it proves "the code we approved". The pin belongs in version control next to
 the code it pins, so updating it requires a human who looked at the diff.
+
+## Next
+
+- [Witness guide](witness.md) — attestation proves *where*; witnesses and anchoring prove *who else saw it* and *when*
+- [Limits](limits.md) — exactly which vendors and modes are real today
+- [Receipt spec](receipt-format.md) — the `attestation` block's exact fields

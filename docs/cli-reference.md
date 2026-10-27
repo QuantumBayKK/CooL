@@ -269,3 +269,9 @@ cool help verify
 cool help attestation   # the concept, not the command
 cool help concepts
 ```
+
+## Next
+
+- [Quickstart](quickstart.md) — `seal` and `verify`, walked through end to end
+- [Verifier reference](verifier-reference.md) — what `verify` actually checks
+- [Witness guide](witness.md) — `witness` and `anchor`, in depth

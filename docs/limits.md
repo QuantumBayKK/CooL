@@ -66,3 +66,9 @@ edit to `CURRENT_GATE` in `src/content/gates.ts`, and CI rejects that change
 until the items justifying the new rung are actually ticked. The scanner that
 enforces this caught a real over-claim in existing copy the first time it
 ran; it is not a formality.
+
+## Next
+
+- [Threat model](threat-model.md) — who each "not real today" item still leaves you trusting
+- [Architecture](architecture.md) — the roadmap section this page's Gate 2/3 items belong to
+- [Licence FAQ](license-faq.md) — what you can and can't rely on contractually today

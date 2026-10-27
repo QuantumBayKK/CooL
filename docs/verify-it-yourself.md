@@ -69,12 +69,12 @@ tampered vector is rejected.
 
 The deeper version of "verify it yourself" is not trusting the published
 package either. The SDK is Apache-2.0 at
-[github.com/KenidoesCode/cool-sdk](https://github.com/KenidoesCode/cool-sdk):
+[github.com/Northwind-Cipher/cool-sdk](https://github.com/Northwind-Cipher/cool-sdk):
 clone it, build it yourself, and seal a record with your own build rather
 than the one on npm.
 
 ```bash
-git clone https://github.com/KenidoesCode/cool-sdk.git
+git clone https://github.com/Northwind-Cipher/cool-sdk.git
 cd cool-sdk && npm install && npm run build
 node ./dist/cli/index.js seal prompt local#test "reproduced locally"
 ```
@@ -82,3 +82,9 @@ node ./dist/cli/index.js seal prompt local#test "reproduced locally"
 If that receipt verifies against the same conformance vectors as the
 published package, the published package is not doing anything your own
 build cannot do — which is the actual claim "offline-verifiable" is making.
+
+## Next
+
+- [Receipt spec](receipt-format.md) — what you just verified, field by field
+- [Verifier reference](verifier-reference.md) — what each of the seven domains actually checks
+- [Threat model](threat-model.md) — who you still have to trust, even after this

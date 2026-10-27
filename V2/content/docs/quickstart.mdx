@@ -5,26 +5,30 @@ section: Start here
 order: 2
 ---
 
-Five minutes from nothing to a record you can verify offline.
+Five minutes from nothing to a record you can verify offline. By the end of
+this page you'll have sealed one real record and checked it yourself.
 
-## Install
+**Before you start:** Node 20 or later, and an existing app that calls a
+model — CooL wraps a call you already make, it doesn't add a new one.
+
+## Step 1 · Install
 
 ```bash
 npm install cool-nwc
 ```
 
-The CLI is the same package:
+The CLI is the same package, installed globally:
 
 ```bash
 npm install -g cool-nwc
 cool --help
 ```
 
-## Connect
+## Step 2 · Connect
 
-`CoolTee.connect` boots an evidence plane. On a laptop or in CI it runs against
-a simulator; in production you pass a `dstack` client and a pinned measurement
-instead.
+`CoolTee.connect` boots an evidence plane — the thing that will hash, sign and
+log whatever you ask it to seal. On a laptop or in CI it runs against a
+built-in simulator; nothing here needs real hardware yet.
 
 ```ts
 import { CoolTee } from "cool-nwc";
@@ -43,7 +47,10 @@ rather than replacing it, and it is never in the critical path — if the eviden
 plane is unavailable your completion still returns.
 </Note>
 
-## Seal a change
+## Step 3 · Seal a change
+
+A "change" is anything that alters how your AI system behaves — here, a
+prompt edit. This is the call that actually produces a record:
 
 ```ts
 await cool.change({
@@ -55,16 +62,26 @@ await cool.change({
 });
 ```
 
-That call commits the change, binds a SHA-256 digest, signs with ML-DSA-65 and
-Ed25519, and appends an RFC 6962 leaf. It returns once the record is sealed.
+That one call commits the change, binds a SHA-256 digest, signs with ML-DSA-65
+and Ed25519, and appends an entry to the transparency log. It returns once the
+record is sealed — nothing happens asynchronously that you have to wait on
+separately.
 
-## Verify it
+## Step 4 · Verify it
+
+This is the part that matters: check what you just sealed, the same way a
+stranger would — no account, no network call.
 
 ```bash
 cool verify .cool/receipts/latest.json
 ```
 
-## Going to production
+You should see all seven domains print `pass` (or `simulated` for
+`attestation`, since you're not on real hardware yet — that's expected, not
+an error). See the [verifier reference](/docs/verifier-reference) for what
+each line means.
+
+## Step 5 · Going to production
 
 Two things change, and nothing else:
 
@@ -86,6 +103,12 @@ const cool = await CoolTee.connect({
 There is no signing key to configure, and there cannot be one — it is derived
 inside the enclave from the measurement. That is exactly why CooL cannot forge
 your records.
+
+## What you just did
+
+You installed the SDK, sealed a real record of a change, and verified it with
+the same code a third party would use — without trusting a dashboard, an
+account, or a network call to tell you it passed.
 
 ## Next
 

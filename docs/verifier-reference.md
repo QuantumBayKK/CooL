@@ -122,3 +122,9 @@ ok = binding == pass
 
 A `fail` on any domain adds a reason string to `verdict.reasons` naming which
 check and why, so a rejection is never just "no".
+
+## Next
+
+- [Attestation guide](attestation.md) — the `attestation` and `enclave` domains, explained from the hardware up
+- [Witness guide](witness.md) — the `witnesses` and `anchor` domains, and why both exist
+- [Threat model](threat-model.md) — what a `pass` verdict does and doesn't cover
