@@ -76,8 +76,13 @@ export function DocsNav({
   return (
     <aside className="docs-nav lg:sticky lg:top-16 lg:h-[calc(100dvh-4rem)] lg:w-[16rem] lg:shrink-0 lg:overflow-y-auto lg:py-10">
       <div className="border-b border-line py-4 lg:border-0 lg:py-0">
+        <Link href="/docs" className="docs-nav-brand">
+          <span className="docs-brand-mark" aria-hidden>C</span>
+          <span className="docs-brand-copy"><b>CooL</b><small>Developer documentation</small></span>
+          <span className="docs-version">DOCS</span>
+        </Link>
         {/* ── search ──────────────────────────────────────────────────── */}
-        <div className="relative">
+        <div className="relative docs-search">
           <Search
             className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-ink-subtle"
             strokeWidth={2}

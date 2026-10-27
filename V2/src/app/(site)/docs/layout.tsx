@@ -18,7 +18,7 @@ export default function DocsLayout({
 }) {
   return (
     <div className="docs-shell">
-      <div className="container-page docs-frame flex flex-col lg:flex-row lg:gap-12">
+      <div className="docs-frame">
         <DocsNav sections={docSections()} index={searchIndex()} />
         <div className="docs-content min-w-0 flex-1">{children}</div>
       </div>

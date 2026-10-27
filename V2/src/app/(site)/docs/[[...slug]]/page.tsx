@@ -5,6 +5,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 
 import { CodeBlock } from "@/components/ui/code";
 import { StatusBadge } from "@/components/ui/primitives";
+import { DocsContextRail } from "@/components/docs/DocsContextRail";
 import { allDocs, getDoc, slugifyHeading } from "@/lib/docs";
 
 export const dynamicParams = false;
@@ -112,7 +113,7 @@ export default async function DocPage({
     .slice(0, 4);
 
   return (
-    <div className="docs-reading flex flex-col gap-10 xl:flex-row xl:gap-12">
+    <div className="docs-reading">
       <article className="docs-article min-w-0 flex-1">
         <div className="docs-eyebrow"><span>{doc.section}</span><span aria-hidden>·</span><span>Documentation</span></div>
         <h1 className="docs-title">{doc.title}</h1>
@@ -151,41 +152,7 @@ export default async function DocPage({
         )}
       </article>
 
-      {/* ── on this page ────────────────────────────────────────────────
-          Hidden below xl rather than collapsed into an accordion: a table of
-          contents that costs a tap to open is a table of contents nobody
-          opens, and the headings are already in the document below. */}
-      {doc.headings.length > 2 && (
-        <nav
-          aria-label="On this page"
-          className="docs-toc hidden w-[13rem] shrink-0 xl:block"
-        >
-          <div className="sticky top-24">
-            <p className="text-label uppercase text-ink-subtle">On this page</p>
-            <ul className="mt-3 flex flex-col gap-1.5">
-              {doc.headings.map((h) => (
-                <li key={h.id} className={h.level === 3 ? "pl-3" : undefined}>
-                  <Link
-                    href={`#${h.id}`}
-                    className="docs-toc-link block text-xs text-ink-muted hover:text-ink"
-                  >
-                    {h.text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
-      )}
-
-      {doc.headings.length > 2 && (
-        <details className="docs-mobile-toc">
-          <summary><span>On this page</span><span aria-hidden>⌄</span></summary>
-          <nav aria-label="On this page">
-            {doc.headings.map((heading) => <Link key={heading.id} href={`#${heading.id}`} className={heading.level === 3 ? "is-subheading" : undefined}>{heading.text}</Link>)}
-          </nav>
-        </details>
-      )}
+      <DocsContextRail headings={doc.headings} />
     </div>
   );
 }

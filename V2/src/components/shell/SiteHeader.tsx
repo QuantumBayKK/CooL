@@ -112,7 +112,7 @@ export function SiteHeader() {
             <Button asChild size="sm" variant="secondary" className="hidden sm:inline-flex">
               <Link href="/docs/quickstart">Get started</Link>
             </Button>
-            <Button asChild size="sm" className="hidden lg:inline-flex">
+            <Button asChild size="sm" className="contact-cta hidden lg:inline-flex">
               <Link href="/contact">Talk to us</Link>
             </Button>
 
@@ -173,7 +173,7 @@ export function SiteHeader() {
           </ul>
 
           <div className="mt-5 flex items-center gap-3">
-            <Button asChild size="sm" className="flex-1">
+            <Button asChild size="sm" className="contact-cta flex-1">
               <Link href="/contact">Talk to us</Link>
             </Button>
             <Button asChild size="sm" variant="secondary" className="flex-1">
