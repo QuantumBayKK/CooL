@@ -151,7 +151,7 @@ export function LinkGitHub({ linked }: { linked: boolean }) {
     if (!supabase) return;
     const { error: e } = await supabase.auth.linkIdentity({
       provider: "github",
-      options: { redirectTo: `${location.origin}/community/auth/callback?next=/community/profile` },
+      options: { redirectTo: `${location.origin}/community/auth/callback` },
     });
     if (e) setError(/manual linking|disabled/i.test(e.message) ? "Linking GitHub is not enabled yet." : "Could not start linking. Please try again.");
   };

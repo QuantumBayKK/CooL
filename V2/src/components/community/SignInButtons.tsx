@@ -5,6 +5,11 @@ import { communityBrowser } from "@/lib/community/browser";
 
 type Provider = "google" | "github";
 
+/** Remembers where to go after sign-in, for ten minutes, readable only by /community routes. */
+function rememberNext(next: string) {
+  document.cookie = `cm_next=${encodeURIComponent(next)}; path=/community; max-age=600; samesite=lax${location.protocol === "https:" ? "; secure" : ""}`;
+}
+
 const LABEL: Record<Provider, string> = { google: "Continue with Google", github: "Continue with GitHub" };
 
 /** Starts OAuth (PKCE). The provider returns to /community/auth/callback, which finishes sign-in. */
@@ -16,7 +21,10 @@ export function SignInButtons({ next }: { next: string }) {
     if (!supabase) return setError("Sign-in is not configured on this deployment.");
     setBusy(provider);
     setError("");
-    const redirectTo = `${location.origin}/community/auth/callback?next=${encodeURIComponent(next)}`;
+    // The return address must match Supabase's allow-list exactly, so it carries no query string;
+    // where to go afterwards rides in a short-lived cookie instead.
+    rememberNext(next);
+    const redirectTo = `${location.origin}/community/auth/callback`;
     const { error: e } = await supabase.auth.signInWithOAuth({
       provider,
       options: { redirectTo, queryParams: provider === "google" ? { prompt: "select_account" } : undefined },

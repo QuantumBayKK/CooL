@@ -9,8 +9,13 @@ import { safeReturnPath } from "@/lib/community/paths";
  */
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
-  const next = safeReturnPath(url.searchParams.get("next"));
-  const fail = (code: string) => NextResponse.redirect(new URL(`/community/login?error=${code}&next=${encodeURIComponent(next)}`, url.origin));
+  // Where to go next: the cookie set when sign-in started (or a ?next= from older links).
+  const saved = request.cookies.get("cm_next")?.value;
+  let fromCookie: string | null = null;
+  try { fromCookie = saved ? decodeURIComponent(saved) : null; } catch { /* malformed: ignore */ }
+  const next = safeReturnPath(fromCookie ?? url.searchParams.get("next"));
+  const done = (res: NextResponse) => { res.cookies.set("cm_next", "", { path: "/community", maxAge: 0 }); return res; };
+  const fail = (code: string) => done(NextResponse.redirect(new URL(`/community/login?error=${code}&next=${encodeURIComponent(next)}`, url.origin)));
 
   if (url.searchParams.get("error")) return fail(url.searchParams.get("error") === "access_denied" ? "access_denied" : "exchange");
   const code = url.searchParams.get("code");
@@ -25,7 +30,7 @@ export async function GET(request: NextRequest) {
     .select("onboarded_at, guidelines_accepted_at")
     .eq("id", data.user.id)
     .maybeSingle();
-  const done = profile?.onboarded_at && profile?.guidelines_accepted_at;
-  const target = done ? next : `/community/welcome?next=${encodeURIComponent(next)}`;
-  return NextResponse.redirect(new URL(target, url.origin));
+  const welcomed = profile?.onboarded_at && profile?.guidelines_accepted_at;
+  const target = welcomed ? next : `/community/welcome?next=${encodeURIComponent(next)}`;
+  return done(NextResponse.redirect(new URL(target, url.origin)));
 }
