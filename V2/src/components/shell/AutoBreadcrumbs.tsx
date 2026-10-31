@@ -39,7 +39,8 @@ import { FOOTER, isFullBleed, isGroup, NAV } from "@/lib/site";
  * separately, through `isFullBleed`, so the walkthrough, the console and the
  * studio cannot drift apart from the footer gate that uses the same list.
  */
-const SUPPRESS = ["/", "/investor", "/admin", "/docs"];
+// The community has its own menu, so it gets no product breadcrumbs.
+const SUPPRESS = ["/", "/investor", "/admin", "/docs", "/community"];
 
 /** `{ "/security/readiness": "Readiness" }` for every route the nav names. */
 function labelRegistry(): Record<string, string> {

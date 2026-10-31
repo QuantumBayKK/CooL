@@ -65,6 +65,20 @@ export function SiteHeader() {
   // Documentation has its own compact masthead and navigation hierarchy.
   if (pathname === "/docs" || pathname.startsWith("/docs/")) return null;
 
+  // The community is Northwind Cipher's, not the product's: just the company mark. Its own menu
+  // sits below this header, so the product navigation and calls to action stay out of the way.
+  if (pathname === "/community" || pathname.startsWith("/community/")) {
+    return (
+      <header className="sticky top-0 z-50 border-b border-line bg-canvas">
+        <div className="container-page flex h-16 items-center">
+          <SiteLink href="/community" className="flex items-center gap-2.5" aria-label="Northwind Cipher community home">
+            <NcBrand />
+          </SiteLink>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-canvas">
       <nav ref={navRef} className="container-page" aria-label="Primary">
@@ -72,20 +86,13 @@ export function SiteHeader() {
           {/* The wordmark goes to `/`, which is the marketing page rather
               than a route — hence `SiteLink`. Same for anything driven by
               `NAV` below, since Pricing is static too. */}
-          {/* The community is Northwind Cipher's, not the product's: it carries the company mark. */}
-          {pathname?.startsWith("/community") ? (
-            <SiteLink href="/community" className="flex items-center gap-2.5" aria-label="Northwind Cipher community — home">
-              <NcBrand />
-            </SiteLink>
-          ) : (
-            <SiteLink
-              href="/"
-              className="flex items-center gap-2.5"
-              aria-label="CooL — home"
-            >
-              <Wordmark />
-            </SiteLink>
-          )}
+          <SiteLink
+            href="/"
+            className="flex items-center gap-2.5"
+            aria-label="CooL — home"
+          >
+            <Wordmark />
+          </SiteLink>
 
           {/* ── desktop ───────────────────────────────────────────────── */}
           <ul className="hidden items-center gap-1 lg:flex">
