@@ -1,0 +1,2 @@
+# Migrations are checksummed when applied; keep their bytes identical on every machine.
+supabase/community/migrations/*.sql text eol=lf
