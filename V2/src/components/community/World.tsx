@@ -35,8 +35,8 @@ const clean = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) 
 
 /**
  * The headquarters. Walk with the arrow keys or WASD, or click/tap where you want to go. Next to an
- * object, a person or a teammate's desk, a small card appears. Other members appear live when the
- * office's multiplayer is on and they have chosen to be visible.
+ * object, a person or a teammate's desk, a small card appears. Other members appear live and move in
+ * real time unless they have chosen to be invisible; a teammate who is here in person leaves their desk.
  */
 export function World({ me, flags, team, desks }: Props) {
   const router = useRouter();
@@ -198,11 +198,21 @@ export function World({ me, flags, team, desks }: Props) {
         map.solid[s.y]![s.x] = true;
         return [{ m, s, actor: makeActor(m.avatar, m.name, s.x, s.y, true) }];
       });
+      const teamFor = (handle: string) => crew.find((m) => m.member_handle === handle);
+      const atDesk = (t: (typeof seated)[number]) => t.actor.sprite.visible;
 
       const meActor = makeActor(self.avatar, "", map.spawn.x, map.spawn.y);
       meActor.tag.visible = false;
       const path: { x: number; y: number }[] = [];
       const others = new Map<string, Actor & { name: string; seen: number }>();
+      // A teammate who is here in person walks around; their desk figure steps away until they leave.
+      const syncSeats = () => {
+        for (const t of seated) {
+          const here = Boolean(t.m.member_handle) && (t.m.member_handle === self.handle || others.has(t.m.member_handle!));
+          t.actor.sprite.visible = t.actor.tag.visible = !here;
+        }
+      };
+      syncSeats();
 
       // A small marker that bobs over whatever you can use right now.
       const marker = new PIXI.Graphics().poly([0, 0, 6, 0, 3, 4]).fill(0xffffff);
@@ -220,14 +230,15 @@ export function World({ me, flags, team, desks }: Props) {
         if (name && name !== lastRoom) { lastRoom = name; setRoom(live ? `Floor ${floor} · ${name}` : name); }
         let next: Card | null = null;
         target = null;
-        const mate = seated.find(({ s }) => near(s.x, s.y));
+        const mate = seated.find((t) => atDesk(t) && near(t.s.x, t.s.y));
         const person = [...others.entries()].find(([, o]) => near(o.tx, o.ty));
         const piece = reachable(map, meActor.tx, meActor.ty);
         if (mate) {
           next = { kind: "person", key: "team:" + mate.m.handle, name: mate.m.name, role: mate.m.role, handle: mate.m.joined ? mate.m.member_handle : null, linkedin: mate.m.linkedin, live: false };
           target = { x: mate.s.x, y: mate.s.y, h: 38 };
         } else if (person) {
-          next = { kind: "person", key: "member:" + person[0], name: person[1].name, handle: person[0], live: true };
+          const crewMate = teamFor(person[0]);
+          next = { kind: "person", key: "member:" + person[0], name: person[1].name, role: crewMate?.role, handle: person[0], linkedin: crewMate?.linkedin, live: true };
           target = { x: person[1].tx, y: person[1].ty, h: 38 };
         } else if (piece?.interact?.startsWith("desk:")) {
           const d = deskList.find((x) => x.id === piece.interact!.slice(5));
@@ -248,7 +259,7 @@ export function World({ me, flags, team, desks }: Props) {
       const supabase = live ? communityBrowser() : null;
       let channel: ReturnType<NonNullable<typeof supabase>["channel"]> | null = null;
       const send = (event: string, payload: Record<string, unknown>) => { void channel?.send({ type: "broadcast", event, payload }); };
-      const clearOthers = () => { for (const o of others.values()) { o.sprite.destroy(); o.shadow.destroy(); o.tag.destroy(); } others.clear(); setOnline(0); };
+      const clearOthers = () => { for (const o of others.values()) { o.sprite.destroy(); o.shadow.destroy(); o.tag.destroy(); } others.clear(); syncSeats(); setOnline(0); };
       const joinFloor = async (n: number, auto: boolean) => {
         if (!supabase || disposed) return;
         if (channel) { await supabase.removeChannel(channel); channel = null; }
@@ -266,12 +277,17 @@ export function World({ me, flags, team, desks }: Props) {
           first = false;
           for (const [handle, metas] of Object.entries(state)) {
             const meta = metas[0];
-            if (!meta || handle === self.handle || others.has(handle)) continue;
+            if (!meta || handle === self.handle) continue;
             const x = Number(meta.x), y = Number(meta.y);
-            const o = makeActor(meta.avatar, clean(meta.name, 40), walkable(map, x, y) ? x : map.spawn.x, walkable(map, x, y) ? y : map.spawn.y);
-            others.set(handle, Object.assign(o, { name: clean(meta.name, 40), seen: Date.now() }));
+            const known = others.get(handle);
+            // Where they last stopped; catches up anyone whose steps were missed.
+            if (known) { if (known.t >= 1 && walkable(map, x, y) && (x !== known.tx || y !== known.ty)) { known.fx = known.tx = x; known.fy = known.ty = y; } continue; }
+            const name = teamFor(handle)?.name ?? clean(meta.name, 40);
+            const o = makeActor(meta.avatar, name, walkable(map, x, y) ? x : map.spawn.x, walkable(map, x, y) ? y : map.spawn.y);
+            others.set(handle, Object.assign(o, { name, seen: Date.now() }));
           }
           for (const [handle, o] of others) if (!state[handle]) { o.sprite.destroy(); o.shadow.destroy(); o.tag.destroy(); others.delete(handle); }
+          syncSeats();
           setOnline(others.size);
           refresh();
         });
@@ -306,7 +322,7 @@ export function World({ me, flags, team, desks }: Props) {
       act.current = {
         open: () => {
           const p = reachable(map, meActor.tx, meActor.ty);
-          const mate = seated.find(({ s }) => near(s.x, s.y));
+          const mate = seated.find((t) => atDesk(t) && near(t.s.x, t.s.y));
           if (mate?.m.joined && mate.m.member_handle) router.push(`/community/inbox?with=${mate.m.member_handle}`);
           else if (p && !mate && p.interact !== "elevator" && !p.interact?.startsWith("desk:")) { const h = hrefFor(p, flagMap); if (h) router.push(h); }
         },
@@ -390,7 +406,7 @@ export function World({ me, flags, team, desks }: Props) {
         const pt = world.toLocal(ev.global);
         const tx = Math.floor(pt.x / TILE), ty = Math.floor(pt.y / TILE);
         const piece = map.pieces.find((p) => p.interact && tx >= p.x && tx < p.x + p.w && ty >= p.y - Math.ceil(art.UP[p.kind] / TILE) && ty < p.y + p.h);
-        const mate = seated.find(({ s }) => tx === s.x && ty >= s.y - 2 && ty <= s.y); // the whole seated figure
+        const mate = seated.find((t) => atDesk(t) && tx === t.s.x && ty >= t.s.y - 2 && ty <= t.s.y); // the whole seated figure
         const targets: { x: number; y: number }[] = [];
         const around = (x0: number, y0: number, w: number, h: number) => {
           for (let y = y0 - 1; y <= y0 + h; y++) for (let x = x0 - 1; x <= x0 + w; x++) if (walkable(map, x, y)) targets.push({ x, y });
@@ -440,7 +456,7 @@ export function World({ me, flags, team, desks }: Props) {
           {full ? <path d="M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4" /> : <path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" />}
         </svg>
       </button>
-      {room && <div key={room} className="cm-world-room" aria-live="polite">{room}</div>}
+      {room && <div key={room} className="cm-world-room" aria-live="polite">{room}{online > 0 && ` · ${online + 1} here`}</div>}
       {live && !visible && <button type="button" className="cm-world-visible" onClick={becomeVisible}>You&apos;re invisible · Show me</button>}
       {toast && <div className="cm-world-toast" role="status">{toast}</div>}
       {card && (
