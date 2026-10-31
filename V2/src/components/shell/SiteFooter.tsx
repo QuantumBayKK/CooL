@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { SiteLink } from "@/components/shell/SiteLink";
 import { NcBrand } from "@/components/community/NcLogo";
-import { StatusBadge } from "@/components/ui/primitives";
 import { FOOTER, SITE } from "@/lib/site";
 
 /**
@@ -23,12 +22,14 @@ export function SiteFooter() {
             </p>
             <Link
               href="/security/readiness"
-              className="group inline-flex w-fit items-center gap-2"
+              aria-label="Live and taking pilot clients. See our readiness."
+              className="inline-flex w-fit items-center gap-2.5 rounded-full border border-ok/30 bg-ok-wash px-3.5 py-1.5 text-sm text-ink transition-colors hover:border-ok/60"
             >
-              <StatusBadge status="ok">Live · Taking pilot clients</StatusBadge>
-              <span className="text-xs text-ink-subtle underline-offset-4 group-hover:underline">
-                Readiness
+              <span aria-hidden className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-ok opacity-60 motion-reduce:animate-none" />
+                <span className="relative inline-flex size-2 rounded-full bg-ok" />
               </span>
+              Live · Taking pilot clients
             </Link>
           </div>
 
