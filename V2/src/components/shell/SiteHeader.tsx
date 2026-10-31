@@ -70,9 +70,12 @@ export function SiteHeader() {
   if (pathname === "/community" || pathname.startsWith("/community/")) {
     return (
       <header className="sticky top-0 z-50 border-b border-line bg-canvas">
-        <div className="container-page flex h-16 items-center">
+        <div className="container-page flex h-16 items-center justify-between">
           <SiteLink href="/community" className="flex items-center gap-2.5" aria-label="Northwind Cipher community home">
             <NcBrand />
+          </SiteLink>
+          <SiteLink href="/" className="inline-flex h-8 items-center gap-1.5 rounded-[--radius-sm] px-3 text-sm text-ink-muted transition-colors hover:text-ink">
+            <span aria-hidden>←</span> Main site
           </SiteLink>
         </div>
       </header>
