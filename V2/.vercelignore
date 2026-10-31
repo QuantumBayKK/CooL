@@ -27,3 +27,10 @@ scripts/verify-sdk.ts
 scripts/verify-tee.ts
 scripts/build-sdk.mjs
 packages
+
+# Secrets never leave this machine (Vercel has its own environment variables).
+.env*
+!.env.example
+
+# Local design-tool state.
+.superdesign

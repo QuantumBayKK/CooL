@@ -7,3 +7,17 @@ npm-debug.log*
 # Docs aren't needed at runtime.
 creative
 PRD.md
+
+# Secrets never leave this machine, at any depth (Vercel has its own environment variables).
+**/.env*
+!**/.env.example
+**/.vercel
+
+# The site lives in V2 (the project's root directory); mirror V2/.vercelignore from here.
+V2/.superdesign
+V2/3d models
+V2/_parked
+V2/packages
+V2/tsconfig.tsbuildinfo
+V2/reports
+"wordmark (1).svg"
