@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { CommunityNav } from "@/components/community/CommunityNav";
+import { LiveMeetings } from "@/components/community/LiveMeetings";
 import { communityConfigured, getMember, isWelcomed } from "@/lib/community/member";
 import { communityServer } from "@/lib/community/supabase";
 
@@ -39,6 +40,7 @@ export default async function CommunityLayout({ children }: { children: React.Re
           Community accounts are not configured on this deployment.
         </p>
       )}
+      {member && isWelcomed(member) && <LiveMeetings />}
       {children}
     </div>
   );

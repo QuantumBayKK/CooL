@@ -5,8 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { communityBrowser } from "@/lib/community/browser";
+import { useMeetings } from "@/lib/community/meetings";
 import { buildWorld, findPath, reachable, teamSeat, walkable, TILE, MAP_W, MAP_H, type Piece } from "@/lib/community/world-map";
 import { ROOMS } from "@/lib/community/world";
+import { MeetingForm } from "./LiveMeetings";
 import { NC_PATHS } from "./NcLogo";
 
 export type TeamMember = { handle: string; name: string; role: string; linkedin: string | null; avatar: unknown; seat: number; member_handle: string | null; joined: boolean };
@@ -33,12 +35,11 @@ const TOUR: { go: string | null; title: string; text: string }[] = [
   { go: "projects.directory", title: "Project district", text: "Open-source projects you can join, any project, not just ours." },
   { go: "commons.ideas", title: "The Commons", text: "Post an idea for a project and shape it together in the open." },
   { go: "assembly.polls", title: "Assembly hall", text: "Votes decide which ideas become real projects." },
-  { go: "meeting.terminal", title: "Meeting hall", text: "Start a Google Meet here and everyone on your floor gets a Join button." },
+  { go: "meeting.terminal", title: "Meeting hall", text: "Start a Google Meet here and the whole community gets a Join button and a notification." },
   { go: "showcase.wall", title: "Showcase", text: "What the community has built." },
   { go: "desk:q1", title: "Quiet work area", text: "Claim a free desk, pin badges on it and draw on its screen." },
   { go: null, title: "And on the site", text: "Inbox for messages, People to meet everyone, and your profile for your points. You earn points by joining, proposing, commenting, voting in public polls and contributing." },
 ];
-const MEET = /^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}$/; // the only links the office will show
 
 function hrefFor(p: Piece, flags: Record<string, boolean>): string | null {
   const room = ROOMS.find((r) => r.interactables.some((i) => i.id === p.interact));
@@ -56,11 +57,9 @@ const clean = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) 
 export function World({ me, flags, team, desks, tour: startTour = false }: Props) {
   const router = useRouter();
   const host = useRef<HTMLDivElement>(null);
-  const act = useRef<{ open: () => void; wave: (handle: string) => void; floor: (n: number) => void; meet: () => void; go: (id: string) => void }>({ open: () => {}, wave: () => {}, floor: () => {}, meet: () => {}, go: () => {} });
+  const act = useRef<{ open: () => void; wave: (handle: string) => void; floor: (n: number) => void; go: (id: string) => void }>({ open: () => {}, wave: () => {}, floor: () => {}, go: () => {} });
   const [tourStep, setTourStep] = useState<number | null>(null);
-  const meetRef = useRef("");
-  const [meetings, setMeetings] = useState<{ handle: string; name: string; link: string }[]>([]);
-  const [meetDraft, setMeetDraft] = useState("");
+  const { meetings } = useMeetings(); // the whole community's, on every floor
   const [card, setCard] = useState<Card | null>(null);
   const [room, setRoom] = useState("");
   const [toast, setToast] = useState("");
@@ -281,13 +280,13 @@ export function World({ me, flags, team, desks, tour: startTour = false }: Props
       const supabase = live ? communityBrowser() : null;
       let channel: ReturnType<NonNullable<typeof supabase>["channel"]> | null = null;
       const send = (event: string, payload: Record<string, unknown>) => { void channel?.send({ type: "broadcast", event, payload }); };
-      // What the floor knows about me: where I stand, and the Google Meet I'm in, if I shared one.
+      // What the floor knows about me: where I stand.
       let sent = { x: -1, y: -1 }, sentAt = 0, tracked = { x: -1, y: -1 }, stoppedAt = 0;
       const announce = () => {
         tracked = { x: meActor.tx, y: meActor.ty };
-        return channel?.track({ name: self.name, avatar: self.avatar, x: meActor.tx, y: meActor.ty, ...(meetRef.current && { meet: meetRef.current }) });
+        return channel?.track({ name: self.name, avatar: self.avatar, x: meActor.tx, y: meActor.ty });
       };
-      const clearOthers = () => { for (const o of others.values()) { o.sprite.destroy(); o.shadow.destroy(); o.tag.destroy(); } others.clear(); syncSeats(); setOnline(0); setMeetings([]); };
+      const clearOthers = () => { for (const o of others.values()) { o.sprite.destroy(); o.shadow.destroy(); o.tag.destroy(); } others.clear(); syncSeats(); setOnline(0); };
       const joinFloor = async (n: number, auto: boolean) => {
         if (!supabase || disposed) return;
         if (channel) { await supabase.removeChannel(channel); channel = null; }
@@ -298,7 +297,7 @@ export function World({ me, flags, team, desks, tour: startTour = false }: Props
         channel = ch;
         let first = true;
         ch.on("presence", { event: "sync" }, () => {
-          const state = ch.presenceState<{ name: string; avatar: unknown; x: number; y: number; meet?: unknown }>();
+          const state = ch.presenceState<{ name: string; avatar: unknown; x: number; y: number }>();
           const count = Object.keys(state).filter((h) => h !== self.handle).length;
           // Arriving at a full floor sends you up to the next identical one.
           if (first && auto && count >= FLOOR_CAP && n < TOP_FLOOR) { first = false; void joinFloor(n + 1, true); return; }
@@ -321,11 +320,6 @@ export function World({ me, flags, team, desks, tour: startTour = false }: Props
           for (const [handle, o] of others) if (!state[handle]) { o.sprite.destroy(); o.shadow.destroy(); o.tag.destroy(); others.delete(handle); }
           syncSeats();
           setOnline(others.size);
-          setMeetings(Object.entries(state).flatMap(([handle, metas]) => {
-            const link = metas[0]?.meet;
-            const o = others.get(handle);
-            return typeof link === "string" && MEET.test(link) ? [{ handle, name: handle === self.handle ? "You" : o?.name ?? "Someone", link }] : [];
-          }));
           refresh();
         });
         ch.on("broadcast", { event: "mv" }, ({ payload }) => {
@@ -390,7 +384,6 @@ export function World({ me, flags, team, desks, tour: startTour = false }: Props
           else if (p && !mate && p.interact !== "elevator" && !p.interact?.startsWith("desk:")) { const h = hrefFor(p, flagMap); if (h) router.push(h); }
         },
         wave: (handle) => { send("wave", { to: handle, name: self.name }); setToast("You waved"); },
-        meet: () => { void announce(); },
         go: (id) => { walkNextTo(id); },
         floor: (n) => {
           if (n < 1 || n > TOP_FLOOR || n === floor) return;
@@ -510,7 +503,7 @@ export function World({ me, flags, team, desks, tour: startTour = false }: Props
       };
     })().catch((error) => { console.error("Office failed to start", error); if (!disposed) setFailed(true); });
 
-    return () => { disposed = true; cleanup(); act.current = { open: () => {}, wave: () => {}, floor: () => {}, meet: () => {}, go: () => {} }; };
+    return () => { disposed = true; cleanup(); act.current = { open: () => {}, wave: () => {}, floor: () => {}, go: () => {} }; };
   }, [key, live, router]);
 
   // New members arrive with ?tour=1; anyone can replay it from the Tour button.
@@ -532,17 +525,6 @@ export function World({ me, flags, team, desks, tour: startTour = false }: Props
     const { error } = (await communityBrowser()?.rpc("claim_desk", { p_id: id })) ?? { error: true };
     setToast(error ? "That desk was just taken" : "This desk is yours");
     if (!error) router.refresh();
-  };
-
-  // Shares a Google Meet with this floor (or stops, given ""). Accepts a full link or the bare code.
-  const shareMeet = (input: string) => {
-    const code = /(?:^|meet\.google\.com\/)([a-z]{3}-[a-z]{4}-[a-z]{3})(?![a-z-])/.exec(input.trim().toLowerCase())?.[1];
-    if (input && !code) return setToast("That isn't a Google Meet link");
-    if (input && !visible) return setToast("You're invisible, so no one would see it");
-    meetRef.current = code ? `https://meet.google.com/${code}` : "";
-    act.current.meet();
-    setMeetDraft("");
-    setToast(code ? "Shared with everyone on this floor" : "Stopped sharing");
   };
 
   const becomeVisible = async () => {
@@ -586,7 +568,7 @@ export function World({ me, flags, team, desks, tour: startTour = false }: Props
         <div className="cm-world-live">
           {online > 0 && <span><i aria-hidden /> {online + 1} here</span>}
           {meetings.map((m) => (
-            <a key={m.handle} href={m.link} target="_blank" rel="noopener noreferrer">{m.handle === me.handle ? "Your Google Meet" : `${m.name} is in a Google Meet`} · Join</a>
+            <a key={m.id} href={m.link} target="_blank" rel="noopener noreferrer">{m.mine ? "Your meeting" : m.host_name}: {m.title} · Join</a>
           ))}
         </div>
       )}
@@ -606,21 +588,7 @@ export function World({ me, flags, team, desks, tour: startTour = false }: Props
           ) : card.kind === "meeting" ? (
             <div className="cm-world-card">
               <strong>Meeting terminal</strong>
-              {meetings.some((m) => m.handle === me.handle) ? (
-                <>
-                  <small>Your Google Meet is shown to everyone on this floor.</small>
-                  <div className="cm-actions"><button type="button" className="cm-btn secondary small" onClick={() => shareMeet("")}>Stop sharing</button></div>
-                </>
-              ) : (
-                <>
-                  <small>Start a Google Meet, then paste its link here to invite everyone on this floor.</small>
-                  <div className="cm-actions"><a className="cm-btn small" href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer">Start a Google Meet</a></div>
-                  <form className="cm-world-meetform" onSubmit={(e) => { e.preventDefault(); shareMeet(meetDraft); }}>
-                    <input aria-label="Google Meet link" placeholder="meet.google.com/abc-defg-hij" value={meetDraft} maxLength={200} onChange={(e) => setMeetDraft(e.target.value)} />
-                    <button type="submit" className="cm-btn secondary small" disabled={!meetDraft.trim()}>Share</button>
-                  </form>
-                </>
-              )}
+              <MeetingForm mine={meetings.find((m) => m.mine)} onDone={setToast} />
             </div>
           ) : card.kind === "elevator" ? (
             <div className="cm-world-card">

@@ -13,7 +13,8 @@ type Request = {
 };
 type Flag = { key: string; enabled: boolean; note: string | null };
 type Cap = { user_id: string; capability: string };
-type Tab = "overview" | "members" | "pending" | "decided" | "flags";
+type Ban = { email: string; reason: string | null; created_at: string };
+type Tab = "overview" | "members" | "pending" | "decided" | "flags" | "bans";
 
 const day = (v: string) => new Date(v).toLocaleDateString("en-GB", { dateStyle: "medium" });
 const tried = (t: string | null) => TRIED.find(([k]) => k === t)?.[1] ?? "—";
@@ -26,6 +27,7 @@ export function AdminPanel() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [flags, setFlags] = useState<Flag[]>([]);
   const [caps, setCaps] = useState<Cap[]>([]);
+  const [bans, setBans] = useState<Ban[]>([]);
   const [loadedAt, setLoadedAt] = useState<Date | null>(null);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState("");
@@ -35,17 +37,19 @@ export function AdminPanel() {
   const load = useCallback(async () => {
     const s = communityBrowser();
     if (!s) return;
-    const [p, r, f, c] = await Promise.all([
+    const [p, r, f, c, b] = await Promise.all([
       s.from("profiles").select("*").order("created_at", { ascending: false }).limit(1000),
       s.from("contribution_requests").select("*").order("created_at", { ascending: false }).limit(500),
       s.from("feature_flags").select("key, enabled, note").order("key"),
       s.from("capabilities").select("user_id, capability"),
+      s.from("banned_emails").select("email, reason, created_at").order("created_at", { ascending: false }),
     ]);
     if (p.error || r.error) return setMsg("Could not load the latest data.");
     setPeople(p.data as Profile[]);
     setRequests(r.data as Request[]);
     setFlags((f.data as Flag[]) ?? []);
     setCaps((c.data as Cap[]) ?? []);
+    setBans((b.data as Ban[]) ?? []);
     setLoadedAt(new Date());
   }, []);
 
@@ -71,6 +75,12 @@ export function AdminPanel() {
     void load();
   };
   const s = communityBrowser();
+  // The ban hammer: deletes the account for good and keeps the email from signing up again.
+  const banHammer = (p: Profile) => {
+    const reason = prompt(`Ban hammer: permanently delete ${p.full_name || p.email}'s account and stop ${p.email} from joining again.\n\nThis can't be undone. Reason (optional), then OK to ban:`);
+    if (reason === null) return;
+    void act(p.id, () => s!.rpc("ban_hammer", { p_target: p.id, p_reason: reason.trim() || null }), `${p.full_name || p.email} has been banned and their account deleted.`);
+  };
 
   if (people === null) return <div className="cm-empty" role="status">Loading…</div>;
   const pending = requests.filter((r) => r.status === "pending");
@@ -88,7 +98,7 @@ export function AdminPanel() {
     if (r?.status === "rejected") return ["Declined", ""];
     return ["Member", ""];
   };
-  const tabs: [Tab, string, number | null][] = [["overview", "Overview", null], ["members", "Members", people.length], ["pending", "Applications", pending.length], ["decided", "Decided", decided.length], ["flags", "Features", null]];
+  const tabs: [Tab, string, number | null][] = [["overview", "Overview", null], ["members", "Members", people.length], ["pending", "Applications", pending.length], ["decided", "Decided", decided.length], ["flags", "Features", null], ["bans", "Banned", bans.length]];
 
   return (
     <div className="cm-stack">
@@ -100,6 +110,19 @@ export function AdminPanel() {
       <div className="cm-tabs" role="tablist">
         {tabs.map(([id, name, n]) => <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>{name}{n !== null && <span>{n}</span>}</button>)}
       </div>
+
+      {tab === "bans" && (
+        bans.length === 0 ? <div className="cm-empty">No one is banned.</div> : (
+          <div className="cm-stack">
+            {bans.map((b) => (
+              <div key={b.email} className="cm-panel cm-panel-head">
+                <div><strong>{b.email}</strong><div className="cm-small cm-muted">Banned {day(b.created_at)}{b.reason && <> · {b.reason}</>}</div></div>
+                <button className="cm-btn secondary small" disabled={busy === b.email} onClick={() => confirm(`Let ${b.email} sign up again? Their old account stays deleted.`) && act(b.email, () => s!.rpc("unban_email", { p_email: b.email }), `${b.email} can sign up again.`)}>Unban</button>
+              </div>
+            ))}
+          </div>
+        )
+      )}
 
       {tab === "overview" && (
         <div className="cm-stats">
@@ -130,6 +153,7 @@ export function AdminPanel() {
                     <td><div className="cm-actions">
                       {p.onboarded_at && <button className="cm-btn secondary small" disabled={busy === p.id} onClick={() => confirm(`${p.role === "contributor" ? "Remove contributor access for" : "Make"} ${p.full_name}${p.role === "contributor" ? "?" : " a contributor?"}`) && act(p.id, () => s!.rpc("set_contributor", { target: p.id, allowed: p.role !== "contributor" }), "Contributor access updated.")}>{p.role === "contributor" ? "Remove contributor" : "Make contributor"}</button>}
                       {p.onboarded_at && <button className="cm-btn secondary small" disabled={busy === p.id} onClick={() => act(p.id, () => s!.rpc("set_capability", { p_target: p.id, p_cap: "moderate", p_on: !isMod(p.id) }), "Moderator permission updated.")}>{isMod(p.id) ? "Remove moderator" : "Make moderator"}</button>}
+                      <button className="cm-btn small cm-btn-danger" disabled={busy === p.id} onClick={() => banHammer(p)}>Ban hammer</button>
                     </div></td>
                   </tr>
                 );

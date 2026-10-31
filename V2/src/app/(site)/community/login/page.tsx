@@ -11,6 +11,7 @@ export const metadata: Metadata = { title: "Sign in" };
 const ERRORS: Record<string, string> = {
   access_denied: "Sign-in was cancelled.",
   exchange: "That sign-in link expired or was already used. Please try again.",
+  blocked: "This account can't join the community.",
 };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {

@@ -174,3 +174,47 @@ test("the welcome no longer requires the CooL question", async () => {
   assert.ok((await t.as(MEMBER, "select public.complete_onboarding('Ada Lovelace', 'maybe', null, 'Building a game.', false)")).error, "a bad answer is still refused");
   assert.ok((await t.as(MEMBER, "select public.complete_onboarding('Ada Lovelace', null, null, 'Hi', false)")).error, "too short is refused");
 });
+
+test("meetings reach every member, only as Meet links, and the host can end them", async () => {
+  const t = await setup();
+  for (const id of [MEMBER, OTHER]) {
+    await t.as(id, "select public.accept_guidelines()");
+    await t.as(id, "select public.complete_onboarding('Member Here', null, null, 'Building things together.', false)");
+  }
+  assert.ok((await t.as(MEMBER, "select public.start_meeting('Hack', 'https://evil.example.com/abc-defg-hij')")).error, "other sites are refused");
+  assert.ok((await t.as(MEMBER, "select public.start_meeting('Hack', 'javascript:alert(1)')")).error);
+  assert.ok((await t.as(IMPOSTOR, "select public.start_meeting('x', 'abc-defg-hij')")).error, "only members can start one");
+  assert.equal((await t.as(MEMBER, "select public.start_meeting('Design sync', 'https://meet.google.com/abc-defg-hij?authuser=0')")).error, undefined);
+  const seen = (await t.as(OTHER, "select * from public.list_meetings()")).rows as { title: string; link: string; mine: boolean }[];
+  assert.equal(seen.length, 1, "another member sees it");
+  assert.equal(seen[0]!.link, "https://meet.google.com/abc-defg-hij", "stored as a clean Meet link");
+  assert.equal(seen[0]!.mine, false);
+  assert.equal((await t.as(null, "select * from public.list_meetings()")).error !== undefined || (await t.as(null, "select * from public.list_meetings()")).rows.length === 0, true, "visitors see nothing");
+  const note = (await t.as(OTHER, "select title, href from public.notifications where kind='meeting'")).rows as { title: string }[];
+  assert.equal(note.length, 1, "and is notified");
+  assert.match(note[0]!.title, /started a Google Meet: Design sync/);
+  assert.equal((await t.as(MEMBER, "select count(*)::int n from public.notifications where kind='meeting'")).rows[0]!.n, 0, "the host isn't notified about their own meeting");
+  assert.ok((await t.as(OTHER, "select * from public.meetings")).error, "the table itself is closed");
+  await t.as(OTHER, "select public.end_meeting()");
+  assert.equal((await t.as(OTHER, "select * from public.list_meetings()")).rows.length, 1, "only the host can end it");
+  await t.as(MEMBER, "select public.end_meeting()");
+  assert.equal((await t.as(OTHER, "select * from public.list_meetings()")).rows.length, 0, "ended for everyone");
+});
+
+test("the ban hammer: admins delete an account and the email cannot come back", async () => {
+  const t = await setup();
+  assert.ok((await t.as(OTHER, "select public.ban_hammer($1, 'spam')", [MEMBER])).error, "members cannot ban");
+  assert.ok((await t.as(OWNER, "select public.ban_hammer($1, null)", [OWNER])).error, "admins cannot ban themselves");
+  assert.ok((await t.as(OWNER, "select public.ban_hammer($1, null)", [IMPOSTOR])).error, "or another admin's address");
+  assert.equal((await t.as(OWNER, "select public.ban_hammer($1, 'spam links')", [MEMBER])).error, undefined);
+  assert.equal((await t.db.query("select 1 from auth.users where id=$1", [MEMBER])).rows.length, 0, "the account is gone");
+  assert.equal((await t.db.query("select 1 from public.profiles where id=$1", [MEMBER])).rows.length, 0, "with its profile");
+  assert.equal((await t.as(OWNER, "select email from public.banned_emails")).rows.length, 1, "admins see the ban list");
+  assert.equal((await t.as(OTHER, "select email from public.banned_emails")).rows.length, 0, "members don't");
+  await assert.rejects(t.user("66666666-6666-6666-6666-666666666666", "ADA@example.com", "Ada Again"), /not allowed to join/, "the same email cannot sign up again");
+  assert.equal((await t.db.query<{ n: number }>("select count(*)::int n from public.admin_audit where action='ban'")).rows[0]!.n, 1, "it is in the audit log");
+  assert.ok((await t.as(OTHER, "select public.unban_email('ada@example.com')")).error, "members cannot unban");
+  await t.as(OWNER, "select public.unban_email('ada@example.com')");
+  await t.user("66666666-6666-6666-6666-666666666666", "ada@example.com", "Ada Again");
+  assert.equal((await t.db.query("select 1 from public.profiles where id='66666666-6666-6666-6666-666666666666'")).rows.length, 1, "after an unban they can join again");
+});

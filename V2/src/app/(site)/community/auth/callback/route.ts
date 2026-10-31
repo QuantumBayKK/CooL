@@ -17,7 +17,9 @@ export async function GET(request: NextRequest) {
   const done = (res: NextResponse) => { res.cookies.set("cm_next", "", { path: "/community", maxAge: 0 }); return res; };
   const fail = (code: string) => done(NextResponse.redirect(new URL(`/community/login?error=${code}&next=${encodeURIComponent(next)}`, url.origin)));
 
-  if (url.searchParams.get("error")) return fail(url.searchParams.get("error") === "access_denied" ? "access_denied" : "exchange");
+  const err = url.searchParams.get("error");
+  // A banned address is refused when its account would be created; Supabase reports that as a database error.
+  if (err) return fail(err === "access_denied" ? "access_denied" : /database error saving new user/i.test(url.searchParams.get("error_description") ?? "") ? "blocked" : "exchange");
   const code = url.searchParams.get("code");
   const supabase = await communityServer();
   if (!code || !supabase) return fail("exchange");

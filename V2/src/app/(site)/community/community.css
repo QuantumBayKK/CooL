@@ -171,7 +171,8 @@ a.cm-panel:hover { border-color: var(--cm-line-strong); background: linear-gradi
 .cm-world-live span, .cm-world-live a { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.35rem 0.75rem; border-radius: 999px; background: rgb(0 0 0 / 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; font-size: 0.8rem; font-weight: 600; }
 .cm-world-live a { background: #fff; color: #000; }
 .cm-world-live i { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
-.cm-world-meetform { display: flex; gap: 0.5rem; margin-top: 0.35rem; }
+.cm-world-meetform { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.35rem; }
+.cm-world-meetrow { display: flex; gap: 0.5rem; }
 .cm-world-meetform input { flex: 1; min-width: 0; padding: 0.4rem 0.6rem; border: 1px solid var(--cm-line-strong); border-radius: 8px; background: rgb(255 255 255 / 0.06); color: #fff; font-size: 16px; }
 .cm-char-pop { animation: cm-pop 0.35s ease; }
 @keyframes cm-pop { 0% { transform: scale(0.85); } 60% { transform: scale(1.06); } 100% { transform: none; } }
@@ -191,3 +192,11 @@ a.cm-panel:hover { border-color: var(--cm-line-strong); background: linear-gradi
   .cm-world-tour { top: auto; bottom: 12px; }
   .cm-world.is-touring .cm-world-prompt, .cm-world.is-touring .cm-world-tourbtn { display: none; }
 }
+/* live meetings, on every community page */
+.cm-live-meet { display: flex; flex-direction: column; gap: 0.5rem; margin: -0.5rem 0 1.5rem; }
+.cm-live-meet-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem 1rem; padding: 0.7rem 1rem; border: 1px solid rgb(74 222 128 / 0.35); border-radius: 14px; background: rgb(74 222 128 / 0.06); color: #e6e6e6; }
+.cm-live-meet-row i { display: inline-block; width: 8px; height: 8px; margin-right: 0.35rem; border-radius: 50%; background: #4ade80; vertical-align: middle; }
+.cm-live-meet-row .cm-actions { gap: 0.5rem; }
+.cm-world-card { max-width: min(24rem, calc(100vw - 48px)); }
+.cm-btn.cm-btn-danger { background: #e5484d; border-color: #e5484d; color: #fff; }
+.cm-btn.cm-btn-danger:hover { background: #cf3a3f; }
