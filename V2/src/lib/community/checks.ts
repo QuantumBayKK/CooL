@@ -22,7 +22,7 @@ export function triedError(v: string) {
 }
 export function reasonError(v: string) {
   const n = v.trim().length;
-  if (n < 20) return "Tell us a little more: at least 20 characters.";
+  if (n < 10) return "Tell us a little more: at least 10 characters.";
   return n > 1000 ? "Keep it under 1000 characters." : "";
 }
 export function usageError(v: string) {

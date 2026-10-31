@@ -6,29 +6,41 @@ import { useRouter } from "next/navigation";
 import { communityBrowser } from "@/lib/community/browser";
 import {
   CLOTH_COLORS, CLOTH_OPTIONS, DEFAULT_AVATAR, FACIAL_OPTIONS, HAIR_COLORS, HAIR_OPTIONS, SKIN_OPTIONS,
-  randomAvatar, renderAvatarScene, sanitizeAvatar, type AvatarSpec,
+  randomAvatar, renderAvatarWalk, sanitizeAvatar, type AvatarSpec,
 } from "@/lib/community/art/avatar";
 
-/** Draws the character's front sprite at a whole-pixel scale so it stays crisp. */
+const POSES = ["down", "right", "up", "left"] as const;
+const CYCLE = [1, 0, 2, 0]; // walk frames: step, pass, other step, pass
+
+/** The character walking on the spot and turning around, drawn at a whole-pixel scale so it stays crisp. */
 function Preview({ spec }: { spec: AvatarSpec }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const c = ref.current;
     if (!c) return;
-    const s = renderAvatarScene(spec);
+    const walk = renderAvatarWalk(spec);
     const k = 6 * Math.max(1, Math.round(window.devicePixelRatio || 1));
-    c.width = s.w * k; c.height = s.h * k;
-    c.style.width = `${s.w * 6}px`; c.style.height = `${s.h * 6}px`;
+    c.width = walk.w * k; c.height = walk.h * k;
+    c.style.width = `${walk.w * 6}px`; c.style.height = `${walk.h * 6}px`;
     const g = c.getContext("2d")!;
-    const img = new ImageData(new Uint8ClampedArray(s.front[0]!), s.w, s.h);
-    const tmp = document.createElement("canvas");
-    tmp.width = s.w; tmp.height = s.h;
-    tmp.getContext("2d")!.putImageData(img, 0, 0);
     g.imageSmoothingEnabled = false;
-    g.clearRect(0, 0, c.width, c.height);
-    g.drawImage(tmp, 0, 0, c.width, c.height);
+    const tmp = document.createElement("canvas");
+    tmp.width = walk.w; tmp.height = walk.h;
+    const draw = (buf: Uint8ClampedArray) => {
+      tmp.getContext("2d")!.putImageData(new ImageData(new Uint8ClampedArray(buf), walk.w, walk.h), 0, 0);
+      g.clearRect(0, 0, c.width, c.height);
+      g.drawImage(tmp, 0, 0, c.width, c.height);
+    };
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { draw(walk.down[0]!); return; }
+    let tick = 0;
+    const timer = setInterval(() => {
+      const pose = POSES[Math.floor(tick / 12) % 4]!; // a few steps facing each way
+      draw(walk[pose][CYCLE[tick % 4]!]!);
+      tick++;
+    }, 160);
+    return () => clearInterval(timer);
   }, [spec]);
-  return <canvas ref={ref} role="img" aria-label="Your character" style={{ imageRendering: "pixelated" }} />;
+  return <canvas ref={ref} key={JSON.stringify(spec)} className="cm-char-pop" role="img" aria-label="Your character" style={{ imageRendering: "pixelated" }} />;
 }
 
 function Swatches({ label, colors, value, onPick }: { label: string; colors: string[]; value: string; onPick: (c: string) => void }) {
@@ -45,8 +57,8 @@ function Swatches({ label, colors, value, onPick }: { label: string; colors: str
   );
 }
 
-/** Your character for the office: a live preview and a few simple choices. */
-export function CharacterMaker({ initial }: { initial: unknown }) {
+/** Your character for the office: a live preview and a few simple choices. With `next`, saving moves on. */
+export function CharacterMaker({ initial, next }: { initial: unknown; next?: string }) {
   const router = useRouter();
   const [spec, setSpec] = useState<AvatarSpec>(() => (initial ? sanitizeAvatar(initial) : DEFAULT_AVATAR));
   const [msg, setMsg] = useState("");
@@ -60,7 +72,8 @@ export function CharacterMaker({ initial }: { initial: unknown }) {
     const { error } = await s.from("profiles").update({ avatar: spec }).eq("id", data.user.id);
     setBusy(false);
     setMsg(error ? "Could not save your character." : "Saved.");
-    if (!error) router.refresh();
+    if (!error && next) router.push(next);
+    else if (!error) router.refresh();
   };
   const select = (label: string, value: string, options: { id: string; label: string }[], on: (v: string) => void) => (
     <label className="cm-field"><span>{label}</span>
@@ -83,7 +96,7 @@ export function CharacterMaker({ initial }: { initial: unknown }) {
         <Swatches label="Hair colour" colors={HAIR_COLORS} value={spec.hairColor} onPick={(c) => set({ hairColor: c })} />
         <Swatches label="Outfit colour" colors={CLOTH_COLORS} value={spec.clothColor} onPick={(c) => set({ clothColor: c })} />
         <label className="cm-check"><input type="checkbox" checked={spec.glasses} onChange={(e) => set({ glasses: e.target.checked })} /> Glasses</label>
-        <div className="cm-actions"><button type="button" className="cm-btn" disabled={busy} onClick={save}>{busy ? "Saving…" : "Save character"}</button>{msg && <span className="cm-small cm-muted" role="status">{msg}</span>}</div>
+        <div className="cm-actions"><button type="button" className="cm-btn" disabled={busy} onClick={save}>{busy ? "Saving…" : next ? "Save and take the tour" : "Save character"}</button>{msg && <span className="cm-small cm-muted" role="status">{msg}</span>}</div>
       </div>
     </div>
   );

@@ -148,3 +148,29 @@ test("contributor applications and admin review still hold (baseline rules)", as
   assert.equal((await t.as(OWNER, "select (public.review_request($1,'approved')).status s", [r.rows[0]!.id])).rows[0]!.s, "approved");
   assert.equal((await t.db.query<{ role: string }>("select role from public.profiles where id=$1", [MEMBER])).rows[0]!.role, "contributor");
 });
+
+test("points come from what members did; only you see the breakdown", async () => {
+  const t = await setup();
+  await t.as(MEMBER, "select public.accept_guidelines()");
+  await t.as(MEMBER, "select public.complete_onboarding('Ada Lovelace', null, '', 'I want to build open tools.', false)");
+  const handle = (await t.db.query<{ handle: string }>("select handle from public.profiles where id=$1", [MEMBER])).rows[0]!.handle;
+  const mine = async () => (await t.as(MEMBER, "select public.my_points() p")).rows[0]!.p as { total: number; parts: Record<string, number> };
+  assert.equal((await mine()).total, 50, "joining is worth 50");
+  await t.as(MEMBER, `update public.profiles set avatar='{"v":1}'::jsonb where id=$1`, [MEMBER]);
+  assert.equal((await mine()).parts.character, 20);
+  assert.equal((await mine()).total, 70);
+  const shown = (await t.as(null, "select public.get_profile($1) p", [handle])).rows[0]!.p as Record<string, unknown>;
+  assert.equal(shown.points, 70, "others see the total on the profile");
+  assert.equal(((await t.as(null, "select points from public.list_profiles() where handle=$1", [handle])).rows[0] as { points: number }).points, 70);
+  assert.equal((await t.as(null, "select public.my_points() p")).rows[0]?.p ?? null, null, "visitors have no points");
+  assert.ok((await t.as(OTHER, "select public.points_parts($1)", [MEMBER])).error, "no one can read another member's breakdown");
+  assert.ok((await t.as(OTHER, "select public.points_total($1)", [MEMBER])).error);
+});
+
+test("the welcome no longer requires the CooL question", async () => {
+  const t = await setup();
+  const r = await t.as(MEMBER, "select public.complete_onboarding('Ada Lovelace', null, null, 'Building a game.', false)");
+  assert.equal(r.error, undefined);
+  assert.ok((await t.as(MEMBER, "select public.complete_onboarding('Ada Lovelace', 'maybe', null, 'Building a game.', false)")).error, "a bad answer is still refused");
+  assert.ok((await t.as(MEMBER, "select public.complete_onboarding('Ada Lovelace', null, null, 'Hi', false)")).error, "too short is refused");
+});

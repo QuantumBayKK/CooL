@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: { default: "Community", template: "%s · Community · Northwind Cipher" },
-  description: "Build, learn and contribute to CooL with the Northwind Cipher community.",
+  description: "Build, learn and work on open-source projects together with the Northwind Cipher community.",
 };
 
 export default async function CommunityLayout({ children }: { children: React.ReactNode }) {

@@ -13,11 +13,10 @@ const LINKS: [string, string][] = [
   ["/community/guidelines", "Guidelines"],
 ];
 
-export function CommunityNav({ signedIn, owner, moderator, unread = 0 }: { signedIn: boolean; owner: boolean; moderator: boolean; unread?: number }) {
+export function CommunityNav({ signedIn, owner, unread = 0 }: { signedIn: boolean; owner: boolean; moderator?: boolean; unread?: number }) {
   const path = usePathname();
   const current = (href: string) => (href === "/community" ? path === href : path === href || path.startsWith(href + "/"));
   const end: [string, string][] = [
-    ...(moderator || owner ? ([["/community/moderation", "Moderation"]] as [string, string][]) : []),
     ...(owner ? ([["/community/admin", "Admin"]] as [string, string][]) : []),
     ...(signedIn ? ([["/community/inbox", "Inbox"]] as [string, string][]) : []),
     signedIn ? ["/community/profile", "Profile"] : ["/community/login", "Sign in"],

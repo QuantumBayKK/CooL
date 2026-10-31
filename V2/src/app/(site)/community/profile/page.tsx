@@ -5,13 +5,22 @@ import { ApplyForm } from "@/components/community/ApplyForm";
 import { CharacterMaker } from "@/components/community/CharacterMaker";
 import { DeskEditor } from "@/components/community/DeskEditor";
 import { LinkGitHub, PrivacyEditor, ProfileEditor, SignOut, YourData } from "@/components/community/ProfileForms";
-import { TRIED } from "@/lib/community/checks";
 import { requireMember } from "@/lib/community/member";
 import { communityServer } from "@/lib/community/supabase";
 
 export const metadata: Metadata = { title: "Profile" };
 
 type Request = { status: "pending" | "approved" | "rejected"; review_note: string | null; created_at: string };
+
+const POINTS: [string, string, string][] = [
+  ["joined", "Joined", "Finish the welcome"],
+  ["character", "Character", "Make your character"],
+  ["desk", "Desk", "Claim a desk in the quiet area"],
+  ["proposals", "Proposals", "Propose a project in the Commons"],
+  ["comments", "Comments", "Join a discussion"],
+  ["votes", "Votes", "Vote in a public poll"],
+  ["contributions", "Contributions", "Get approved as a contributor"],
+];
 
 export default async function ProfilePage() {
   const member = await requireMember("/community/profile");
@@ -23,6 +32,8 @@ export default async function ProfilePage() {
   const { data: desks } = (await supabase?.rpc("list_desks")) ?? { data: null };
   const myDesk = ((desks as { id: string; owner_handle: string | null; badges: string[]; screen: string }[] | null) ?? []).find((d) => d.owner_handle === p.handle) ?? null;
   const first = p.full_name.split(" ")[0] || "there";
+  const { data: pts } = (await supabase?.rpc("my_points")) ?? { data: null };
+  const points = (pts as { total: number; parts: Record<string, number> } | null) ?? { total: 0, parts: {} };
 
   return (
     <div className="cm-in cm-stack">
@@ -36,6 +47,19 @@ export default async function ProfilePage() {
         </div>
       </header>
 
+      <section className="cm-panel" id="points" aria-labelledby="points-title">
+        <div className="cm-panel-head">
+          <h2 id="points-title">Your points</h2>
+          <span className="cm-points">{points.total}</span>
+        </div>
+        <div className="cm-tags">
+          {POINTS.map(([key, label, how]) => (
+            <span key={key} className={`cm-tag${points.parts[key] ? " ok" : ""}`} title={how}>{label} · {points.parts[key] ?? 0}</span>
+          ))}
+        </div>
+        <p className="cm-muted cm-small">Earned from what you do: joining (50), making your character (20), claiming a desk (10), each proposal (40), each comment (5, up to 200), each vote in a public poll (10), and each approved contribution (100). Everyone sees your total.</p>
+      </section>
+
       <section className="cm-panel" id="character" aria-labelledby="char-title">
         <h2 id="char-title">Your character</h2>
         <CharacterMaker initial={p.avatar} />
@@ -47,10 +71,10 @@ export default async function ProfilePage() {
       </section>
 
       <section className="cm-panel" aria-labelledby="contrib-title">
-        <h2 id="contrib-title">Contributing to CooL</h2>
+        <h2 id="contrib-title">Contributing to projects</h2>
         {p.role === "contributor" ? (
           <><p><span className="cm-tag ok">Contributor</span></p><p className="cm-muted">Pick an issue and open a pull request on GitHub.</p>
-            <div className="cm-actions"><Link className="cm-btn" href="/community/projects/cool-sdk">Find an issue</Link></div></>
+            <div className="cm-actions"><Link className="cm-btn" href="/community/projects">Find a project</Link></div></>
         ) : latest?.status === "pending" ? (
           <><p><span className="cm-tag warn">Under review</span></p><p className="cm-muted">Your application is with the team. This page updates when they decide.</p></>
         ) : member.owner ? (
@@ -58,7 +82,7 @@ export default async function ProfilePage() {
         ) : (
           <>
             {latest?.status === "rejected" && <p className="cm-muted">Your last application wasn&apos;t approved.{latest.review_note && <> Note from the team: {latest.review_note}</>}</p>}
-            <p className="cm-muted">CooL is built by a small team. Share your GitHub and links to work you&apos;ve done, and the team will review it.</p>
+            <p className="cm-muted">Want to build with others? Share your GitHub and links to work you&apos;ve done on any project. Once the team approves it, you&apos;re marked as a contributor (+100 points).</p>
             <ApplyForm />
           </>
         )}
@@ -73,8 +97,7 @@ export default async function ProfilePage() {
           <h2 id="about-title">About you</h2>
           <dl className="cm-dl">
             <dt>Name</dt><dd>{p.full_name}</dd>
-            <dt>Tried CooL</dt><dd>{TRIED.find(([k]) => k === p.tried_cool)?.[1] ?? "—"}{p.cool_usage && <div className="cm-small cm-muted">{p.cool_usage}</div>}</dd>
-            <dt>Why you joined</dt><dd>{p.join_reason ?? "—"}</dd>
+            <dt>What you want to build</dt><dd>{p.join_reason ?? "—"}</dd>
             <dt>Member since</dt><dd>{p.onboarded_at ? new Date(p.onboarded_at).toLocaleDateString("en-GB", { dateStyle: "medium" }) : "—"}</dd>
           </dl>
           <p className="cm-small"><Link className="cm-link" href={`/community/contributors/${p.handle}`}>See your public profile →</Link></p>

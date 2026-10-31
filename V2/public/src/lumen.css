@@ -27,7 +27,7 @@
 .lumen { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; opacity: var(--lumen-fade, 1); }
 .lumen > * { position: absolute; inset: 0; width: 100%; height: 100%; }
 .lumen__silk { display: block; opacity: 0; transition: opacity 2.4s ease; }
-.lumen__silk.is-ready { opacity: .12; }
+.lumen__silk.is-ready { opacity: .5; } /* strong enough to read on laptop panels, which crush near-black */
 .lumen__spread { background: radial-gradient(40% 32% at 50% 46%, rgba(255,255,255,.03), transparent 70%); }
 .lumen__dots { background-image: radial-gradient(rgba(255,255,255,.22) 1px, transparent 1.4px); background-size: 14px 14px;
   -webkit-mask-image: radial-gradient(55% 45% at 50% 50%, #000 0%, transparent 75%); mask-image: radial-gradient(55% 45% at 50% 50%, #000 0%, transparent 75%); opacity: .05; }

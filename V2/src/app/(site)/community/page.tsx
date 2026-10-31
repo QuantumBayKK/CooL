@@ -12,7 +12,7 @@ export default async function CommunityHome({ searchParams }: { searchParams: Pr
       {sp.deleted && <p className="cm-notice" role="status">Your account has been deleted.</p>}
       <section className="cm-hero" aria-labelledby="home-title">
         <h1 id="home-title">Great things start with <span className="cm-ndot">good company.</span></h1>
-        <p className="cm-lead">A home for open-source collaboration around CooL: walk into the office, find a project, propose your own, and decide together what the community builds next.</p>
+        <p className="cm-lead">A home for building in the open, on any project: walk into the office, meet people live, find a project, propose your own, and decide together what gets built next.</p>
         <div className="cm-actions">
           <a className="cm-btn" href={start.href}>{start.label} ↗</a>
           <Link className="cm-btn secondary" href="/community/world">Enter the office</Link>

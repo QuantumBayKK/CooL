@@ -12,10 +12,11 @@ import { NC_PATHS } from "./NcLogo";
 export type TeamMember = { handle: string; name: string; role: string; linkedin: string | null; avatar: unknown; seat: number; member_handle: string | null; joined: boolean };
 export type Me = { handle: string; name: string; avatar: unknown; visible: boolean };
 export type Desk = { id: string; owner_handle: string | null; owner_name: string | null; badges: string[]; screen: string };
-type Props = { me: Me; flags: Record<string, boolean>; team: TeamMember[]; desks: Desk[] };
+type Props = { me: Me; flags: Record<string, boolean>; team: TeamMember[]; desks: Desk[]; tour?: boolean };
 type Card =
   | { kind: "object"; label: string; href: string | null }
   | { kind: "elevator"; floor: number }
+  | { kind: "meeting" }
   | { kind: "desk"; id: string; owner: string | null; mine: boolean; hasDesk: boolean }
   | { kind: "person"; key: string; name: string; role?: string; handle: string | null; linkedin?: string | null; live: boolean };
 type Dir = "down" | "up" | "left" | "right";
@@ -24,6 +25,20 @@ const STEP = 0.18; // seconds per tile
 const FLOOR_CAP = 25; // people per floor; a full floor sends newcomers to the next identical floor
 const TOP_FLOOR = 9;
 const CYCLE = [1, 0, 2, 0]; // walk frames: step, pass, other step, pass
+// The tour: your character walks to each place in turn while a line explains it.
+const TOUR: { go: string | null; title: string; text: string }[] = [
+  { go: "lobby.directory", title: "Main lobby", text: "Everyone arrives here. Walk up to anyone to Message or Wave; the notice board has the news." },
+  { go: "elevator", title: "Elevator", text: "Every floor is the same office. When one fills up, the next opens; ride up and down to visit." },
+  { go: "help.guidelines", title: "Help desk", text: "The guidelines, the privacy notice and your profile settings." },
+  { go: "projects.directory", title: "Project district", text: "Open-source projects you can join, any project, not just ours." },
+  { go: "commons.ideas", title: "The Commons", text: "Post an idea for a project and shape it together in the open." },
+  { go: "assembly.polls", title: "Assembly hall", text: "Votes decide which ideas become real projects." },
+  { go: "meeting.terminal", title: "Meeting hall", text: "Start a Google Meet here and everyone on your floor gets a Join button." },
+  { go: "showcase.wall", title: "Showcase", text: "What the community has built." },
+  { go: "desk:q1", title: "Quiet work area", text: "Claim a free desk, pin badges on it and draw on its screen." },
+  { go: null, title: "And on the site", text: "Inbox for messages, People to meet everyone, and your profile for your points. You earn points by joining, proposing, commenting, voting in public polls and contributing." },
+];
+const MEET = /^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}$/; // the only links the office will show
 
 function hrefFor(p: Piece, flags: Record<string, boolean>): string | null {
   const room = ROOMS.find((r) => r.interactables.some((i) => i.id === p.interact));
@@ -38,10 +53,14 @@ const clean = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) 
  * object, a person or a teammate's desk, a small card appears. Other members appear live and move in
  * real time unless they have chosen to be invisible; a teammate who is here in person leaves their desk.
  */
-export function World({ me, flags, team, desks }: Props) {
+export function World({ me, flags, team, desks, tour: startTour = false }: Props) {
   const router = useRouter();
   const host = useRef<HTMLDivElement>(null);
-  const act = useRef<{ open: () => void; wave: (handle: string) => void; floor: (n: number) => void }>({ open: () => {}, wave: () => {}, floor: () => {} });
+  const act = useRef<{ open: () => void; wave: (handle: string) => void; floor: (n: number) => void; meet: () => void; go: (id: string) => void }>({ open: () => {}, wave: () => {}, floor: () => {}, meet: () => {}, go: () => {} });
+  const [tourStep, setTourStep] = useState<number | null>(null);
+  const meetRef = useRef("");
+  const [meetings, setMeetings] = useState<{ handle: string; name: string; link: string }[]>([]);
+  const [meetDraft, setMeetDraft] = useState("");
   const [card, setCard] = useState<Card | null>(null);
   const [room, setRoom] = useState("");
   const [toast, setToast] = useState("");
@@ -204,7 +223,7 @@ export function World({ me, flags, team, desks }: Props) {
       const meActor = makeActor(self.avatar, "", map.spawn.x, map.spawn.y);
       meActor.tag.visible = false;
       const path: { x: number; y: number }[] = [];
-      const others = new Map<string, Actor & { name: string; seen: number }>();
+      const others = new Map<string, Actor & { name: string; seen: number; route: { x: number; y: number }[] }>();
       // A teammate who is here in person walks around; their desk figure steps away until they leave.
       const syncSeats = () => {
         for (const t of seated) {
@@ -244,6 +263,9 @@ export function World({ me, flags, team, desks }: Props) {
           const d = deskList.find((x) => x.id === piece.interact!.slice(5));
           next = { kind: "desk", id: piece.interact.slice(5), owner: d?.owner_name ?? null, mine: d?.owner_handle === self.handle, hasDesk: deskList.some((x) => x.owner_handle === self.handle) };
           target = { x: piece.x + (piece.w - 1) / 2, y: piece.y + piece.h - 1, h: art.UP[piece.kind] + 8 };
+        } else if (piece?.interact === "meeting.terminal") {
+          next = { kind: "meeting" };
+          target = { x: piece.x + (piece.w - 1) / 2, y: piece.y + piece.h - 1, h: art.UP[piece.kind] + 8 };
         } else if (piece?.interact === "elevator") {
           next = { kind: "elevator", floor };
           target = { x: piece.x + (piece.w - 1) / 2, y: piece.y + piece.h - 1, h: art.UP[piece.kind] + 8 };
@@ -259,7 +281,13 @@ export function World({ me, flags, team, desks }: Props) {
       const supabase = live ? communityBrowser() : null;
       let channel: ReturnType<NonNullable<typeof supabase>["channel"]> | null = null;
       const send = (event: string, payload: Record<string, unknown>) => { void channel?.send({ type: "broadcast", event, payload }); };
-      const clearOthers = () => { for (const o of others.values()) { o.sprite.destroy(); o.shadow.destroy(); o.tag.destroy(); } others.clear(); syncSeats(); setOnline(0); };
+      // What the floor knows about me: where I stand, and the Google Meet I'm in, if I shared one.
+      let sent = { x: -1, y: -1 }, sentAt = 0, tracked = { x: -1, y: -1 }, stoppedAt = 0;
+      const announce = () => {
+        tracked = { x: meActor.tx, y: meActor.ty };
+        return channel?.track({ name: self.name, avatar: self.avatar, x: meActor.tx, y: meActor.ty, ...(meetRef.current && { meet: meetRef.current }) });
+      };
+      const clearOthers = () => { for (const o of others.values()) { o.sprite.destroy(); o.shadow.destroy(); o.tag.destroy(); } others.clear(); syncSeats(); setOnline(0); setMeetings([]); };
       const joinFloor = async (n: number, auto: boolean) => {
         if (!supabase || disposed) return;
         if (channel) { await supabase.removeChannel(channel); channel = null; }
@@ -270,7 +298,7 @@ export function World({ me, flags, team, desks }: Props) {
         channel = ch;
         let first = true;
         ch.on("presence", { event: "sync" }, () => {
-          const state = ch.presenceState<{ name: string; avatar: unknown; x: number; y: number }>();
+          const state = ch.presenceState<{ name: string; avatar: unknown; x: number; y: number; meet?: unknown }>();
           const count = Object.keys(state).filter((h) => h !== self.handle).length;
           // Arriving at a full floor sends you up to the next identical one.
           if (first && auto && count >= FLOOR_CAP && n < TOP_FLOOR) { first = false; void joinFloor(n + 1, true); return; }
@@ -280,33 +308,54 @@ export function World({ me, flags, team, desks }: Props) {
             if (!meta || handle === self.handle) continue;
             const x = Number(meta.x), y = Number(meta.y);
             const known = others.get(handle);
-            // Where they last stopped; catches up anyone whose steps were missed.
-            if (known) { if (known.t >= 1 && walkable(map, x, y) && (x !== known.tx || y !== known.ty)) { known.fx = known.tx = x; known.fy = known.ty = y; } continue; }
+            // Where they settled. Moves arrive faster than this, so it only corrects someone whose
+            // moves were missed, never a person who is walking.
+            if (known) {
+              if (known.t >= 1 && !known.route.length && Date.now() - known.seen > 2000 && walkable(map, x, y) && (x !== known.tx || y !== known.ty)) { known.fx = known.tx = x; known.fy = known.ty = y; }
+              continue;
+            }
             const name = teamFor(handle)?.name ?? clean(meta.name, 40);
             const o = makeActor(meta.avatar, name, walkable(map, x, y) ? x : map.spawn.x, walkable(map, x, y) ? y : map.spawn.y);
-            others.set(handle, Object.assign(o, { name, seen: Date.now() }));
+            others.set(handle, Object.assign(o, { name, seen: 0, route: [] }));
           }
           for (const [handle, o] of others) if (!state[handle]) { o.sprite.destroy(); o.shadow.destroy(); o.tag.destroy(); others.delete(handle); }
           syncSeats();
           setOnline(others.size);
+          setMeetings(Object.entries(state).flatMap(([handle, metas]) => {
+            const link = metas[0]?.meet;
+            const o = others.get(handle);
+            return typeof link === "string" && MEET.test(link) ? [{ handle, name: handle === self.handle ? "You" : o?.name ?? "Someone", link }] : [];
+          }));
           refresh();
         });
         ch.on("broadcast", { event: "mv" }, ({ payload }) => {
           const o = others.get(clean(payload.h, 40));
           const x = Number(payload.x), y = Number(payload.y);
           if (!o || !walkable(map, x, y)) return; // never trust a position that is off the floor
-          if (Math.abs(x - o.tx) + Math.abs(y - o.ty) === 1) stepActor(o, x, y);
-          else { o.fx = o.tx = x; o.fy = o.ty = y; o.t = 1; }
-          refresh();
+          o.seen = Date.now();
+          // Walk them there tile by tile; snap only if they're somewhere unreachable or far off.
+          const route = findPath(map, o.tx, o.ty, x, y);
+          if (route && route.length <= 40) o.route = route;
+          else { o.route = []; o.fx = o.tx = x; o.fy = o.ty = y; o.t = 1; }
         });
         ch.on("broadcast", { event: "wave" }, ({ payload }) => {
           if (payload.to === self.handle) setToast(`${clean(payload.name, 40)} waved at you`);
         });
         ch.subscribe(async (status) => {
-          if (status === "SUBSCRIBED" && shown) await ch.track({ name: self.name, avatar: self.avatar, x: meActor.tx, y: meActor.ty });
+          if (status === "SUBSCRIBED" && shown && channel === ch) { await announce(); sent = { x: meActor.tx, y: meActor.ty }; }
         });
         refresh();
       };
+      // If the connection drops (sleep, network change, an expired sign-in), rejoin the same floor.
+      let broken = 0;
+      const checkLive = () => {
+        if (disposed || !supabase || !channel) return;
+        broken = channel.state === "joined" || channel.state === "joining" ? 0 : broken + 1;
+        if (broken >= 2) { broken = 0; void supabase.realtime.setAuth().then(() => joinFloor(floor, false)).catch(() => {}); }
+      };
+      const watchdog = setInterval(checkLive, 5000);
+      const onShow = () => { if (document.visibilityState === "visible") checkLive(); };
+      document.addEventListener("visibilitychange", onShow);
       let floor = 1;
       if (supabase) {
         try {
@@ -319,6 +368,20 @@ export function World({ me, flags, team, desks }: Props) {
         }
       }
 
+      // Walks to the nearest free tile beside a piece (the tour, and the end-to-end suite).
+      const walkNextTo = (id: string) => {
+        const p = map.pieces.find((q) => q.interact === id);
+        let best: { x: number; y: number }[] | null = null;
+        for (let y = p ? p.y - 1 : 0; p && y <= p.y + p.h; y++) for (let x = p.x - 1; x <= p.x + p.w; x++) {
+          // only spots where this piece is the one within reach (corners and neighbours' spots don't count)
+          if (!walkable(map, x, y) || reachable(map, x, y)?.interact !== id) continue;
+          const r = x === meActor.tx && y === meActor.ty ? [] : findPath(map, meActor.tx, meActor.ty, x, y);
+          if (r && (!best || r.length < best.length)) best = r;
+        }
+        if (best) { path.length = 0; path.push(...best); }
+        return Boolean(best);
+      };
+
       act.current = {
         open: () => {
           const p = reachable(map, meActor.tx, meActor.ty);
@@ -327,12 +390,21 @@ export function World({ me, flags, team, desks }: Props) {
           else if (p && !mate && p.interact !== "elevator" && !p.interact?.startsWith("desk:")) { const h = hrefFor(p, flagMap); if (h) router.push(h); }
         },
         wave: (handle) => { send("wave", { to: handle, name: self.name }); setToast("You waved"); },
+        meet: () => { void announce(); },
+        go: (id) => { walkNextTo(id); },
         floor: (n) => {
           if (n < 1 || n > TOP_FLOOR || n === floor) return;
           setToast(`Floor ${n}`);
           void joinFloor(n, false);
         },
       };
+      // A hook for the local end-to-end suite to read positions and walk; never part of a production build.
+      if (process.env.NODE_ENV !== "production") Object.assign(window, { __office: {
+        me: () => ({ x: meActor.tx, y: meActor.ty, floor }),
+        others: () => [...others].map(([h, o]) => ({ h, name: o.name, x: o.tx, y: o.ty, moving: o.t < 1 || o.route.length > 0 })),
+        walkTo: (x: number, y: number) => { const r = findPath(map, meActor.tx, meActor.ty, x, y); if (r) { path.length = 0; path.push(...r); } return Boolean(r); },
+        nextTo: walkNextTo,
+      } });
       refresh();
 
       // ── viewport ──
@@ -347,7 +419,6 @@ export function World({ me, flags, team, desks }: Props) {
       app.renderer.on("resize", layout);
 
       const keys = new Set<string>();
-      let sentAt = 0;
       app.ticker.add((ticker) => {
         const dt = Math.min(ticker.deltaMS / 1000, 0.05);
         if (meActor.t >= 1) {
@@ -358,19 +429,24 @@ export function World({ me, flags, team, desks }: Props) {
             if ((dx || dy) && walkable(map, meActor.tx + dx, meActor.ty + dy)) next = { x: meActor.tx + dx, y: meActor.ty + dy };
             else if (dx || dy) meActor.dir = dy < 0 ? "up" : dy > 0 ? "down" : dx < 0 ? "left" : "right";
           }
-          if (next && walkable(map, next.x, next.y)) {
-            stepActor(meActor, next.x, next.y);
-            if (shown && performance.now() - sentAt > 120) { send("mv", { h: self.handle, x: next.x, y: next.y }); sentAt = performance.now(); }
-          }
+          if (next && walkable(map, next.x, next.y)) stepActor(meActor, next.x, next.y);
         }
         const wasMoving = meActor.t < 1;
         const pos = place(meActor, dt, path.length > 0);
-        if (wasMoving && meActor.t >= 1) {
-          refresh();
-          if (shown && path.length === 0) void channel?.track({ name: self.name, avatar: self.avatar, x: meActor.tx, y: meActor.ty });
+        if (wasMoving && meActor.t >= 1) { refresh(); stoppedAt = performance.now(); }
+        // Tell the floor where I'm heading: a clicked route in one message, held keys a few times a
+        // second (others walk the tiles in between). Once I've stood still, settle my position.
+        if (shown && channel) {
+          const now = performance.now();
+          const goal = path.length ? path[path.length - 1]! : { x: meActor.tx, y: meActor.ty };
+          if ((goal.x !== sent.x || goal.y !== sent.y) && now - sentAt >= 250) { send("mv", { h: self.handle, x: goal.x, y: goal.y }); sent = goal; sentAt = now; }
+          if (meActor.t >= 1 && !path.length && now - stoppedAt >= 600 && (meActor.tx !== tracked.x || meActor.ty !== tracked.y)) void announce();
         }
         for (const { actor } of seated) place(actor, dt, false);
-        for (const o of others.values()) place(o, dt, false);
+        for (const o of others.values()) {
+          if (o.t >= 1 && o.route.length) { const n = o.route.shift()!; stepActor(o, n.x, n.y); if (!o.route.length) refresh(); }
+          place(o, dt, o.route.length > 0);
+        }
 
         if (target) {
           bob += dt;
@@ -427,18 +503,46 @@ export function World({ me, flags, team, desks }: Props) {
         window.removeEventListener("keydown", down);
         window.removeEventListener("keyup", up);
         window.removeEventListener("blur", blur);
+        clearInterval(watchdog);
+        document.removeEventListener("visibilitychange", onShow);
         if (channel) void supabase?.removeChannel(channel);
         app.destroy(true, { children: true, texture: true });
       };
     })().catch((error) => { console.error("Office failed to start", error); if (!disposed) setFailed(true); });
 
-    return () => { disposed = true; cleanup(); act.current = { open: () => {}, wave: () => {}, floor: () => {} }; };
+    return () => { disposed = true; cleanup(); act.current = { open: () => {}, wave: () => {}, floor: () => {}, meet: () => {}, go: () => {} }; };
   }, [key, live, router]);
+
+  // New members arrive with ?tour=1; anyone can replay it from the Tour button.
+  useEffect(() => {
+    if (!startTour) return;
+    window.history.replaceState(null, "", "/community/world");
+    const t = setTimeout(() => setTourStep(0), 1200); // let the office load first
+    return () => clearTimeout(t);
+  }, [startTour]);
+  useEffect(() => {
+    const go = tourStep === null ? null : TOUR[tourStep]?.go;
+    if (!go) return;
+    const t = setTimeout(() => act.current.go(go), 50);
+    return () => clearTimeout(t);
+  }, [tourStep]);
+  const step = tourStep === null ? null : TOUR[tourStep];
 
   const claim = async (id: string) => {
     const { error } = (await communityBrowser()?.rpc("claim_desk", { p_id: id })) ?? { error: true };
     setToast(error ? "That desk was just taken" : "This desk is yours");
     if (!error) router.refresh();
+  };
+
+  // Shares a Google Meet with this floor (or stops, given ""). Accepts a full link or the bare code.
+  const shareMeet = (input: string) => {
+    const code = /(?:^|meet\.google\.com\/)([a-z]{3}-[a-z]{4}-[a-z]{3})(?![a-z-])/.exec(input.trim().toLowerCase())?.[1];
+    if (input && !code) return setToast("That isn't a Google Meet link");
+    if (input && !visible) return setToast("You're invisible, so no one would see it");
+    meetRef.current = code ? `https://meet.google.com/${code}` : "";
+    act.current.meet();
+    setMeetDraft("");
+    setToast(code ? "Shared with everyone on this floor" : "Stopped sharing");
   };
 
   const becomeVisible = async () => {
@@ -450,13 +554,42 @@ export function World({ me, flags, team, desks }: Props) {
   };
 
   return (
-    <div className={`cm-world${full ? " is-full" : ""}`} ref={host} data-online={online}>
+    <div className={`cm-world${full ? " is-full" : ""}${tourStep !== null ? " is-touring" : ""}`} ref={host} data-online={online}>
       <button type="button" className="cm-world-full" onClick={toggleFull} aria-label={full ? "Exit full screen" : "Full screen"} aria-pressed={full}>
         <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
           {full ? <path d="M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4" /> : <path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" />}
         </svg>
       </button>
-      {room && <div key={room} className="cm-world-room" aria-live="polite">{room}{online > 0 && ` · ${online + 1} here`}</div>}
+      <button type="button" className="cm-world-tourbtn" onClick={() => setTourStep(0)}>Tour</button>
+      {step && tourStep !== null && (
+        <div className="cm-world-tour" role="dialog" aria-label="Office tour">
+          <small>{tourStep + 1} of {TOUR.length}</small>
+          <strong>{step.title}</strong>
+          <p>{step.text}</p>
+          {!step.go && (
+            <div className="cm-actions">
+              <Link className="cm-btn secondary small" href="/community/inbox">Inbox</Link>
+              <Link className="cm-btn secondary small" href="/community/contributors">People</Link>
+              <Link className="cm-btn secondary small" href="/community/profile#points">Your points</Link>
+            </div>
+          )}
+          <div className="cm-actions">
+            {tourStep + 1 < TOUR.length
+              ? <button type="button" className="cm-btn small" onClick={() => setTourStep(tourStep + 1)}>Next</button>
+              : <button type="button" className="cm-btn small" onClick={() => setTourStep(null)}>Start exploring</button>}
+            {tourStep + 1 < TOUR.length && <button type="button" className="cm-btn secondary small" onClick={() => setTourStep(null)}>End tour</button>}
+          </div>
+        </div>
+      )}
+      {room && <div key={room} className="cm-world-room" aria-live="polite">{room}</div>}
+      {(online > 0 || meetings.length > 0) && (
+        <div className="cm-world-live">
+          {online > 0 && <span><i aria-hidden /> {online + 1} here</span>}
+          {meetings.map((m) => (
+            <a key={m.handle} href={m.link} target="_blank" rel="noopener noreferrer">{m.handle === me.handle ? "Your Google Meet" : `${m.name} is in a Google Meet`} · Join</a>
+          ))}
+        </div>
+      )}
       {live && !visible && <button type="button" className="cm-world-visible" onClick={becomeVisible}>You&apos;re invisible · Show me</button>}
       {toast && <div className="cm-world-toast" role="status">{toast}</div>}
       {card && (
@@ -469,6 +602,25 @@ export function World({ me, flags, team, desks }: Props) {
                 {card.mine ? <Link className="cm-btn small" href="/community/profile#desk">Decorate</Link>
                   : !card.owner && <button type="button" className="cm-btn small" onClick={() => claim(card.id)}>Claim this desk</button>}
               </div>
+            </div>
+          ) : card.kind === "meeting" ? (
+            <div className="cm-world-card">
+              <strong>Meeting terminal</strong>
+              {meetings.some((m) => m.handle === me.handle) ? (
+                <>
+                  <small>Your Google Meet is shown to everyone on this floor.</small>
+                  <div className="cm-actions"><button type="button" className="cm-btn secondary small" onClick={() => shareMeet("")}>Stop sharing</button></div>
+                </>
+              ) : (
+                <>
+                  <small>Start a Google Meet, then paste its link here to invite everyone on this floor.</small>
+                  <div className="cm-actions"><a className="cm-btn small" href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer">Start a Google Meet</a></div>
+                  <form className="cm-world-meetform" onSubmit={(e) => { e.preventDefault(); shareMeet(meetDraft); }}>
+                    <input aria-label="Google Meet link" placeholder="meet.google.com/abc-defg-hij" value={meetDraft} maxLength={200} onChange={(e) => setMeetDraft(e.target.value)} />
+                    <button type="submit" className="cm-btn secondary small" disabled={!meetDraft.trim()}>Share</button>
+                  </form>
+                </>
+              )}
             </div>
           ) : card.kind === "elevator" ? (
             <div className="cm-world-card">

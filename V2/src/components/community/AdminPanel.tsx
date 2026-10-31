@@ -105,7 +105,7 @@ export function AdminPanel() {
         <div className="cm-stats">
           {([["Members", people.length, `${people.filter((p) => loadedAt && Date.parse(p.created_at) > loadedAt.getTime() - 7 * 864e5).length} new this week`],
             ["Finished welcome", onboarded.length, `${people.length - onboarded.length} still to finish`],
-            ["Contributors", contributors.length, "Approved to contribute to CooL"],
+            ["Contributors", contributors.length, "Approved contributors"],
             ["Applications waiting", pending.length, pending.length ? "Review them in Applications" : "All caught up"]] as [string, number, string][]).map(([k, v, h]) => (
             <div key={k} className="cm-panel cm-stat"><p className="cm-eyebrow" style={{ margin: 0 }}>{k}</p><strong>{v}</strong><small>{h}</small></div>
           ))}

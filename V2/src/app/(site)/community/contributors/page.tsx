@@ -7,7 +7,7 @@ import { communityServer } from "@/lib/community/supabase";
 
 export const metadata: Metadata = { title: "People" };
 
-type Row = { handle: string; name: string; avatar_url: string | null; role: string; joined_at: string };
+type Row = { handle: string; name: string; avatar_url: string | null; role: string; joined_at: string; points: number };
 
 const TEAM = [
   { name: "Pranauv Shrinaath (Keni)", role: "System design", href: "https://www.linkedin.com/in/pranauvshrinaath/" },
@@ -50,7 +50,7 @@ export default async function PeoplePage() {
             <div className="cm-grid">
               {rows.map((r) => (
                 <Link key={r.handle} className="cm-panel" href={`/community/contributors/${r.handle}`}>
-                  <Person name={r.name} avatarUrl={r.avatar_url} sub={<>@{r.handle}{r.role === "contributor" && " · Contributor"}</>} />
+                  <Person name={r.name} avatarUrl={r.avatar_url} sub={<>@{r.handle}{r.role === "contributor" && " · Contributor"} · {r.points} points</>} />
                 </Link>
               ))}
             </div>

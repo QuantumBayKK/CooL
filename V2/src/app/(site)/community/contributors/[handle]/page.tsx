@@ -6,7 +6,7 @@ import { Person } from "@/components/community/Person";
 import { communityServer } from "@/lib/community/supabase";
 
 type PublicProfile = {
-  handle: string; name: string; avatar_url?: string; role: string; joined_at?: string;
+  handle: string; name: string; avatar_url?: string; role: string; joined_at?: string; points?: number;
   bio?: string; skills?: string[]; timezone?: string; self?: boolean;
 };
 
@@ -32,7 +32,7 @@ export default async function ContributorPage({ params }: { params: Promise<{ ha
     <article className="cm-in cm-stack" style={{ maxWidth: "48rem" }}>
       <header className="cm-head">
         <p className="cm-eyebrow">@{p.handle}</p>
-        <Person name={p.name} avatarUrl={p.avatar_url} sub={p.role === "contributor" ? "Contributor" : "Member"} />
+        <Person name={p.name} avatarUrl={p.avatar_url} sub={<>{p.role === "contributor" ? "Contributor" : "Member"} · {p.points ?? 0} points</>} />
         {canMessage && <div className="cm-actions" style={{ marginTop: "1rem" }}><Link className="cm-btn small" href={`/community/inbox?with=${p.handle}`}>Message</Link></div>}
       </header>
       {p.bio && <section className="cm-panel"><h2>About</h2><p>{p.bio}</p></section>}

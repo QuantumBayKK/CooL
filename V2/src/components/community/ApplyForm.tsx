@@ -9,7 +9,7 @@ const INTERESTS = [["code", "Code"], ["docs", "Docs"], ["tools", "Tooling"], ["o
 const GITHUB = /^[A-Za-z0-9-]{1,39}$/;
 const LINK = /^https:\/\/\S{4,}$/;
 
-/** Apply to contribute to CooL with a GitHub username and links to past work. Reviewed by the owners. */
+/** Apply to become a contributor with a GitHub username and links to past work. Reviewed by the owners. */
 export function ApplyForm() {
   const router = useRouter();
   const [interest, setInterest] = useState<(typeof INTERESTS)[number][0]>("code");

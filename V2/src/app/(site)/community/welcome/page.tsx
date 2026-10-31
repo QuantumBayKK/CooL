@@ -17,16 +17,14 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
     <section className="cm-in cm-stack" aria-labelledby="welcome-title" style={{ maxWidth: "46rem" }}>
       <div>
         <p className="cm-eyebrow">Welcome to Northwind Cipher</p>
-        <h1 id="welcome-title">{sp.edit ? "Edit your answers." : "A few quick questions."}</h1>
-        <p className="cm-lead">About a minute. Your answers help the team welcome you; you choose who else sees them on your profile.</p>
+        <h1 id="welcome-title">{sp.edit ? "Edit your answers." : "Step 1 of 3: say hello."}</h1>
+        <p className="cm-lead">Then make your character and take a quick tour of the office. Bring any project: yours, an idea, or one you want to help with.</p>
       </div>
       <WelcomeForm
         next={next}
         initial={{
           name: p?.full_name ?? "",
           handle: p?.handle ?? "",
-          tried: p?.tried_cool ?? "",
-          usage: p?.cool_usage ?? "",
           reason: p?.join_reason ?? "",
           guidelines: Boolean(p?.guidelines_accepted_at),
         }}

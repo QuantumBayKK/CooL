@@ -7,7 +7,7 @@ import { communityServer } from "@/lib/community/supabase";
 
 export const metadata: Metadata = { title: "World" };
 
-export default async function WorldPage() {
+export default async function WorldPage({ searchParams }: { searchParams: Promise<{ tour?: string }> }) {
   const member = await requireMember("/community/world");
   const [flags, supabase] = await Promise.all([getFlags(), communityServer()]);
   const [{ data: team }, { data: desks }] = await Promise.all([
@@ -23,6 +23,7 @@ export default async function WorldPage() {
         flags={flags}
         team={(team as TeamMember[] | null) ?? []}
         desks={(desks as Desk[] | null) ?? []}
+        tour={(await searchParams).tour === "1"}
       />
     </section>
   );
