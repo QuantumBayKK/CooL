@@ -32,7 +32,7 @@ export async function CodeBlock({
 }) {
   const html = await codeToHtml(code.trim(), {
     lang,
-    theme: "github-light",
+    theme: "github-dark-default",
     // `structure: "classic"` keeps the <pre><code> wrapper Shiki's CSS expects.
     transformers: [
       {

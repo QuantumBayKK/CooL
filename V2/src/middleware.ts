@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { SESSION_COOKIE_NAME } from "@/lib/auth/cookies";
+import { refreshCommunitySession } from "@/lib/community/session-refresh";
 
 /**
  * Edge middleware: security headers, and a cheap gate on the private routes.
@@ -76,6 +77,9 @@ function contentSecurityPolicy(
   nonceable: boolean,
 ): string {
   const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  // The community has its own Supabase project (accounts, realtime): https and wss.
+  const community = process.env.NEXT_PUBLIC_COMMUNITY_SUPABASE_URL ?? "";
+  const communityHosts = community ? ` ${community} ${community.replace(/^https:/, "wss:")}` : "";
 
   // 'unsafe-eval' in development only — Turbopack's HMR needs it, and it must
   // never reach production.
@@ -115,11 +119,14 @@ function contentSecurityPolicy(
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
     // `www.google-analytics.com` also serves the collection pixel on some
     // transports, which is an image load rather than a fetch.
-    `img-src 'self' data: blob:${ga ? " https://www.google-analytics.com" : ""}`,
+    // Community members' profile photos come from their Google or GitHub account.
+    `img-src 'self' data: blob: https://lh3.googleusercontent.com https://avatars.githubusercontent.com${ga ? " https://www.google-analytics.com" : ""}`,
     `font-src 'self' data: https://fonts.gstatic.com`,
     // The portal talks to Supabase; nothing else is allowed out. In dev the
     // websocket for HMR is added.
-    `connect-src 'self' ${supabase}${gaConnect} ${dev ? "ws: http://127.0.0.1:*" : ""}`,
+    `connect-src 'self' ${supabase}${communityHosts}${gaConnect} ${dev ? "ws: http://127.0.0.1:*" : ""}`,
+    // The homepage embeds the product demo from Loom; no other frame source.
+    `frame-src https://www.loom.com`,
     `object-src 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,
@@ -136,7 +143,7 @@ function contentSecurityPolicy(
 const PRIVATE_PREFIXES = ["/investor", "/admin"];
 const PUBLIC_IN_PRIVATE = ["/investor/login", "/admin/login"];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const dev = process.env.NODE_ENV !== "production";
 
@@ -149,6 +156,12 @@ export function middleware(request: NextRequest) {
     (p) => pathname === p || pathname.startsWith(`${p}/`),
   );
   const isLogin = PUBLIC_IN_PRIVATE.some((p) => pathname === p);
+
+  // Community pages render per request (they read the member's session), so they can carry the
+  // nonce. The member's session cookie is refreshed here because pages cannot write cookies.
+  const isCommunity = pathname === "/community" || pathname.startsWith("/community/");
+  const communityCookies = isCommunity ? await refreshCommunitySession(request) : [];
+  if (communityCookies.length) headers.set("cookie", request.cookies.toString());
 
   let response: NextResponse;
 
@@ -170,8 +183,9 @@ export function middleware(request: NextRequest) {
   // else in the app is prerendered. See the note on `contentSecurityPolicy`.
   response.headers.set(
     "content-security-policy",
-    contentSecurityPolicy(nonce, dev, isPrivate),
+    contentSecurityPolicy(nonce, dev, isPrivate || isCommunity),
   );
+  for (const { name, value, options } of communityCookies) response.cookies.set(name, value, options);
   response.headers.set("x-content-type-options", "nosniff");
   response.headers.set("referrer-policy", "strict-origin-when-cross-origin");
   response.headers.set("x-frame-options", "DENY");

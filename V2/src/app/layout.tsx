@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Abril_Fatface, Archivo, Inter } from "next/font/google";
+import { Abril_Fatface, Archivo, Doto, Inter } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 
 import "./globals.css";
@@ -50,6 +50,14 @@ import { SITE } from "@/lib/site";
  * Next's `adjustFontFallback` keeps the metric mismatch small enough that the
  * swap does not shift layout.
  */
+// Dot-matrix accent type (labels, indices), self-hosted like the rest.
+const doto = Doto({
+  subsets: ["latin"],
+  weight: ["800"],
+  variable: "--font-doto",
+  display: "swap",
+});
+
 const archivo = Archivo({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
@@ -168,7 +176,7 @@ export const viewport: Viewport = {
   // One colour, because there is one theme. Declared unconditionally so that a
   // reader whose OS is set to dark still gets a white iOS status bar matching
   // the white canvas, rather than the black one Safari would otherwise infer.
-  themeColor: "#ffffff",
+  themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
   // Not `maximumScale: 1`. Blocking pinch-zoom is a WCAG 1.4.4 failure, and on
@@ -188,7 +196,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${abril.variable} ${inter.variable} ${GeistMono.variable}`}
+      className={`${doto.variable} ${archivo.variable} ${abril.variable} ${inter.variable} ${GeistMono.variable}`}
     >
       <body className="min-h-dvh bg-canvas text-ink antialiased">
         {/* Skip link — the first tab stop on every page. Visually hidden until

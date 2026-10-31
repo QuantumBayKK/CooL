@@ -41,3 +41,6 @@ CLAUDE.md
 # public/studio/. The archive itself is not a build input.
 cool-recorder-studio.zip
 .env*
+
+# superdesign scratch
+.superdesign/tmp/

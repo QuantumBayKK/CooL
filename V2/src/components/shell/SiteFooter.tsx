@@ -1,22 +1,15 @@
 import Link from "next/link";
 
 import { SiteLink } from "@/components/shell/SiteLink";
-import { Wordmark } from "@/components/shell/Wordmark";
+import { NcBrand } from "@/components/community/NcLogo";
 import { StatusBadge } from "@/components/ui/primitives";
-import { CURRENT_STAGE } from "@/content/gates";
 import { FOOTER, SITE } from "@/lib/site";
 
 /**
- * Footer.
- *
- * Four columns of navigation and one honest line about where the product
- * actually is. That line is generated from `gates.ts` rather than typed, so it
- * cannot drift away from the readiness page — and it appears on every page,
- * which is the point: a reader should never get deep into the site without
- * having been told what is simulated.
+ * Footer: the Northwind Cipher mark, four columns of navigation, and the company's current status.
+ * The detailed, item-by-item readiness ladder lives on /security/readiness (from `gates.ts`).
  */
 export function SiteFooter() {
-  const stage = CURRENT_STAGE;
   const year = new Date().getFullYear();
 
   return (
@@ -24,7 +17,7 @@ export function SiteFooter() {
       <div className="container-page py-14">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,18rem)_1fr]">
           <div className="flex flex-col gap-4">
-            <Wordmark />
+            <NcBrand />
             <p className="max-w-[30ch] text-sm text-ink-muted">
               {SITE.description}
             </p>
@@ -32,11 +25,9 @@ export function SiteFooter() {
               href="/security/readiness"
               className="group inline-flex w-fit items-center gap-2"
             >
-              <StatusBadge status="warn">
-                Stage {stage.n} · {stage.name}
-              </StatusBadge>
+              <StatusBadge status="ok">Live · Taking pilot clients</StatusBadge>
               <span className="text-xs text-ink-subtle underline-offset-4 group-hover:underline">
-                What that means
+                Readiness
               </span>
             </Link>
           </div>

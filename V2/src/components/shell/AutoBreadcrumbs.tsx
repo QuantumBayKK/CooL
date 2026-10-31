@@ -39,7 +39,7 @@ import { FOOTER, isFullBleed, isGroup, NAV } from "@/lib/site";
  * separately, through `isFullBleed`, so the walkthrough, the console and the
  * studio cannot drift apart from the footer gate that uses the same list.
  */
-const SUPPRESS = ["/", "/investor", "/admin"];
+const SUPPRESS = ["/", "/investor", "/admin", "/docs"];
 
 /** `{ "/security/readiness": "Readiness" }` for every route the nav names. */
 function labelRegistry(): Record<string, string> {

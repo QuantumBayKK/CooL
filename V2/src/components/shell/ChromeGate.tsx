@@ -21,6 +21,6 @@ import { isFullBleed } from "@/lib/site";
  */
 export function HideOnFullBleed({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  if (isFullBleed(pathname)) return null;
+  if (isFullBleed(pathname) || pathname === "/docs" || pathname.startsWith("/docs/")) return null;
   return <>{children}</>;
 }

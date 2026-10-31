@@ -45,6 +45,7 @@ const HIDE_ON = [
   "/investor",
   "/admin",
   "/thank-you",
+  "/docs",
 ];
 
 const SHOW_AFTER = 620;

@@ -10,7 +10,7 @@
 <meta name="keywords" content="AI audit trail, AI governance, AI compliance, verifiable AI, AI change control, tamper-evident logs, post-quantum signatures, ML-DSA-65, confidential computing, Intel TDX, Phala dstack, remote attestation, transparency log, RFC 6962, EU AI Act Article 12, model risk management, NVIDIA Inception, Northwind Cipher, CooL" />
 <meta name="author" content="Northwind Cipher Pvt. Ltd." />
 <meta name="application-name" content="CooL" />
-<meta name="theme-color" content="#ffffff" />
+<meta name="theme-color" content="#000000" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="icon" href="/assets/favicon-solid.svg" type="image/svg+xml" />
 <link rel="icon" href="/assets/icon-192.png" type="image/png" sizes="192x192" />
@@ -38,631 +38,376 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/src/app.css" />
-<link rel="stylesheet" href="/src/site-extras.css" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Doto:wght@500;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/src/site.css" />
+<link rel="stylesheet" href="/src/caution.css" />
+<link rel="stylesheet" href="/src/lumen.css" />
 </head>
-<body>
-<div class="topbar" role="note" aria-label="NVIDIA Inception Program member">
-<div class="topbar__in">
-<span class="topbar__nv"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#76B900" d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.493 3.374 6.493 3.374s-2.774 3.851-5.75 3.851c-.398 0-.787-.062-1.158-.185v-4.346c1.528.185 1.837.857 2.747 2.385l2.04-1.714s-1.492-1.952-4-1.952a6.016 6.016 0 0 0-.796.035m0-4.735v2.138l.424-.027c5.45-.185 9.01 4.47 9.01 4.47s-4.08 4.964-8.330 4.964c-.37 0-.733-.035-1.095-.097v1.325c.3.035.61.062.91.062 3.957 0 6.82-2.023 9.593-4.408.459.371 2.34 1.263 2.73 1.652-2.633 2.208-8.772 3.984-12.253 3.984-.335 0-.653-.018-.971-.053v1.864H24V4.063zm0 10.326v1.131c-3.657-.654-4.673-4.46-4.673-4.46s1.758-1.944 4.673-2.262v1.237H8.94c-1.528-.186-2.730 1.245-2.730 1.245s.68 2.412 2.739 3.110M2.456 10.9s2.164-3.197 6.5-3.533V6.201C4.153 6.59 0 10.653 0 10.653s2.35 6.802 8.948 7.420v-1.237c-4.84-.6-6.492-5.936-6.492-5.936z"/></svg><b>NVIDIA Inception Program</b></span>
-<span class="topbar__pill">Member</span>
-<span class="topbar__sep" aria-hidden="true"></span>
-<span class="topbar__msg">Northwind Cipher is part of NVIDIA's program for AI startups.</span>
-</div>
-</div>
-<header class="nav" id="nav">
-<div class="nav__in">
-<a href="/" class="brand" aria-label="Northwind Cipher · CooL — home">
-<i class="brand__wm" aria-hidden="true"></i>
-</a>
-<nav class="nav__links">
-<a href="#product">Product</a>
-<a href="#verify">Verification</a>
-<a href="/docs">Docs</a>
+<body class="c">
+
+<header class="cnav" id="nav">
+<div class="cnav__in">
+<a href="/" class="brand" aria-label="Northwind Cipher · CooL — home"><i class="brand__wm" aria-hidden="true"></i></a>
+<nav class="cnav__links" aria-label="Primary">
+<a href="/#product">Product</a>
+<a href="/#get-started">Get started</a>
+<a href="/community">Community</a>
 <a href="/pricing">Pricing</a>
-<a href="#team">Company</a>
-<a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub</a>
+<div class="cnav__menu">
+<button type="button" class="cnav__trigger" aria-expanded="false" aria-controls="menu-resources">Resources <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5"/></svg></button>
+<div class="cnav__panel" id="menu-resources">
+<a href="/studio" class="cnav__item cnav__item--feature"><b>Studio</b><span>See CooL seal, verify and catch a tampered record — live in your browser.</span></a>
+<a href="/docs" class="cnav__item"><b>Documentation</b><span>Quickstart, guides and reference.</span></a>
+<a href="/docs/cli-reference" class="cnav__item"><b>CLI reference</b><span>Every <code>cool</code> command.</span></a>
+<a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener" class="cnav__item"><b>GitHub ↗</b><span>Source for the SDK and verifier.</span></a>
+<a href="https://www.npmjs.com/package/cool-nwc" target="_blank" rel="noopener" class="cnav__item"><b>npm ↗</b><span>Install <code>cool-nwc</code>.</span></a>
+</div>
+</div>
+<a href="/#company">Company</a>
 </nav>
-<div class="nav__right">
-<a href="#start" class="btn btn--ghost">Contact</a>
-<a href="/studio" class="btn btn--dark btn--sm">See the Studio</a>
-<a href="https://cal.com/coolnwc" target="_blank" rel="noopener" class="btn btn--accent btn--sm">Book a call</a>
+<div class="cnav__right">
+<a href="/docs" class="cnav__plain">Docs</a>
+<a href="https://cal.com/coolnwc" target="_blank" rel="noopener" class="cnav__cta">Book a call</a>
 <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><i></i></button>
 </div>
 </div>
 </header>
 <div class="drawer" id="drawer">
-<a href="#product">Product</a>
-<a href="#verify">Verification</a>
-<a href="/docs">Docs</a>
+<a href="/#product">Product</a>
+<a href="/#get-started">Get started</a>
+<a href="/community">Community</a>
 <a href="/pricing">Pricing</a>
 <a href="/studio">Studio</a>
-<a href="#team">Company</a>
-<a href="#faq">FAQ</a>
+<a href="/docs">Documentation</a>
+<a href="/#company">Company</a>
 <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub ↗</a>
-<a href="https://cal.com/coolnwc" target="_blank" rel="noopener" class="btn btn--accent btn--full">Book a call</a>
+<a href="https://cal.com/coolnwc" target="_blank" rel="noopener" class="btn btn--full">Book a call</a>
 </div>
+
 <main id="top">
-<section class="hero">
-<div class="wrap hero__grid">
+
+<!-- Hero: the whole first screen -->
+<section class="chero chero--lumen" id="hero">
+<!-- Layers, back to front: silk light, dot matrix, grain, vignette -->
+<div class="lumen" aria-hidden="true">
+<canvas class="lumen__silk" id="silk"></canvas>
+<div class="lumen__spread"></div>
+<div class="lumen__dots"></div>
+<div class="lumen__grain"></div>
+<div class="lumen__vignette"></div>
+</div>
+<div class="chero__in chero__center" id="heroCopy">
+<h1 class="lumen__h" data-reveal><span class="lumen__h1">The black box</span><span class="ndot" data-decode>for AI.</span></h1>
+<p class="chero__lead" data-reveal>Every change your AI makes — prompts, models, policies, tool grants — captured the moment it ships, sealed with post-quantum signatures, and verifiable by anyone, offline, across any provider.</p>
+<div class="chero__actions" data-reveal>
+<a href="#get-started" class="cbtn">Get started</a>
+<a href="#demo" class="clink">Watch the demo</a>
+</div>
+<button class="cmd chero__cmd glass" data-copy="npm i -g cool-nwc" aria-label="Copy install command" data-reveal><span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span><svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg></button>
+</div>
+</section>
+
+<!-- Terminal -->
+<section class="csec csec--tight csec--lit" id="terminal">
+<div class="cwrap">
+<div class="cterm" data-reveal>
+<div class="cterm__bar">
+<span class="cterm__dots"><i></i><i></i><i></i></span>
+<span class="cterm__title">cool — verify</span>
+<span class="cterm__tag">offline · no account</span>
+</div>
+<div class="cterm__body" id="cterm">
+<div class="cterm__line cterm__cmd"><span class="p">~/refund-agent $</span> COOL_REQUIRE_HARDWARE=1 cool verify receipt.json</div>
+<div class="cterm__line m">reading receipt · Phala Cloud · Intel TDX</div>
+<div class="cterm__gap"></div>
+<div class="cterm__line"><span class="ok">✓</span> binding</div>
+<div class="cterm__line"><span class="ok">✓</span> signature</div>
+<div class="cterm__line"><span class="ok">✓</span> inclusion</div>
+<div class="cterm__line"><span class="ok">✓</span> consistency</div>
+<div class="cterm__line"><span class="ok">✓</span> witness</div>
+<div class="cterm__line"><span class="ok">✓</span> attestation</div>
+<div class="cterm__line"><span class="ok">✓</span> enclave</div>
+<div class="cterm__gap"></div>
+<div class="cterm__line cterm__verdict"><span class="cterm__badge">VERIFIED</span> 7 / 7 domains · hardware required<span class="cterm__cursor" aria-hidden="true"></span></div>
+</div>
+</div>
+<p class="cnote cnote--center" data-reveal>Real output shape of the open verifier. Binding, signature and inclusion verify fully offline; attestation is checked against Intel TDX quotes from Phala Cloud — <a href="https://github.com/Northwind-Cipher/cool-sdk/blob/main/artifacts/closure-verification-matrix.md" target="_blank" rel="noopener">evidence published in the SDK repo</a>.</p>
+</div>
+</section>
+
+<!-- Demo video -->
+<section class="csec" id="demo">
+<div class="cwrap">
+<div class="chead" data-reveal>
+<p class="mlabel">Demo</p>
+<h2 class="ch2">See it in action.</h2>
+<p class="cbody">A short walkthrough of CooL sealing a change and verifying it.</p>
+</div>
+<div class="cvideo" data-reveal>
+<iframe src="https://www.loom.com/embed/82f0ece9e6644d549f3d07761d38f39a?hide_owner=true&amp;hide_share=true&amp;hide_title=true&amp;hideEmbedTopBar=true" title="CooL demo video" loading="lazy" allow="fullscreen; picture-in-picture" allowfullscreen></iframe>
+</div>
+<p class="cnote cnote--center" data-reveal><a href="https://www.loom.com/share/82f0ece9e6644d549f3d07761d38f39a" target="_blank" rel="noopener">Open the video on Loom ↗</a></p>
+</div>
+</section>
+
+<!-- Product -->
+<section class="csec" id="product">
+<div class="cwrap">
+<div class="chead" data-reveal>
+<p class="mlabel">Product</p>
+<h2 class="ch2">Three pieces: capture, log, verify.</h2>
+<p class="cbody">CooL sits beside the AI you already run. When something about it changes, CooL records it, locks it into a log nobody can quietly rewrite, and gives you a receipt anyone can check.</p>
+</div>
+<div class="ctri" data-reveal>
+<article>
+<div class="ctri__ic"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></div>
+<h3>Capture</h3>
+<p>A change ships — a new prompt, a swapped model, an edited policy — and it is recorded at the moment it happens, not written up afterwards by hand.</p>
+<a href="#get-started" class="clink">Install the SDK</a>
+</article>
+<article>
+<div class="ctri__ic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="5" rx="1"/><rect x="3" y="16" width="6" height="5" rx="1"/><rect x="15" y="16" width="6" height="5" rx="1"/><path d="M12 8v4M6 16v-4h12v4"/></svg></div>
+<h3>Log</h3>
+<p>Records are appended to a Merkle log built the way Certificate Transparency builds one (RFC 6962). Tampering isn't prevented by access control — it's made detectable by anyone.</p>
+<a href="/docs/architecture" class="clink">How the log holds</a>
+</article>
+<article>
+<div class="ctri__ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
+<h3>Verify</h3>
+<p>Anyone can check a receipt on their own machine — no CooL account, no network call, nothing of ours in the loop. Trust the maths, not the vendor.</p>
+<a href="/docs/verify-it-yourself" class="clink">Verify it yourself</a>
+</article>
+</div>
+<div class="ctri ctri--quiet" data-reveal>
+<article><h3>Capture automatically</h3><p>The weeks a year lost to change-paperwork come back as engineering time, because the record is a side effect of shipping rather than a task after it.</p></article>
+<article><h3>Verify offline</h3><p>Evidence assembled by hand for an audit becomes evidence produced continuously. Audits stop being fire drills and become an export.</p></article>
+<article><h3>Prove for a decade</h3><p>Hybrid post-quantum signing means a record sealed today still stands when the security assumptions of today have moved on.</p></article>
+</div>
+</div>
+</section>
+
+<!-- Get started -->
+<section class="csec" id="get-started">
+<div class="cwrap">
+<div class="chead" data-reveal>
+<p class="mlabel">Get started</p>
+<h2 class="ch2">From install to a verified record in five minutes.</h2>
+<p class="cbody">You need Node 20 or later and an app that already calls a model. CooL wraps a call you already make — it doesn't add a new one.</p>
+</div>
+<div class="guide" data-reveal>
+<div class="guide__rail"><ol class="guide__steps" role="tablist" aria-label="Setup steps">
+<li><button role="tab" aria-selected="true" aria-controls="g1" id="t1"><span>1</span><strong>Download</strong><em>Install the SDK and CLI</em></button></li>
+<li><button role="tab" aria-selected="false" aria-controls="g2" id="t2"><span>2</span><strong>Connect</strong><em>Wrap your model call</em></button></li>
+<li><button role="tab" aria-selected="false" aria-controls="g3" id="t3"><span>3</span><strong>Seal</strong><em>Record a change</em></button></li>
+<li><button role="tab" aria-selected="false" aria-controls="g4" id="t4"><span>4</span><strong>Verify</strong><em>Check it offline</em></button></li>
+<li><button role="tab" aria-selected="false" aria-controls="g5" id="t5"><span>5</span><strong>Deploy</strong><em>Run on real hardware</em></button></li>
+</ol><span class="guide__progress" aria-hidden="true"><i></i></span></div>
 <div>
-<a href="/docs" class="docslink" data-reveal>
-<span>New here? Start with the developer docs</span>
-<span class="docslink__go">Read the docs<span aria-hidden="true">→</span></span>
-</a>
-<p class="eyebrow" data-reveal>Northwind Cipher · System-of-record for AI change</p>
-<h1 class="d1" data-reveal>The black box for&nbsp;AI.</h1>
-<p class="lead" data-reveal>Private by default. Provable by design.</p>
-<p class="support" data-reveal>Every change your AI makes — prompts, models, policies, tool grants — captured the moment it ships, sealed with post-quantum signatures, and verifiable by anyone, offline, across any provider.</p>
-<div class="btn-row" data-reveal>
-<button class="cmd cmd--accent" data-copy="npm i -g cool-nwc">
-<span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span>
-<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
-</button>
-<a href="/studio" class="btn btn--dark">See the Studio</a>
-<a href="https://github.com/Northwind-Cipher/cool-sdk" class="btn btn--line" target="_blank" rel="noopener">SDK on GitHub</a>
+<div class="guide__panel" role="tabpanel" id="g1" aria-labelledby="t1">
+<h3 class="h3">Install the SDK and CLI</h3>
+<p class="body">One package gives you the library, the <code>cool</code> command and the offline verifier. Prefer not to use npm? Download the tarball directly and check it against the published SHA-256 checksums.</p>
+<div class="code"><div class="code__bar"><span>Terminal</span><button class="code__copy" data-copy="npm install -g cool-nwc"><span>Copy</span></button></div>
+<pre><span class="p">$ </span><span class="k">npm install -g cool-nwc</span>
+<span class="p">$ </span><span class="k">cool --help</span>
+
+<span class="c"># or add it to your app as a library</span>
+<span class="p">$ </span><span class="k">npm install cool-nwc</span></pre></div>
+<div class="actions"><a href="/sdk/cool-nwc-2.5.0.tgz" class="btn btn--sm btn--ghost" download>Download v2.5.0</a><a href="/sdk/checksums.txt" class="link">Checksums</a><a href="https://www.npmjs.com/package/cool-nwc" target="_blank" rel="noopener" class="link">npm</a></div>
+<button type="button" class="guide__next" data-next="t2">Next: Connect →</button>
 </div>
-<div class="hero__proof" data-reveal>
-<div><b data-count="7">7</b><span>verification domains</span></div>
-<div><b data-count="7">7</b><span>verified on Intel TDX</span></div>
-<div><b data-count="0">0</b><span>trust required in us</span></div>
+<div class="guide__panel" role="tabpanel" id="g2" aria-labelledby="t2" hidden>
+<h3 class="h3">Wrap your existing model call</h3>
+<p class="body"><code>CoolTee.connect</code> starts the evidence plane — the part that hashes, signs and logs. On a laptop or in CI it runs against a built-in simulator, so nothing needs real hardware yet. Your <code>backend</code> function is your inference call, unchanged; if the evidence plane is unavailable, your completion still returns.</p>
+<div class="code"><div class="code__bar"><span>app.ts</span><button class="code__copy" data-copy='import { CoolTee } from "cool-nwc";
+
+const cool = await CoolTee.connect({
+  app: { name: "refund-agent", imageDigest: process.env.IMAGE_DIGEST! },
+  backend: async ({ model, prompt, params }) => ({
+    output: await yourModel(model, prompt, params),
+  }),
+});'><span>Copy</span></button></div>
+<pre><span class="k">import</span> { CoolTee } <span class="k">from</span> <span class="s">"cool-nwc"</span>;
+
+<span class="k">const</span> cool = <span class="k">await</span> CoolTee.connect({
+  app: { name: <span class="s">"refund-agent"</span>, imageDigest: process.env.IMAGE_DIGEST! },
+  backend: <span class="k">async</span> ({ model, prompt, params }) =&gt; ({
+    output: <span class="k">await</span> yourModel(model, prompt, params),
+  }),
+});</pre></div>
+<button type="button" class="guide__next" data-next="t3">Next: Seal →</button>
 </div>
+<div class="guide__panel" role="tabpanel" id="g3" aria-labelledby="t3" hidden>
+<h3 class="h3">Record a change</h3>
+<p class="body">A change is anything that alters how your AI behaves. One call hashes it with SHA-256, signs it with ML-DSA-65 + Ed25519 and appends it to the log. From a terminal or CI it is one command. Kinds: <code>prompt</code>, <code>model</code>, <code>params</code>, <code>policy</code>, <code>dataset</code>, <code>agent-permission</code>, <code>tool</code>.</p>
+<div class="code"><div class="code__bar"><span>app.ts</span><button class="code__copy" data-copy='cool seal prompt billing/agent#system "Approve refunds up to $500."'><span>Copy CLI</span></button></div>
+<pre><span class="k">await</span> cool.change({
+  kind: <span class="s">"prompt"</span>,
+  ref: <span class="s">"billing/refund-agent#system"</span>,
+  before: previousPrompt,
+  after: nextPrompt,
+  actor: { id: <span class="s">"ci:github-actions"</span>, method: <span class="s">"oidc"</span> },
+});
+
+<span class="c"># the same thing from the CLI</span>
+<span class="p">$ </span><span class="k">cool seal prompt billing/agent#system "Approve refunds up to $500."</span></pre></div>
+<button type="button" class="guide__next" data-next="t4">Next: Verify →</button>
 </div>
-<figure class="hero__art" data-reveal aria-label="A Merkle transparency log: four sealed change records chaining upward into one root">
-<svg class="mk" viewBox="0 0 470 400" role="img">
-<defs>
-<linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="#12294d"/><stop offset="1" stop-color="#0a1a33"/>
-</linearGradient>
-<linearGradient id="pulse" x1="0" y1="1" x2="0" y2="0">
-<stop offset="0" stop-color="#6fb0ff" stop-opacity="0"/>
-<stop offset=".5" stop-color="#6fb0ff" stop-opacity="1"/>
-<stop offset="1" stop-color="#6fb0ff" stop-opacity="0"/>
-</linearGradient>
-</defs>
-<g class="mk__edges" fill="none" stroke="var(--border-2)" stroke-width="1.4" stroke-linecap="round">
-<path class="mk__e" data-leaf="0" d="M55 300 L170 222"/>
-<path class="mk__e" data-leaf="1" d="M175 300 L170 222"/>
-<path class="mk__e" data-leaf="2" d="M295 300 L350 222"/>
-<path class="mk__e" data-leaf="3" d="M415 300 L350 222"/>
-<path class="mk__e" data-node="0" d="M170 188 L260 118"/>
-<path class="mk__e" data-node="1" d="M350 188 L260 118"/>
-</g>
-<g class="mk__spark" fill="none" stroke="url(#pulse)" stroke-width="2.4" stroke-linecap="round">
-<path class="mk__s" data-leaf="0" d="M55 300 L170 222"/>
-<path class="mk__s" data-leaf="1" d="M175 300 L170 222"/>
-<path class="mk__s" data-leaf="2" d="M295 300 L350 222"/>
-<path class="mk__s" data-leaf="3" d="M415 300 L350 222"/>
-<path class="mk__s" data-node="0" d="M170 188 L260 118"/>
-<path class="mk__s" data-node="1" d="M350 188 L260 118"/>
-</g>
-<g class="mk__root">
-<rect x="196" y="74" width="128" height="44" rx="5" fill="url(#hg)"/>
-<rect class="mk__halo" x="196" y="74" width="128" height="44" rx="5" fill="none" stroke="#6fb0ff" stroke-width="1.4"/>
-<text x="260" y="94" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#6fb0ff">root</text>
-<text x="260" y="108" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9.5" fill="#a9bbd6">e0e0eb0c&#8230;3817</text>
-</g>
-<g font-family="ui-monospace,monospace" font-size="9.5">
-<g class="mk__node" data-node="0">
-<rect x="118" y="188" width="104" height="34" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
-<text x="170" y="209" text-anchor="middle" fill="#44556e">bf595e2f&#8230;bc96</text>
-</g>
-<g class="mk__node" data-node="1">
-<rect x="298" y="188" width="104" height="34" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
-<text x="350" y="209" text-anchor="middle" fill="#44556e">dff5eb4e&#8230;ee02</text>
-</g>
-</g>
-<g font-family="ui-monospace,monospace" font-size="9">
-<g class="mk__leaf" data-leaf="0">
-<rect x="8" y="300" width="94" height="52" rx="4" fill="#1e50a2" stroke="#143a7a"/>
-<text x="18" y="322" fill="#ffffff">prompt.update</text>
-<text x="18" y="338" fill="#c9dcff">seq 1 &#183; sealed</text>
-</g>
-<g class="mk__leaf" data-leaf="1">
-<rect x="128" y="300" width="94" height="52" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
-<text x="138" y="322" fill="#16294a">model.swap</text>
-<text x="138" y="338" fill="#556885">seq 2 &#183; sealed</text>
-</g>
-<g class="mk__leaf" data-leaf="2">
-<rect x="248" y="300" width="94" height="52" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
-<text x="258" y="322" fill="#16294a">policy.change</text>
-<text x="258" y="338" fill="#556885">seq 3 &#183; sealed</text>
-</g>
-<g class="mk__leaf" data-leaf="3">
-<rect x="368" y="300" width="94" height="52" rx="4" fill="#ffffff" stroke="#c2d0e6"/>
-<text x="378" y="322" fill="#16294a">tool.grant</text>
-<text x="378" y="338" fill="#556885">seq 4 &#183; sealed</text>
-</g>
-</g>
-<text class="mk__cap" x="8" y="386" font-family="ui-monospace,monospace" font-size="10" fill="#556885">SHA-256 leaves &#183; RFC-6962 node hashing &#183; append-only</text>
-</svg>
-</figure>
+<div class="guide__panel" role="tabpanel" id="g4" aria-labelledby="t4" hidden>
+<h3 class="h3">Check it like a stranger would</h3>
+<p class="body">No account, no network call. All seven checks should print <code>pass</code> — or <code>simulated</code> for attestation, because you aren't on real hardware yet. That's expected, not an error.</p>
+<div class="code"><div class="code__bar"><span>Terminal</span><button class="code__copy" data-copy="cool verify last"><span>Copy</span></button></div>
+<pre><span class="p">$ </span><span class="k">cool verify last</span>
+<span class="p">$ </span><span class="k">cool verify all</span>               <span class="c"># exits 1 if any record fails</span>
+<span class="p">$ </span><span class="k">cool verify ./receipt.json --json</span></pre></div>
+<div class="actions"><a href="/docs/verifier-reference" class="link">What each check means</a></div>
+<button type="button" class="guide__next" data-next="t5">Next: Deploy →</button>
 </div>
-</section>
-<section class="band band--surface" id="ecosystem">
-<div class="wrap">
-<div class="head head--wide rise">
-<p class="eyebrow">Ecosystem</p>
-<h2 class="d2">Built with the people building confidential AI.</h2>
+<div class="guide__panel" role="tabpanel" id="g5" aria-labelledby="t5" hidden>
+<h3 class="h3">Move to real hardware</h3>
+<p class="body">Run CooL inside an Intel TDX confidential VM on Phala Cloud. The <code>deploy/</code> folder contains the container image, compose file and dstack manifest. Point it at a quote verifier and pin the measurement, and attestation moves from <code>simulated</code> to <code>pass</code>. There is no signing key to configure — it is derived inside the enclave, which is why CooL cannot forge your records.</p>
+<div class="code"><div class="code__bar"><span>Terminal</span><button class="code__copy" data-copy="phala deploy -c docker-compose.yml -n cool-evidence"><span>Copy</span></button></div>
+<pre><span class="c"># 1. get a confidential VM</span>
+<span class="p">$ </span><span class="k">cd deploy</span>
+<span class="p">$ </span><span class="k">phala deploy -c docker-compose.yml -n cool-evidence</span>
+
+<span class="c"># 2. give it a vendor root to check against</span>
+<span class="p">$ </span><span class="k">export QUOTE_VERIFIER_URL=https://api.phala.network/attest/verify</span>
+
+<span class="c"># 3. confirm, then refuse anything simulated</span>
+<span class="p">$ </span><span class="k">cool status</span>
+<span class="p">$ </span><span class="k">cool verify last --require-hardware</span></pre></div>
+<div class="actions"><a href="/docs/attestation" class="link">Full deployment guide</a></div>
 </div>
-<div class="eco">
-<div class="eco__item rise">
-<div class="eco__top"><span class="eco__mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#76B900" d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.493 3.374 6.493 3.374s-2.774 3.851-5.75 3.851c-.398 0-.787-.062-1.158-.185v-4.346c1.528.185 1.837.857 2.747 2.385l2.04-1.714s-1.492-1.952-4-1.952a6.016 6.016 0 0 0-.796.035m0-4.735v2.138l.424-.027c5.45-.185 9.01 4.47 9.01 4.47s-4.08 4.964-8.330 4.964c-.37 0-.733-.035-1.095-.097v1.325c.3.035.61.062.91.062 3.957 0 6.82-2.023 9.593-4.408.459.371 2.34 1.263 2.73 1.652-2.633 2.208-8.772 3.984-12.253 3.984-.335 0-.653-.018-.971-.053v1.864H24V4.063zm0 10.326v1.131c-3.657-.654-4.673-4.46-4.673-4.46s1.758-1.944 4.673-2.262v1.237H8.94c-1.528-.186-2.730 1.245-2.730 1.245s.68 2.412 2.739 3.110M2.456 10.9s2.164-3.197 6.5-3.533V6.201C4.153 6.59 0 10.653 0 10.653s2.35 6.802 8.948 7.420v-1.237c-4.84-.6-6.492-5.936-6.492-5.936z"/></svg>NVIDIA <small>Inception</small></span><span class="badge badge--real">member</span></div>
-<p>Northwind Cipher is a member of the NVIDIA Inception Program, NVIDIA's program for startups building in AI.</p>
-<a class="src" href="https://www.nvidia.com/en-us/startups/" target="_blank" rel="noopener">nvidia.com/startups ↗</a>
-</div>
-<div class="eco__item rise" style="--rd:90ms">
-<div class="eco__top"><span class="eco__mark"><img class="eco__logo" src="/partners/phala.svg" alt="Phala" width="138" height="48" loading="lazy" /><small>dstack</small></span><span class="badge badge--real">infrastructure</span></div>
-<p>Phala provides the confidential-compute infrastructure CooL runs on: Intel TDX confidential VMs through dstack. All seven verification domains are verified on it.</p>
-<a class="src" href="https://github.com/Northwind-Cipher/cool-sdk/blob/main/artifacts/closure-verification-matrix.md" target="_blank" rel="noopener">Read the evidence ↗</a>
-</div>
-<div class="eco__item rise" style="--rd:180ms">
-<div class="eco__top"><img class="eco__logo" src="/partners/edgeless-systems.png" alt="Edgeless Systems" width="680" height="244" loading="lazy" /><span class="badge badge--soon">in progress</span></div>
-<div class="eco__award"><img src="/partners/wiwo-best-of-technology-2026.png" alt="WirtschaftsWoche Best of Technology 2026" width="220" height="260" loading="lazy" /><span><b>Best of Technology 2026</b>Awarded by WirtschaftsWoche</span></div>
-<p>Award-winning confidential computing, and the makers of Contrast — confidential containers for Kubernetes. We are working towards a collaboration.</p>
-<a class="src" href="https://www.edgeless.systems/" target="_blank" rel="noopener">edgeless.systems ↗</a>
 </div>
 </div>
 </div>
 </section>
-<section class="band" id="verify">
-<div class="wrap split">
-<div class="split__media" data-reveal>
-<div class="term">
-<div class="term__bar"><span class="term__dots"><i></i><i></i><i></i></span> terminal · cool-nwc</div>
-<div class="term__body">
-<div class="term__line"><span class="c">$</span> COOL_REQUIRE_HARDWARE=1 cool verify receipt.json</div>
-<div class="term__line"><span class="m">reading receipt · Phala Cloud · Intel TDX</span></div>
-<div class="term__line"> </div>
-<div class="term__line"><span class="ok">✓</span> binding      <span class="m">record → digest</span></div>
-<div class="term__line"><span class="ok">✓</span> signature    <span class="m">ML-DSA-65 + Ed25519</span></div>
-<div class="term__line"><span class="ok">✓</span> inclusion    <span class="m">leaf ∈ log</span></div>
-<div class="term__line"><span class="ok">✓</span> consistency  <span class="m">log is append-only</span></div>
-<div class="term__line"><span class="ok">✓</span> witness      <span class="m">independent root</span></div>
-<div class="term__line"><span class="ok">✓</span> attestation  <span class="m">Intel TDX quote · Phala</span></div>
-<div class="term__line"><span class="ok">✓</span> enclave      <span class="m">MRTD + RTMR0–3 pinned</span></div>
-<div class="term__line"> </div>
-<div class="term__line"><span class="ok">7 / 7 domains verified</span> <span class="m">· hardware required</span></div>
+
+<!-- Founders -->
+<section class="csec" id="company">
+<div class="cwrap">
+<div class="chead" data-reveal>
+<p class="mlabel">Founders</p>
+<h2 class="ch2 ch2--wide">Applied post-quantum cryptography and confidential-compute inference.</h2>
 </div>
-</div>
-</div>
-<div class="split__copy" data-reveal>
-<p class="eyebrow">Open verifier</p>
-<h2 class="d2">Every change can carry proof</h2>
-<p class="support">Instead of asking anyone to trust a claim we make, CooL emits a sealed record that software can check on its own. The verifier needs no CooL account and no network connection — it reads the receipt and the maths either holds or it doesn't.</p>
-<div class="btn-row">
-<button class="cmd" data-copy="cool verify receipt.json">
-<span class="cmd__dollar">$</span><span>cool verify receipt.json</span>
-<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
-</button>
-<a href="#domains" class="btn btn--line">What the 7 domains check</a>
-</div>
-<p class="note" style="margin-top:24px">Binding, signature and inclusion verify fully offline. Attestation is checked against Intel TDX quotes from Phala Cloud — the raw quotes, verifier responses and tamper tests are <a href="https://github.com/Northwind-Cipher/cool-sdk/blob/main/artifacts/closure-verification-matrix.md" target="_blank" rel="noopener" style="border-bottom:1px solid var(--border-2)">published in the SDK repo</a>.</p>
-</div>
-</div>
-</section>
-<section class="band" id="studio">
-<div class="wrap split split--flip">
-<div class="split__media" data-reveal>
-<div class="accentbox">
-<div class="accentbox__tabs" id="stTabs">
-<button class="tab is-on" data-tab="seal">1 — seal a change</button>
-<button class="tab" data-tab="verify">2 — verify the log</button>
-<button class="tab" data-tab="tamper">3 — try to tamper</button>
-</div>
-<div class="term" id="studioStage">
-<div class="term__bar">
-<span class="term__dots"><i></i><i></i><i></i></span>
-transparency log <span style="margin-left:auto" id="stSize">0 records</span>
-</div>
-<div class="term__body">
-<div id="stLog" style="max-height:150px;overflow:auto"></div>
-<div id="stReceipt" hidden style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
-<div class="term__line"><span class="m">leaf  </span><span id="rcLeaf" class="c"></span></div>
-<div class="term__line"><span class="m">sig   </span><span id="rcSig" class="c"></span></div>
-<div class="term__line"><span class="m">root  </span><span id="rcRoot" class="c"></span></div>
-</div>
-<div id="stDomains" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);display:grid;grid-template-columns:repeat(2,1fr);gap:2px 16px">
-<div class="term__line dom-row" data-dom="binding"><span class="m">·</span> binding <b class="m">—</b></div>
-<div class="term__line dom-row" data-dom="signature"><span class="m">·</span> signature <b class="m">—</b></div>
-<div class="term__line dom-row" data-dom="inclusion"><span class="m">·</span> inclusion <b class="m">—</b></div>
-<div class="term__line dom-row" data-dom="consistency"><span class="m">·</span> consistency <b class="m">—</b></div>
-<div class="term__line dom-row" data-dom="witness"><span class="m">·</span> witness <b class="m">—</b></div>
-<div class="term__line dom-row" data-dom="attestation"><span class="m">·</span> attestation <b class="k">tdx</b></div>
-<div class="term__line dom-row" data-dom="enclave"><span class="m">·</span> enclave <b class="k">tdx</b></div>
-</div>
-<div class="term__line" id="stVerdict" style="margin-top:12px"><span class="m">awaiting verification</span></div>
-</div>
-</div>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:24px">
-<button class="btn btn--dark btn--sm" id="stSeal">Seal a change</button>
-<button class="btn btn--line btn--sm" id="stVerify">Verify log</button>
-<button class="btn btn--line btn--sm" id="stTamper">Tamper</button>
-</div>
-</div>
-</div>
-<div class="split__copy" data-reveal>
-<p class="eyebrow">The Studio · runs in your browser</p>
-<h2 class="d2">Don't trust us. Verify it&nbsp;here.</h2>
-<p class="support">This is not a video and not a mock-up. The panel beside this text runs real SHA-256 canonical hashing, a real ECDSA P-256 signature over the digest, and a real Merkle log with real inclusion and consistency proofs — in your browser, with no server involved.</p>
-<p class="support" style="margin-top:16px">Seal a few changes. Then press <em>Tamper</em> and verify again: the signature still passes, because it was made over the original digest — but binding, inclusion and consistency all fail. That precision is the product.</p>
-<div class="btn-row">
-<a href="#domains" class="btn btn--dark">Read the domains</a>
-</div>
-<p class="note" style="margin-top:24px">The browser signs with ECDSA P-256 because that is what browsers expose natively. Production seals with hybrid <span class="mono">ML-DSA-65 + Ed25519</span>. Attestation and enclave are marked <span class="mono">tdx</span> here: they need an Intel TDX quote, which a browser cannot produce. They run and pass on Phala Cloud.</p>
-</div>
-</div>
-</section>
-<section class="band band--surface">
-<div class="wrap">
-<div class="head head--wide" data-reveal>
-<p class="eyebrow">Why now</p>
-<h2 class="d2">Regulation is turning "nice to have" into "on the record."</h2>
-<p class="support">We have no customer logos to show you yet. These are the obligations doing the pushing instead — each one a public document you can read yourself.</p>
-</div>
-<div class="cells" data-reveal>
-<div class="cell">
-<b>EU AI Act, Art. 12</b>
-<p>Requires automatic recording of events over the lifetime of high-risk AI systems. Not notes — automatic, lifetime logging.</p>
-</div>
-<div class="cell">
-<b>India DPDP Rules, 2025</b>
-<p>Continuous logging, multi-year retention and independent audit, with financial penalties for gaps.</p>
-</div>
-<div class="cell">
-<b>SR 11-7 lineage</b>
-<p>US model-risk supervision expects documented, defensible records of what a model was and when it changed.</p>
-</div>
-<div class="cell">
-<b>RBI draft AI/ML norms</b>
-<p>Model-risk expectations arriving for Indian financial institutions on the same documentary spine.</p>
-</div>
-</div>
-<p class="note" style="margin-top:24px" data-reveal>Regulation mandates records and logs. It does not — yet — mandate that those records be cryptographically tamper-proof, and we don't claim it does. The narrower, true claim: the volume and rigour now required is beyond what manual, editable processes reliably produce.</p>
-</div>
-</section>
-<section class="band" id="product">
-<div class="wrap">
-<div class="head head--wide" data-reveal>
-<p class="eyebrow">Product</p>
-<h2 class="d2">Three concrete pieces: capture, log, verify.</h2>
-</div>
-<div class="grid grid--3">
-<article class="card" data-reveal>
-<div class="card__viz">
-<svg viewBox="0 0 260 120" style="width:100%;height:auto">
-<rect x="12" y="16" width="150" height="10" rx="2" fill="#1e50a2"/>
-<rect x="12" y="34" width="104" height="10" rx="2" fill="#c2d0e6"/>
-<rect x="12" y="52" width="132" height="10" rx="2" fill="#c2d0e6"/>
-<rect x="12" y="70" width="76" height="10" rx="2" fill="#1e50a2"/>
-<rect x="12" y="88" width="118" height="10" rx="2" fill="#c2d0e6"/>
-<rect x="176" y="14" width="72" height="92" rx="4" fill="#0a1a33"/>
-<text x="212" y="56" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9" fill="#6fb0ff">SDK</text>
-<text x="212" y="70" text-anchor="middle" font-family="ui-monospace,monospace" font-size="8" fill="#a9bbd6">hooks</text>
-</svg>
-</div>
-<p class="eyebrow" style="margin:0">Capture</p>
-<h3 class="d3">SDK and CLI</h3>
-<p class="support" style="font-size:.875rem">A change ships — a new prompt, a swapped model, an edited policy — and it is recorded at the moment it happens, not written up afterwards by hand.</p>
-<div class="card__foot">
-<button class="cmd" data-copy="npm i -g cool-nwc">
-<span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span>
-<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
-</button>
-</div>
-</article>
-<article class="card" data-reveal>
-<div class="card__viz">
-<svg viewBox="0 0 260 120" style="width:100%;height:auto">
-<g stroke="#c2d0e6" stroke-width="1.1" fill="none">
-<path d="M40 96 L80 58"/><path d="M120 96 L80 58"/>
-<path d="M160 96 L200 58"/><path d="M240 96 L200 58"/>
-<path d="M80 58 L140 24"/><path d="M200 58 L140 24"/>
-</g>
-<rect x="112" y="12" width="56" height="20" rx="3" fill="#0a1a33"/>
-<g fill="#fff" stroke="#c2d0e6"><rect x="58" y="48" width="44" height="18" rx="3"/><rect x="178" y="48" width="44" height="18" rx="3"/></g>
-<g><rect x="20" y="88" width="40" height="18" rx="3" fill="#1e50a2"/>
-<rect x="100" y="88" width="40" height="18" rx="3" fill="#fff" stroke="#c2d0e6"/>
-<rect x="140" y="88" width="40" height="18" rx="3" fill="#fff" stroke="#c2d0e6"/>
-<rect x="220" y="88" width="34" height="18" rx="3" fill="#fff" stroke="#c2d0e6"/></g>
-</svg>
-</div>
-<p class="eyebrow" style="margin:0">Log</p>
-<h3 class="d3">Transparency log</h3>
-<p class="support" style="font-size:.875rem">Records are appended to a Merkle log built the way Certificate Transparency builds one (RFC 6962). Tampering isn't prevented by access control — it's made detectable by anyone.</p>
-<div class="card__foot">
-<a href="#domains" class="btn btn--line btn--sm btn--full">How the log holds</a>
-</div>
-</article>
-<article class="card" data-reveal>
-<div class="card__viz">
-<svg viewBox="0 0 260 120" style="width:100%;height:auto">
-<rect x="16" y="14" width="228" height="92" rx="4" fill="#071528"/>
-<text x="30" y="36" font-family="ui-monospace,monospace" font-size="9" fill="#6fb0ff">$ cool verify</text>
-<g font-family="ui-monospace,monospace" font-size="8.5" fill="#6fb0ff">
-<text x="30" y="54">✓ binding</text><text x="130" y="54">✓ inclusion</text>
-<text x="30" y="70">✓ signature</text><text x="130" y="70">✓ consistency</text>
-<text x="30" y="86">✓ witness</text>
-</g>
-<text x="130" y="86" font-family="ui-monospace,monospace" font-size="8.5" fill="#6fb0ff">✓ attestation</text>
-</svg>
-</div>
-<p class="eyebrow" style="margin:0">Verify</p>
-<h3 class="d3">Open verifier</h3>
-<p class="support" style="font-size:.875rem">Anyone can check a receipt on their own machine — no CooL account, no network call, nothing of ours in the loop. Trust the maths, not the vendor.</p>
-<div class="card__foot">
-<button class="cmd" data-copy="cool verify receipt.json">
-<span class="cmd__dollar">$</span><span>cool verify receipt.json</span>
-<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
-</button>
-</div>
-</article>
-</div>
-</div>
-</section>
-<section class="band" id="domains">
-<div class="wrap">
-<div class="head head--wide" data-reveal>
-<p class="eyebrow">Verification</p>
-<h2 class="d2">Seven independent domains. All seven verified on real hardware.</h2>
-<p class="support">A receipt is not a single yes/no. It is seven separate checks that can fail independently — which is what makes a failure diagnostic instead of merely alarming.</p>
-</div>
-<div class="grid grid--4" data-reveal>
-<article class="dom">
-<div class="dom__top">
-<span class="dom__ic"><svg viewBox="0 0 24 24"><path d="M7 12h10M7 8h10M7 16h6"/></svg></span>
-<span class="badge badge--real">real</span>
-</div>
-<h3>binding</h3>
-<p>The record still hashes to the digest that was signed. Edit one character and this fails.</p>
-</article>
-<article class="dom">
-<div class="dom__top">
-<span class="dom__ic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/></svg></span>
-<span class="badge badge--real">real</span>
-</div>
-<h3>signature</h3>
-<p>The digest carries a valid signature from the sealing key. Hybrid ML-DSA-65 + Ed25519 in production.</p>
-</article>
-<article class="dom">
-<div class="dom__top">
-<span class="dom__ic"><svg viewBox="0 0 24 24"><path d="M12 4v6M8 14l4-4 4 4M5 20h14"/></svg></span>
-<span class="badge badge--real">real</span>
-</div>
-<h3>inclusion</h3>
-<p>This leaf is genuinely inside the published log, provable by path, not by our say-so.</p>
-</article>
-<article class="dom">
-<div class="dom__top">
-<span class="dom__ic"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h16M9 4v16"/></svg></span>
-<span class="badge badge--real">real</span>
-</div>
-<h3>consistency</h3>
-<p>The log only ever grew. No earlier entry was rewritten to make a later one look clean.</p>
-</article>
-<article class="dom">
-<div class="dom__top">
-<span class="dom__ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/></svg></span>
-<span class="badge badge--real">real</span>
-</div>
-<h3>witness</h3>
-<p>An independently computed root agrees with the published one — a second pair of eyes on the same maths.</p>
-</article>
-<article class="dom">
-<div class="dom__top">
-<span class="dom__ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg></span>
-<span class="badge badge--real">real</span>
-</div>
-<h3>attestation</h3>
-<p>An Intel TDX quote, via Phala dstack, proving which enclave produced the record — and binding it to the signing key.</p>
-</article>
-<article class="dom">
-<div class="dom__top">
-<span class="dom__ic"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
-<span class="badge badge--real">real</span>
-</div>
-<h3>enclave</h3>
-<p>The measured environment (MRTD, RTMR0–3) matches the approved pin. A changed workload is rejected.</p>
-</article>
-<article class="dom" style="background:var(--surface);border-style:dashed">
-<div class="dom__top">
-<span class="dom__ic" style="background:#fff"><svg viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z"/><path d="M9 12h6M9 16h6"/></svg></span>
-<span class="badge badge--soon">evidence</span>
-</div>
-<h3>Published runs</h3>
-<p>Receipts, quotes and an 11-row tamper matrix from Phala Cloud runs, in the open. <a href="https://github.com/Northwind-Cipher/cool-sdk/blob/main/artifacts/closure-verification-matrix.md" target="_blank" rel="noopener" style="border-bottom:1px solid var(--border-2)">Read it ↗</a></p>
-</article>
-</div>
-</div>
-</section>
-<section class="band band--surface">
-<div class="wrap">
-<div class="facts" data-reveal>
-<div class="fact"><b data-count="7">7</b><span>independent verification domains in the open verifier</span></div>
-<div class="fact"><b data-count="7">7</b><span>verified on real Intel TDX hardware via Phala Cloud</span></div>
-<div class="fact"><b data-count="119">119</b><span>SDK tests passing, 0 skipped</span></div>
-<div class="fact"><b data-count="0">0</b><span>customer data in our control plane, by design</span></div>
-</div>
-<p class="note" style="margin-top:40px" data-reveal>These are the only numbers on this page. There are no user counts, uptime percentages or latency figures here, because CooL has none to report yet — and a number invented to fill a gap would undo every real one beside it.</p>
-</div>
-</section>
-<section class="band">
-<div class="wrap">
-<div class="head head--wide" data-reveal>
-<p class="eyebrow">Platform</p>
-<h2 class="d2">Capture automatically. Verify offline. Prove for a decade.</h2>
-</div>
-<div class="grid grid--3">
-<div class="card" data-reveal>
-<h3 class="d3">Capture automatically</h3>
-<p class="support" style="font-size:.875rem">The weeks a year lost to change-paperwork come back as engineering time, because the record is a side effect of shipping rather than a task after it.</p>
-</div>
-<div class="card" data-reveal>
-<h3 class="d3">Verify offline</h3>
-<p class="support" style="font-size:.875rem">Evidence assembled by hand for an audit becomes evidence produced continuously. Audits stop being fire drills and become an export.</p>
-</div>
-<div class="card" data-reveal>
-<h3 class="d3">Prove for a decade</h3>
-<p class="support" style="font-size:.875rem">Hybrid post-quantum signing means a record sealed today still stands when the security assumptions of today have moved on.</p>
-</div>
-</div>
-</div>
-</section>
-<section class="band" id="team">
-<div class="wrap">
-<div class="head head--wide rise">
-<p class="eyebrow">Founders</p>
-<h2 class="d2">Applied post-quantum cryptography, and confidential-compute inference.</h2>
-</div>
-<div class="grid grid--2">
-<article class="person person--photo rise" style="--rd:0ms">
-<figure class="ftile" data-tiles>
-<img src="/founders/pranauv-portrait.jpg" alt="Pranauv Shrinaath S" width="760" height="950" loading="lazy" decoding="async" />
-<div class="ftile__grid" aria-hidden="true"></div>
-<span class="ftile__hash" aria-hidden="true">sig · ML-DSA-65</span>
-<span class="ftile__tag">Founder &amp; CEO</span>
-</figure>
-<div class="person__body">
-<h3>Pranauv Shrinaath S</h3>
-<p class="role">Founder &amp; CEO · Post-quantum cryptography &amp; blockchain</p>
+<div class="fdr">
+<article class="fdr__row" data-reveal>
+<figure class="fdr__shot"><img src="/founders/pranauv.jpg" alt="Pranauv Shrinaath S" width="1122" height="1402" loading="lazy" decoding="async" /><span class="fdr__screen" aria-hidden="true"></span><figcaption class="fdr__idx" aria-hidden="true">01</figcaption></figure>
+<div class="fdr__copy">
+<p class="fdr__role">Founder &amp; CEO</p>
+<h3 class="fdr__name">Pranauv<span>Shrinaath S</span></h3>
+<p class="fdr__focus">Post-quantum cryptography · blockchain</p>
 <ul>
-<li><span class="mono">ipsec-pqc-ikev2</span> — published research mapping ML-KEM into IKEv2 (liboqs / C).</li>
-<li>Research on decentralising public banks, secured with PQC + Hyperledger Fabric.</li>
-<li>Onsite research internship, NUS Singapore.</li>
-<li>Building since 14.</li>
+<li><code>ipsec-pqc-ikev2</code> — published research mapping ML-KEM into IKEv2 (liboqs / C)</li>
+<li>Research on decentralising public banks, secured with PQC + Hyperledger Fabric</li>
+<li>Onsite research internship, NUS Singapore</li>
+<li>Building since 14</li>
 </ul>
-<div class="person__links">
-<a class="mail" href="mailto:pranauvshrinaath@northwindcipher.com"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M2 4.5l6 4.5 6-4.5"/></svg>pranauvshrinaath@northwindcipher.com</a>
-<a class="src" href="https://github.com/KenidoesCode" target="_blank" rel="noopener">github.com/KenidoesCode ↗</a>
-</div>
+<p class="fdr__links"><a href="https://github.com/KenidoesCode" target="_blank" rel="noopener">github/KenidoesCode</a><a href="mailto:pranauvshrinaath@northwindcipher.com">email</a></p>
 </div>
 </article>
-<article class="person person--photo rise" style="--rd:120ms">
-<figure class="ftile" data-tiles>
-<img src="/founders/kailosh-portrait.jpg" alt="Kailosh Kalimuthu" width="760" height="1138" loading="lazy" decoding="async" />
-<div class="ftile__grid" aria-hidden="true"></div>
-<span class="ftile__hash" aria-hidden="true">tee · intel-tdx</span>
-<span class="ftile__tag">Co-Founder &amp; CTO</span>
-</figure>
-<div class="person__body">
-<h3>Kailosh Kalimuthu</h3>
-<p class="role">Co-Founder &amp; CTO · Trusted execution environments &amp; AI inference</p>
+<article class="fdr__row fdr__row--flip" data-reveal>
+<figure class="fdr__shot"><img src="/founders/kailosh.jpg" alt="Kailosh Kalimuthu" width="1086" height="1448" loading="lazy" decoding="async" /><span class="fdr__screen" aria-hidden="true"></span><figcaption class="fdr__idx" aria-hidden="true">02</figcaption></figure>
+<div class="fdr__copy">
+<p class="fdr__role">Co-Founder &amp; CTO</p>
+<h3 class="fdr__name">Kailosh<span>Kalimuthu</span></h3>
+<p class="fdr__focus">Trusted execution environments · AI inference</p>
 <ul>
-<li>Built <strong>BIFROST</strong> — a decentralised P2P comms / storage / compute network.</li>
-<li>Repurposes idle hardware into an encrypted, distributed micro-cloud.</li>
-<li>6 months building with US startup Decipher.</li>
-<li>Building since 16.</li>
+<li>Built <strong>BIFROST</strong> — a decentralised P2P comms / storage / compute network</li>
+<li>Repurposes idle hardware into an encrypted, distributed micro-cloud</li>
+<li>6 months building with US startup Decipher</li>
+<li>Building since 16</li>
 </ul>
-<div class="person__links">
-<a class="mail" href="mailto:kailoshkalimuthu@northwindcipher.com"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M2 4.5l6 4.5 6-4.5"/></svg>kailoshkalimuthu@northwindcipher.com</a>
-<a class="src" href="https://github.com/Sk1zmo" target="_blank" rel="noopener">github.com/Sk1zmo ↗</a>
-</div>
+<p class="fdr__links"><a href="https://github.com/Sk1zmo" target="_blank" rel="noopener">github/Sk1zmo</a><a href="mailto:kailoshkalimuthu@northwindcipher.com">email</a></p>
 </div>
 </article>
 </div>
-<p class="note rise" style="margin-top:24px">Nothing here is claimed beyond what is listed, and every line is one click from being checked. On a deep-tech team page, one exaggeration a reader can disprove poisons every true line next to it.</p>
 </div>
 </section>
-<section class="band" id="faq">
-<div class="wrap" style="max-width:860px">
-<div class="head" data-reveal>
-<p class="eyebrow">Questions</p>
-<h2 class="d2">The parts people ask about twice.</h2>
+
+<!-- FAQ: two-column split -->
+<section class="csec" id="faq">
+<div class="cwrap csplit">
+<div class="csplit__side" data-reveal>
+<p class="mlabel">FAQ</p>
+<h2 class="ch2">Questions, answered.</h2>
+<p class="cbody">Can't find what you need? The documentation goes deeper, or talk to the founders directly.</p>
+<div class="chero__actions chero__actions--left"><a href="/docs" class="cbtn cbtn--ghost">Read the docs</a><a href="https://cal.com/coolnwc" target="_blank" rel="noopener" class="clink">Book a call</a></div>
+</div>
+<div class="faq-wrap faqs" data-reveal>
+<div class="faq"><button class="faq__q">What does CooL actually record? <i></i></button><div class="faq__a"><p>A change to the behaviour of an AI system: an edited prompt, a swapped model, a changed policy, a granted tool. Each one is serialised deterministically, hashed, signed, and appended to a transparency log. It records the change, not your users' data.</p></div></div>
+<div class="faq"><button class="faq__q">What does "verifiable offline" mean in practice? <i></i></button><div class="faq__a"><p>You take a receipt file and run the open verifier on your own machine, with the network switched off. It recomputes the digest, checks the signature, checks the inclusion path and the consistency of the log. Nothing of ours is contacted, so nothing of ours has to be trusted.</p></div></div>
+<div class="faq"><button class="faq__q">What hardware does attestation run on? <i></i></button><div class="faq__a"><p>Intel TDX confidential VMs on Phala Cloud, through dstack. All seven checks have been verified on that hardware, with the raw quotes and tamper tests published in the SDK repo. Limits, stated plainly: CPU TDX only, no GPU attestation claimed, and quote verification goes through Phala's service unless you supply collateral locally. With <code>COOL_REQUIRE_HARDWARE=1</code> the verifier fails closed rather than downgrading to simulation.</p></div></div>
+<div class="faq"><button class="faq__q">Does CooL run or host my model? <i></i></button><div class="faq__a"><p>No. Your model runs wherever it already runs, on whichever provider you already use. CooL sits beside it and records what changed. That neutrality is the point — a system of record tied to one vendor cannot be the system of record.</p></div></div>
+<div class="faq"><button class="faq__q">Why post-quantum, when nothing is broken yet? <i></i></button><div class="faq__a"><p>Because evidence has a long shelf life. A record sealed for a seven-year retention obligation has to survive the whole seven years, and "harvest now, verify later" is a real problem for signatures that outlive their assumptions. Hybrid ML-DSA-65 + Ed25519 holds if either scheme is broken.</p></div></div>
+<div class="faq"><button class="faq__q">Can I use it today? <i></i></button><div class="faq__a"><p><code>npm i -g cool-nwc</code> is published and installs the SDK and verifier; the source is on <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub</a> under BUSL-1.1. Automatic capture is the active build. Launch prices are on the <a href="/pricing">pricing page</a>, but billing is not live yet, so there is nothing to buy today.</p></div></div>
+</div>
+</div>
+</section>
+
+<!-- Closing CTA: two-column split -->
+<section class="csec ccta" id="contact">
+<div class="cwrap csplit csplit--cta">
+<div data-reveal>
+<h2 class="ccta__h">A product you check, not one you're asked to believe.</h2>
+<div class="chero__actions chero__actions--left">
+<a href="https://cal.com/coolnwc" class="cbtn" target="_blank" rel="noopener">Book a call</a>
+<a href="#get-started" class="clink">Install the SDK</a>
+</div>
 </div>
 <div data-reveal>
-<div class="faq">
-<button class="faq__q">What does CooL actually record? <i></i></button>
-<div class="faq__a"><p>A change to the behaviour of an AI system: an edited prompt, a swapped model, a changed policy, a granted tool. Each one is serialised deterministically, hashed, signed, and appended to a transparency log. It records the change, not your users' data.</p></div>
-</div>
-<div class="faq">
-<button class="faq__q">What does "verifiable offline" mean in practice? <i></i></button>
-<div class="faq__a"><p>You take a receipt file and run the open verifier on your own machine, with the network switched off. It recomputes the digest, checks the signature, checks the inclusion path and the consistency of the log. Nothing of ours is contacted, so nothing of ours has to be trusted.</p></div>
-</div>
-<div class="faq">
-<button class="faq__q">What hardware does attestation run on? <i></i></button>
-<div class="faq__a"><p>Intel TDX confidential VMs on Phala Cloud, through dstack. All seven domains have been verified on that hardware, with the raw quotes and tamper tests published in the SDK repo. Limits, stated plainly: CPU TDX only, no GPU attestation claimed, and quote verification goes through Phala's service unless you supply collateral locally. With <span class="mono">COOL_REQUIRE_HARDWARE=1</span> the verifier fails closed rather than downgrading to simulation.</p></div>
-</div>
-<div class="faq">
-<button class="faq__q">Does CooL run or host my model? <i></i></button>
-<div class="faq__a"><p>No. Your model runs wherever it already runs, on whichever provider you already use. CooL sits beside it and records what changed. That neutrality is the point — a system of record tied to one vendor cannot be the system of record.</p></div>
-</div>
-<div class="faq">
-<button class="faq__q">Why post-quantum, when nothing is broken yet? <i></i></button>
-<div class="faq__a"><p>Because evidence has a long shelf life. A record sealed for a seven-year retention obligation has to survive the whole seven years, and "harvest now, verify later" is a real problem for signatures that outlive their assumptions. Hybrid ML-DSA-65 + Ed25519 holds if either scheme is broken.</p></div>
-</div>
-<div class="faq" style="border-bottom:1px solid var(--border)">
-<button class="faq__q">Can I use it today? <i></i></button>
-<div class="faq__a"><p><span class="mono">npm i -g cool-nwc</span> is published and installs the SDK and verifier; the source is on <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener" style="border-bottom:1px solid var(--border-2)">GitHub</a> under BUSL-1.1. Automatic capture is the active build. Launch prices are on the <a href="/pricing" style="border-bottom:1px solid var(--border-2)">pricing page</a>, but billing is not live yet, so there is nothing to buy today.</p></div>
-</div>
+<p class="cbody">Book a call and we'll walk a change you'd want on the record through end to end — or install the SDK and check it yourself.</p>
+<div class="contacts"><a href="mailto:pranauvshrinaath@northwindcipher.com">pranauvshrinaath@northwindcipher.com</a><a href="mailto:kailoshkalimuthu@northwindcipher.com">kailoshkalimuthu@northwindcipher.com</a></div>
 </div>
 </div>
 </section>
-<section class="band band--flush" id="start" style="border-top:0">
-<div class="wrap">
-<div class="final" data-reveal>
-<h2 class="d2">A product you check, not one you're asked to believe.</h2>
-<p>Book a call and we'll walk a change you'd want on the record through end to end — or install the SDK and check it yourself.</p>
-<div class="btn-row">
-<a href="https://cal.com/coolnwc" class="btn btn--accent" target="_blank" rel="noopener">Book a call</a>
-<button class="cmd" data-copy="npm i -g cool-nwc">
-<span class="cmd__dollar">$</span><span>npm i -g cool-nwc</span>
-<svg class="cmd__ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5H3.5a1 1 0 0 0-1 1v7"/></svg>
-</button>
-<a href="https://github.com/Northwind-Cipher/cool-sdk" class="btn btn--line" target="_blank" rel="noopener">View on GitHub</a>
-</div>
-<div class="final__mail">
-<a href="mailto:pranauvshrinaath@northwindcipher.com">pranauvshrinaath@northwindcipher.com</a>
-<a href="mailto:kailoshkalimuthu@northwindcipher.com">kailoshkalimuthu@northwindcipher.com</a>
-</div>
-</div>
-</div>
-</section>
+
 </main>
+
 <footer class="foot">
 <div class="wrap">
 <div class="foot__cols">
 <div>
-<a href="/" class="brand" aria-label="CooL — home" style="margin-bottom:16px">
-<i class="brand__wm" aria-hidden="true"></i>
-</a>
-<p class="note" style="max-width:30ch">The verifiable system-of-record for AI change. Built by Northwind Cipher. Member of NVIDIA Inception.</p>
+<a href="/" class="brand" aria-label="CooL — home"><i class="brand__wm" aria-hidden="true"></i></a>
+<p class="note">The verifiable system of record for AI change. Built by Northwind Cipher. Member of NVIDIA Inception.</p>
 </div>
 <div>
 <h4>Product</h4>
-<a href="#product">Overview</a>
-<a href="#domains">Verification domains</a>
+<a href="/#product">Overview</a>
+<a href="/#demo">Demo</a>
 <a href="/studio">Studio</a>
-<a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">SDK on GitHub ↗</a>
-<a href="https://www.npmjs.com/package/cool-nwc" target="_blank" rel="noopener">SDK on npm ↗</a>
+<a href="/pricing">Pricing</a>
 </div>
 <div>
-<h4>Pricing</h4>
-<a href="/pricing">Plans</a>
-<a href="/pricing#faq">Pricing FAQ</a>
-<a href="/pricing#sales">Enterprise</a>
+<h4>Developers</h4>
+<a href="/#get-started">Get started</a>
+<a href="/docs">Documentation</a>
+<a href="/docs/cli-reference">CLI reference</a>
+<a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub</a>
+<a href="https://www.npmjs.com/package/cool-nwc" target="_blank" rel="noopener">npm</a>
 </div>
 <div>
 <h4>Company</h4>
-<a href="#team">Founders</a>
-<a href="#faq">FAQ</a>
-<a href="https://cal.com/coolnwc" target="_blank" rel="noopener">Book a call ↗</a>
+<a href="/#company">Founders</a>
+<a href="/#faq">FAQ</a>
+<a href="https://cal.com/coolnwc" target="_blank" rel="noopener">Book a call</a>
 </div>
 <div>
 <h4>Legal</h4>
-<a href="#">Privacy</a>
-<a href="#">Terms</a>
-<a href="#">Responsible disclosure</a>
+<a href="/privacy">Privacy</a>
+<a href="/docs/license-faq">License</a>
+<a href="/security">Security</a>
 </div>
 </div>
 <div class="foot__legal">
-<span>© 2026 Northwind Cipher Pvt. Ltd.</span>
-<span class="mono" id="clock">--:--:--</span>
+<span>© 2026 Northwind Cipher Pvt. Ltd. Coimbatore, India.</span>
 <span>Every change, sealed as it ships.</span>
 </div>
 </div>
 </footer>
 <script type="module" src="/src/app.js"></script>
-<script type="module" src="/src/site-extras.js"></script>
+<script type="module" src="/src/guide.js"></script>
+<script type="module" src="/src/caution.js"></script>
+<script type="module" src="/src/lumen.js"></script>
 </body>
 </html>

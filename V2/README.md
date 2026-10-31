@@ -44,8 +44,12 @@ rounding up to `pass`: **the rule lives in code, not in an instruction someone
 has to remember.**
 
 Today the product is at **Stage 0** — "here's a working demo, verify it
-yourself, offline." Two of seven verification domains do not pass, and both are
-named on the homepage rather than buried.
+yourself, offline." Real Intel TDX attestation and all seven verifier domains
+have been exercised on Phala Cloud; that hardware run does not mean every
+local/browser receipt has hardware evidence. Those receipts say `simulated`.
+The witness runs on a separate CVM but under the same CooL account, and public
+anchoring is not yet a relied-upon part of the integrity story. These limits
+are published in [`content/docs/limits.mdx`](content/docs/limits.mdx).
 
 ---
 
@@ -84,6 +88,21 @@ re-enactment, not an animation, not a recording.
 | `/investor/login` | Invite code, rate limited 5 per 15 min per /24 |
 | `/investor/*` | Encrypted session + server-side row check on every request |
 | `/admin/*` | Passphrase, rate limited 5 per hour |
+
+### Adding or editing documentation
+
+The published docs are MDX files in `content/docs/`; the plain-Markdown GitHub
+mirror lives in the repository-level `../docs/` directory. Add a page with
+`title`, `description`, `section`, and `order` front matter. Use one of the
+existing sections (`Start here`, `Concepts`, `Reference`, `Operations`) or add
+its display order in `src/lib/docs.ts`. The route, sidebar, search index, page
+metadata, article TOC, and sitemap are generated from the MDX source.
+
+Use the existing `Note`, `Warning`, `Grid`, and `CardLink` components and fenced
+code blocks for consistent rendering. After editing, run `npm run verify:all`
+and `npm run build`; run `npm run docs:mirror` to refresh the Markdown mirror.
+The [docs implementation report](DOCS-IMPLEMENTATION.md) records the reference
+audit, source-of-truth decisions, verification results, and current content gaps.
 
 ---
 
@@ -218,10 +237,15 @@ normalisation before it reaches the database.
 
 Stated here for the same reason it is stated on the site.
 
-- **Hardware attestation is simulated.** No TDX in the loop. The verifier
-  reports `simulated` and can never report `pass`.
-- **Public anchoring is absent.** The log is signed by our keys alone, which is
-  not tamper-evident against us. External witnesses close this. Gate 2.
+- **A separate-organisation witness is not deployed.** The witness runs in its
+  own CVM with its own enclave-sealed key, but under the same CooL account as
+  the primary log. This is not yet independent against a determined insider.
+- **Public anchoring is not yet a relied-upon safeguard.** The OpenTimestamps
+  submission and offline verification mechanisms exist; the readiness claim
+  that the log relies on public anchoring remains a Gate 2 item.
+- **Hardware evidence depends on the runtime.** Real Intel TDX attestation has
+  been verified on Phala Cloud. Laptop and browser demo receipts use the
+  simulator and correctly report `simulated` instead of `pass`.
 - **The admin console is one shared passphrase.** Correct for one admin; the
   moment there are two it must become Supabase Auth plus an allowlist, because a
   shared credential cannot be revoked for one holder or attributed to a person.

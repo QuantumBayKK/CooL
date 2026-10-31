@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
+import { ArrowLeft, ArrowRight, Info, TriangleAlert } from "lucide-react";
 
 import { CodeBlock } from "@/components/ui/code";
-import { StatusBadge } from "@/components/ui/primitives";
-import { DocsContextRail } from "@/components/docs/DocsContextRail";
+import { DocsToc } from "@/components/docs/DocsToc";
 import { allDocs, getDoc, slugifyHeading } from "@/lib/docs";
 
 export const dynamicParams = false;
@@ -41,7 +42,7 @@ export async function generateMetadata({
 /**
  * MDX component overrides.
  *
- * Headings get ids matching `slugifyHeading` so the table of contents resolves.
+ * Headings get stable ids for links shared in URLs and other pages.
  * Code fences route through the same Shiki block the rest of the site uses, so
  * a snippet in the docs and a snippet on the homepage are highlighted by one
  * implementation with one theme pair.
@@ -65,16 +66,19 @@ const components = {
     return <CodeBlock lang={lang} code={code} className="my-6" />;
   },
   Note: ({ children }: { children?: React.ReactNode }) => (
-    <aside className="my-6 border border-line bg-surface p-4">
-      <StatusBadge status="neutral">Note</StatusBadge>
-      <div className="mt-2.5 text-sm text-ink-muted">{children}</div>
+    <aside className="docs-callout">
+      <Info className="docs-callout-icon" aria-hidden strokeWidth={1.8} />
+      <div><p className="docs-callout-title">Note</p><div className="docs-callout-body">{children}</div></div>
     </aside>
   ),
   Warning: ({ children }: { children?: React.ReactNode }) => (
-    <aside className="my-6 border border-warn/30 bg-warn-wash p-4">
-      <StatusBadge status="warn">Important</StatusBadge>
-      <div className="mt-2.5 text-sm text-ink-muted">{children}</div>
+    <aside className="docs-callout docs-callout-warn">
+      <TriangleAlert className="docs-callout-icon" aria-hidden strokeWidth={1.8} />
+      <div><p className="docs-callout-title">Important</p><div className="docs-callout-body">{children}</div></div>
     </aside>
+  ),
+  table: ({ children }: { children?: React.ReactNode }) => (
+    <div className="docs-table"><table>{children}</table></div>
   ),
   // A link grid for a landing page's "where to go next" — reuses the same
   // bordered, shadowless cell pattern as the architecture page's topology
@@ -82,15 +86,12 @@ const components = {
   // than a card component), so a docs index doesn't invent a second visual
   // language for "here are some things you can click".
   Grid: ({ children }: { children?: React.ReactNode }) => (
-    <div className="my-8 grid gap-px bg-line sm:grid-cols-2">{children}</div>
+    <div className="docs-cards">{children}</div>
   ),
   CardLink: ({ href, title, desc }: { href: string; title: string; desc: string }) => (
-    <Link
-      href={href}
-      className="group block bg-canvas p-5 transition-colors duration-[--duration-state] ease-[--ease-out] hover:bg-surface"
-    >
-      <span className="text-sm font-semibold text-ink">{title}</span>
-      <span className="mt-1 block text-sm text-ink-muted">{desc}</span>
+    <Link href={href} className="docs-card">
+      <span className="docs-card-title">{title}<ArrowRight className="docs-card-arrow" aria-hidden strokeWidth={1.8} /></span>
+      <span className="docs-card-desc">{desc}</span>
     </Link>
   ),
 };
@@ -114,8 +115,10 @@ export default async function DocPage({
 
   return (
     <div className="docs-reading">
-      <article className="docs-article min-w-0 flex-1">
-        <div className="docs-eyebrow"><span>{doc.section}</span><span aria-hidden>·</span><span>Documentation</span></div>
+      <article className="docs-article min-w-0">
+        <nav className="docs-eyebrow" aria-label="Breadcrumb">
+          <Link href="/docs">Docs</Link><span aria-hidden="true">/</span><span>{doc.section}</span>
+        </nav>
         <h1 className="docs-title">{doc.title}</h1>
         {doc.description && (
           <p className="docs-description max-w-prose text-lead text-ink-muted">
@@ -124,7 +127,7 @@ export default async function DocPage({
         )}
 
         <div className="prose-cool docs-prose">
-          <MDXRemote source={doc.body} components={components} />
+          <MDXRemote source={doc.body} components={components} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
         </div>
 
         {(backlinks.length > 0 || previous || next) && (
@@ -144,15 +147,16 @@ export default async function DocPage({
             )}
             {(previous || next) && (
               <nav className="docs-pagination" aria-label="More documentation">
-                {previous ? <Link href={previous.slug ? `/docs/${previous.slug}` : "/docs"} className="docs-page-link docs-page-prev"><span className="docs-page-direction">← Previous</span><span>{previous.title}</span></Link> : <span />}
-                {next ? <Link href={next.slug ? `/docs/${next.slug}` : "/docs"} className="docs-page-link docs-page-next"><span className="docs-page-direction">Next →</span><span>{next.title}</span></Link> : <span />}
+                {previous ? <Link href={previous.slug ? `/docs/${previous.slug}` : "/docs"} className="docs-page-link docs-page-prev"><span className="docs-page-direction"><ArrowLeft className="size-3.5" aria-hidden /> Previous</span><span className="docs-page-title">{previous.title}</span></Link> : <span />}
+                {next ? <Link href={next.slug ? `/docs/${next.slug}` : "/docs"} className="docs-page-link docs-page-next"><span className="docs-page-direction">Next <ArrowRight className="size-3.5" aria-hidden /></span><span className="docs-page-title">{next.title}</span></Link> : <span />}
               </nav>
             )}
           </footer>
         )}
       </article>
-
-      <DocsContextRail headings={doc.headings} />
+      <aside className="docs-aside">
+        <DocsToc headings={doc.headings} />
+      </aside>
     </div>
   );
 }

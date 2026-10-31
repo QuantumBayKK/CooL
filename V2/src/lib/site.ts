@@ -85,6 +85,7 @@ export const NAV: readonly (NavItem | NavGroup)[] = [
     ],
   },
   { label: "Docs", href: "/docs" },
+  { label: "Community", href: "/community" },
   { label: "Pricing", href: "/pricing" },
   { label: "Company", href: "/about" },
 ] as const;
