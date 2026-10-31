@@ -23,14 +23,14 @@ test("migrations run cleanly and twice-safe baseline", async () => {
   assert.equal(n.rows[0]!.n, 4);
 });
 
-test("new accounts get a unique handle and private-by-default privacy", async () => {
+test("new accounts get a unique handle and are visible to everyone by default", async () => {
   const t = await setup();
   const rows = (await t.db.query<{ handle: string; presence: string; profile: string; timezone: string }>(
     "select p.handle, v.presence, v.profile, v.timezone from public.profiles p join public.profile_privacy v on v.user_id = p.id where p.id = $1", [MEMBER])).rows;
   assert.equal(rows[0]!.handle, "ada-lovelace");
   assert.equal(rows[0]!.presence, "online");
-  assert.equal(rows[0]!.profile, "members");
-  assert.equal(rows[0]!.timezone, "private");
+  assert.equal(rows[0]!.profile, "public");
+  assert.equal(rows[0]!.timezone, "public");
   await t.user("55555555-5555-5555-5555-555555555555", "ada2@example.com", "Ada Lovelace");
   const dup = (await t.db.query<{ handle: string }>("select handle from public.profiles where id = '55555555-5555-5555-5555-555555555555'")).rows[0]!.handle;
   assert.notEqual(dup, "ada-lovelace");
@@ -68,21 +68,23 @@ test("get_profile honours per-field privacy for visitors, members and self", asy
   await t.as(MEMBER, "update public.profiles set bio='Hello', timezone='Asia/Kolkata' where id=$1", [MEMBER]);
   const handle = (await t.db.query<{ handle: string }>("select handle from public.profiles where id=$1", [MEMBER])).rows[0]!.handle;
 
-  // default: members-only profile; visitor sees nothing
+  // default: everyone, visitors included, sees the profile, bio and time zone, never the email
+  const byDefault = (await t.as(null, "select public.get_profile($1) p", [handle])).rows[0]!.p as Record<string, unknown>;
+  assert.equal(byDefault.bio, "Hello");
+  assert.equal(byDefault.timezone, "Asia/Kolkata");
+  assert.equal(JSON.stringify(byDefault).includes("@"), false, "no email ever");
+  assert.equal((await t.as(null, "select * from public.list_profiles()")).rows.length, 2);
+
+  // members only, with a private bio and time zone
+  await t.as(MEMBER, "update public.profile_privacy set profile='members', bio='private', timezone='private' where user_id=$1", [MEMBER]);
   assert.equal((await t.as(null, "select public.get_profile($1) p", [handle])).rows[0]!.p, null);
+  assert.equal((await t.as(null, "select * from public.list_profiles()")).rows.length, 1);
   const asMember = (await t.as(OTHER, "select public.get_profile($1) p", [handle])).rows[0]!.p as Record<string, unknown>;
-  assert.equal(asMember.bio, "Hello");
-  assert.equal(asMember.timezone, undefined, "timezone is private by default");
+  assert.equal(asMember.name, "Name Here");
+  assert.equal(asMember.bio, undefined);
+  assert.equal(asMember.timezone, undefined);
   const asSelf = (await t.as(MEMBER, "select public.get_profile($1) p", [handle])).rows[0]!.p as Record<string, unknown>;
   assert.equal(asSelf.timezone, "Asia/Kolkata");
-
-  // public profile, private bio
-  await t.as(MEMBER, "update public.profile_privacy set profile='public', bio='private' where user_id=$1", [MEMBER]);
-  const asVisitor = (await t.as(null, "select public.get_profile($1) p", [handle])).rows[0]!.p as Record<string, unknown>;
-  assert.equal(asVisitor.name, "Name Here");
-  assert.equal(asVisitor.bio, undefined);
-  assert.equal(JSON.stringify(asVisitor).includes("@"), false, "no email ever");
-  assert.equal((await t.as(null, "select * from public.list_profiles()")).rows.length, 1);
 });
 
 test("members cannot read or change someone else's privacy", async () => {
@@ -90,7 +92,7 @@ test("members cannot read or change someone else's privacy", async () => {
   assert.equal((await t.as(MEMBER, "select * from public.profile_privacy")).rows.length, 1);
   await t.as(MEMBER, "update public.profile_privacy set profile='private' where user_id=$1", [OTHER]);
   const v = (await t.db.query<{ profile: string }>("select profile from public.profile_privacy where user_id=$1", [OTHER])).rows[0]!;
-  assert.equal(v.profile, "members");
+  assert.equal(v.profile, "public");
 });
 
 test("owner needs a verified Google identity; capabilities are owner-granted and audited", async () => {

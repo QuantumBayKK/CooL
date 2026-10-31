@@ -83,7 +83,7 @@ export default async function ProfilePage() {
 
       <section className="cm-panel" aria-labelledby="privacy-title">
         <h2 id="privacy-title">Privacy</h2>
-        <p className="cm-muted cm-small">Private by default. Nothing about you is shown to visitors unless you choose &quot;Everyone&quot;.</p>
+        <p className="cm-muted cm-small">Everyone can see your profile and find you in the office by default. Narrow any field below, or go invisible. Your email is never shown.</p>
         {member.privacy && <PrivacyEditor initial={member.privacy} />}
       </section>
 

@@ -24,7 +24,7 @@ export default async function PeoplePage() {
       <header className="cm-head">
         <p className="cm-eyebrow">Good company</p>
         <h1>Meet your people.</h1>
-        <p className="cm-lead">The team behind CooL, and the members who chose to be listed. Everyone controls who sees their profile.</p>
+        <p className="cm-lead">The team behind Northwind Cipher, and everyone in the community.</p>
       </header>
 
       <section aria-labelledby="team-title" className="cm-stack">
@@ -43,8 +43,8 @@ export default async function PeoplePage() {
         {error ? <p className="cm-error" role="alert">The member list could not be loaded. Please try again.</p>
           : rows.length === 0 ? (
             <div className="cm-empty">
-              {member && isWelcomed(member) ? "No one has made their profile visible yet. You can, from your profile's privacy settings."
-                : "Members' profiles are visible to other members by default. Sign in to see who's here."}
+              {member && isWelcomed(member) ? "No one else is here yet."
+                : "No one is listed yet. Sign in to see members who keep their profile to members."}
             </div>
           ) : (
             <div className="cm-grid">

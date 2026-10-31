@@ -26,7 +26,7 @@ export default function CommunityPrivacyPage() {
       </section>
       <section className="cm-panel">
         <h2>Who sees it</h2>
-        <p>You choose, field by field: everyone, members only, or only you. By default your profile is visible to members only, your time zone is private, and you are invisible in the office. Your email address is never shown to other members. The Northwind Cipher team can see member details to review applications and keep the community safe.</p>
+        <p>You choose, field by field: everyone, members only, or only you. By default everyone can see your profile, bio, skills and time zone, and you appear in the office. Your email address is never shown to other members. The Northwind Cipher team can see member details to review applications and keep the community safe.</p>
       </section>
       <section className="cm-panel">
         <h2>What we don&apos;t do</h2>
