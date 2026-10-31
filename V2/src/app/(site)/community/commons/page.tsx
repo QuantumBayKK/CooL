@@ -1,10 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { NotOpenYet } from "@/components/community/NotOpenYet";
 import { ProposalCard } from "@/components/community/ProposalCard";
 import { OUTCOME, STATUS, when, type Poll, type Proposal } from "@/lib/community/commons";
-import { commonsOpen } from "@/lib/community/flags";
 import { getMember, isWelcomed } from "@/lib/community/member";
 import { communityServer } from "@/lib/community/supabase";
 
@@ -12,9 +10,6 @@ export const metadata: Metadata = { title: "The Commons" };
 
 export default async function CommonsPage() {
   const member = await getMember();
-  if (!(await commonsOpen(Boolean(member?.owner)))) {
-    return <NotOpenYet title="The Commons opens soon." body="Propose open-source projects, discuss them in the open, and vote on what the community builds next." />;
-  }
   const supabase = await communityServer();
   await supabase?.rpc("close_due_polls");
   const [{ data: polls }, { data: props }, { data: results }] = await Promise.all([

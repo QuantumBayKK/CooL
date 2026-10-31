@@ -26,11 +26,14 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
 export default async function ContributorPage({ params }: { params: Promise<{ handle: string }> }) {
   const p = await load((await params).handle);
   if (!p) notFound();
+  const supabase = await communityServer();
+  const canMessage = !p.self && (await supabase?.rpc("can_message_handle", { p_handle: p.handle }))?.data === true;
   return (
     <article className="cm-in cm-stack" style={{ maxWidth: "48rem" }}>
       <header className="cm-head">
         <p className="cm-eyebrow">@{p.handle}</p>
         <Person name={p.name} avatarUrl={p.avatar_url} sub={p.role === "contributor" ? "Contributor" : "Member"} />
+        {canMessage && <div className="cm-actions" style={{ marginTop: "1rem" }}><Link className="cm-btn small" href={`/community/inbox?with=${p.handle}`}>Message</Link></div>}
       </header>
       {p.bio && <section className="cm-panel"><h2>About</h2><p>{p.bio}</p></section>}
       {(p.skills?.length || p.timezone) ? (

@@ -10,7 +10,7 @@ export const getFlags = cache(async (): Promise<Record<string, boolean>> => {
   return Object.fromEntries(((data as { key: string; enabled: boolean }[] | null) ?? []).map((f) => [f.key, f.enabled]));
 });
 
-/** The Commons is open when its flag is on; owners can always preview it. */
-export async function commonsOpen(owner: boolean) {
-  return owner || (await getFlags()).commons === true;
+/** The Commons is open to everyone (no longer behind a flag). */
+export async function commonsOpen() {
+  return true;
 }

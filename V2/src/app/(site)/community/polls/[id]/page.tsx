@@ -3,9 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { BallotForm, PollOwnerActions } from "@/components/community/BallotForm";
-import { NotOpenYet } from "@/components/community/NotOpenYet";
 import { ELIGIBILITY, OUTCOME, PASS_RULE, POLL_KINDS, when, type Poll, type PollOption, type PollResult } from "@/lib/community/commons";
-import { commonsOpen } from "@/lib/community/flags";
 import { getMember } from "@/lib/community/member";
 import { communityServer } from "@/lib/community/supabase";
 
@@ -13,7 +11,6 @@ export const metadata: Metadata = { title: "Vote" };
 
 export default async function PollPage({ params }: { params: Promise<{ id: string }> }) {
   const [{ id }, member] = await Promise.all([params, getMember()]);
-  if (!(await commonsOpen(Boolean(member?.owner)))) return <NotOpenYet title="Voting opens soon." body="The voting chamber arrives with The Commons." />;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const supabase = (await communityServer())!;
   await supabase.rpc("close_due_polls");

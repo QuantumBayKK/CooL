@@ -1,10 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { NotOpenYet } from "@/components/community/NotOpenYet";
 import { ProposalCard } from "@/components/community/ProposalCard";
 import { CATEGORIES, STATUS, type Proposal } from "@/lib/community/commons";
-import { commonsOpen } from "@/lib/community/flags";
 import { getMember, isWelcomed } from "@/lib/community/member";
 import { communityServer } from "@/lib/community/supabase";
 
@@ -18,7 +16,6 @@ type Search = { q?: string; category?: string; stage?: string; sort?: string; be
 export default async function ProposalsPage({ searchParams }: { searchParams: Promise<Search> }) {
   const sp = await searchParams;
   const member = await getMember();
-  if (!(await commonsOpen(Boolean(member?.owner)))) return <NotOpenYet title="Proposals open soon." body="The idea board arrives with The Commons." />;
   const supabase = (await communityServer())!;
   let query = supabase.from("proposals").select("*").limit(200);
   const stage = STAGES.some(([k]) => k === sp.stage) ? sp.stage ?? "" : "";

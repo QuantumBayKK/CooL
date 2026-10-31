@@ -11,8 +11,21 @@ const select = (tab, focus = false) => {
     document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
     if (on && bar) bar.style.width = `${((i + 1) / tabs.length) * 100}%`;
   });
-  if (focus) tab.focus();
+  if (focus) tab.focus({ preventScroll: true });
 };
+
+// Keep the guide one steady height (the tallest step), so switching steps never moves the page.
+const panels = tabs.map((t) => document.getElementById(t.getAttribute("aria-controls"))).filter(Boolean);
+const holder = panels[0]?.parentElement;
+const steady = () => {
+  if (!holder) return;
+  holder.style.minHeight = "";
+  let tallest = 0;
+  for (const p of panels) { const was = p.hidden; p.hidden = false; tallest = Math.max(tallest, p.offsetHeight); p.hidden = was; }
+  holder.style.minHeight = `${tallest}px`;
+};
+steady();
+addEventListener("resize", steady, { passive: true });
 
 tabs.forEach((tab, i) => {
   tab.tabIndex = i === 0 ? 0 : -1;
@@ -27,8 +40,8 @@ tabs.forEach((tab, i) => {
 
 document.querySelectorAll(".guide__next").forEach((btn) =>
   btn.addEventListener("click", () => {
+    // Stay put: the steps change in place, the page does not scroll.
     select(document.getElementById(btn.dataset.next), true);
-    document.querySelector(".guide__rail")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }),
 );
 

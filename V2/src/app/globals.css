@@ -1167,3 +1167,6 @@ img[src*="wordmark"] { filter: invert(1) brightness(0.95); }
 @keyframes docs-in { from { opacity: 0; transform: translateY(18px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
 @media (prefers-reduced-motion: reduce) { .docs-site::before, .docs-article { animation: none; } }
 
+
+/* Solid heading colour in the docs (gradient-clipped text was unreliable on some machines). */
+.docs-title, .docs-prose h2 { background: none !important; -webkit-text-fill-color: currentColor; color: #fff; }

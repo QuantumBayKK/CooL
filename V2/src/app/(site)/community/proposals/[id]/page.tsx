@@ -2,11 +2,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { NotOpenYet } from "@/components/community/NotOpenYet";
 import { Person } from "@/components/community/Person";
 import { CommentThread, FollowButton, ProposalActions, type Comment } from "@/components/community/ProposalClient";
 import { CATEGORIES, FIELDS, PROJECT_TYPES, STATUS, when, type Proposal } from "@/lib/community/commons";
-import { commonsOpen } from "@/lib/community/flags";
 import { getMember, isWelcomed } from "@/lib/community/member";
 import { communityServer } from "@/lib/community/supabase";
 
@@ -27,7 +25,6 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function ProposalPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ v?: string }> }) {
   const [{ id }, sp, member] = await Promise.all([params, searchParams, getMember()]);
-  if (!(await commonsOpen(Boolean(member?.owner)))) return <NotOpenYet title="Proposals open soon." body="The idea board arrives with The Commons." />;
   const r = await load(id);
   if (!r?.proposal) notFound();
   const { supabase, proposal: p } = r;

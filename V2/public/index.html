@@ -178,11 +178,6 @@
 <a href="/docs/verify-it-yourself" class="clink">Verify it yourself</a>
 </article>
 </div>
-<div class="ctri ctri--quiet" data-reveal>
-<article><h3>Capture automatically</h3><p>The weeks a year lost to change-paperwork come back as engineering time, because the record is a side effect of shipping rather than a task after it.</p></article>
-<article><h3>Verify offline</h3><p>Evidence assembled by hand for an audit becomes evidence produced continuously. Audits stop being fire drills and become an export.</p></article>
-<article><h3>Prove for a decade</h3><p>Hybrid post-quantum signing means a record sealed today still stands when the security assumptions of today have moved on.</p></article>
-</div>
 </div>
 </section>
 
@@ -307,7 +302,7 @@ const cool = await CoolTee.connect({
 </div>
 </article>
 <article class="fdr__row fdr__row--flip" data-reveal>
-<figure class="fdr__shot"><img src="/founders/kailosh.jpg" alt="Kailosh Kalimuthu" width="1086" height="1448" loading="lazy" decoding="async" /><span class="fdr__screen" aria-hidden="true"></span><figcaption class="fdr__idx" aria-hidden="true">02</figcaption></figure>
+<figure class="fdr__shot"><img src="/founders/kailosh.jpg?v=2" alt="Kailosh Kalimuthu" width="1025" height="1535" loading="lazy" decoding="async" /><span class="fdr__screen" aria-hidden="true"></span><figcaption class="fdr__idx" aria-hidden="true">02</figcaption></figure>
 <div class="fdr__copy">
 <p class="fdr__role">Co-Founder &amp; CTO</p>
 <h3 class="fdr__name">Kailosh<span>Kalimuthu</span></h3>
@@ -335,12 +330,12 @@ const cool = await CoolTee.connect({
 <div class="chero__actions chero__actions--left"><a href="/docs" class="cbtn cbtn--ghost">Read the docs</a><a href="https://cal.com/coolnwc" target="_blank" rel="noopener" class="clink">Book a call</a></div>
 </div>
 <div class="faq-wrap faqs" data-reveal>
-<div class="faq"><button class="faq__q">What does CooL actually record? <i></i></button><div class="faq__a"><p>A change to the behaviour of an AI system: an edited prompt, a swapped model, a changed policy, a granted tool. Each one is serialised deterministically, hashed, signed, and appended to a transparency log. It records the change, not your users' data.</p></div></div>
-<div class="faq"><button class="faq__q">What does "verifiable offline" mean in practice? <i></i></button><div class="faq__a"><p>You take a receipt file and run the open verifier on your own machine, with the network switched off. It recomputes the digest, checks the signature, checks the inclusion path and the consistency of the log. Nothing of ours is contacted, so nothing of ours has to be trusted.</p></div></div>
-<div class="faq"><button class="faq__q">What hardware does attestation run on? <i></i></button><div class="faq__a"><p>Intel TDX confidential VMs on Phala Cloud, through dstack. All seven checks have been verified on that hardware, with the raw quotes and tamper tests published in the SDK repo. Limits, stated plainly: CPU TDX only, no GPU attestation claimed, and quote verification goes through Phala's service unless you supply collateral locally. With <code>COOL_REQUIRE_HARDWARE=1</code> the verifier fails closed rather than downgrading to simulation.</p></div></div>
-<div class="faq"><button class="faq__q">Does CooL run or host my model? <i></i></button><div class="faq__a"><p>No. Your model runs wherever it already runs, on whichever provider you already use. CooL sits beside it and records what changed. That neutrality is the point — a system of record tied to one vendor cannot be the system of record.</p></div></div>
-<div class="faq"><button class="faq__q">Why post-quantum, when nothing is broken yet? <i></i></button><div class="faq__a"><p>Because evidence has a long shelf life. A record sealed for a seven-year retention obligation has to survive the whole seven years, and "harvest now, verify later" is a real problem for signatures that outlive their assumptions. Hybrid ML-DSA-65 + Ed25519 holds if either scheme is broken.</p></div></div>
-<div class="faq"><button class="faq__q">Can I use it today? <i></i></button><div class="faq__a"><p><code>npm i -g cool-nwc</code> is published and installs the SDK and verifier; the source is on <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub</a> under BUSL-1.1. Automatic capture is the active build. Launch prices are on the <a href="/pricing">pricing page</a>, but billing is not live yet, so there is nothing to buy today.</p></div></div>
+<div class="faq"><button class="faq__q">What does CooL actually record? <i></i></button><div class="faq__a"><p class="faq__short">Every change to how your AI behaves, and never your users' data.</p><p>A change to the behaviour of an AI system: an edited prompt, a swapped model, a changed policy, a granted tool. Each one is serialised deterministically, hashed, signed, and appended to a transparency log. It records the change, not your users' data.</p></div></div>
+<div class="faq"><button class="faq__q">What does "verifiable offline" mean in practice? <i></i></button><div class="faq__a"><p class="faq__short">Anyone can check a receipt on their own machine, with the internet switched off.</p><p>You take a receipt file and run the open verifier on your own machine, with the network switched off. It recomputes the digest, checks the signature, checks the inclusion path and the consistency of the log. Nothing of ours is contacted, so nothing of ours has to be trusted.</p></div></div>
+<div class="faq"><button class="faq__q">What hardware does attestation run on? <i></i></button><div class="faq__a"><p class="faq__short">Intel TDX confidential VMs on Phala Cloud.</p><p>Intel TDX confidential VMs on Phala Cloud, through dstack. All seven checks have been verified on that hardware, with the raw quotes and tamper tests published in the SDK repo. Limits, stated plainly: CPU TDX only, no GPU attestation claimed, and quote verification goes through Phala's service unless you supply collateral locally. With <code>COOL_REQUIRE_HARDWARE=1</code> the verifier fails closed rather than downgrading to simulation.</p></div></div>
+<div class="faq"><button class="faq__q">Does CooL run or host my model? <i></i></button><div class="faq__a"><p class="faq__short">No. Your model stays where it runs today.</p><p>No. Your model runs wherever it already runs, on whichever provider you already use. CooL sits beside it and records what changed. That neutrality is the point — a system of record tied to one vendor cannot be the system of record.</p></div></div>
+<div class="faq"><button class="faq__q">Why post-quantum, when nothing is broken yet? <i></i></button><div class="faq__a"><p class="faq__short">Because records have to stay trustworthy for years, longer than today's signatures may last.</p><p>Because evidence has a long shelf life. A record sealed for a seven-year retention obligation has to survive the whole seven years, and "harvest now, verify later" is a real problem for signatures that outlive their assumptions. Hybrid ML-DSA-65 + Ed25519 holds if either scheme is broken.</p></div></div>
+<div class="faq"><button class="faq__q">Can I use it today? <i></i></button><div class="faq__a"><p class="faq__short">Yes. Install it with <code>npm i -g cool-nwc</code>.</p><p><code>npm i -g cool-nwc</code> is published and installs the SDK and verifier; the source is on <a href="https://github.com/Northwind-Cipher/cool-sdk" target="_blank" rel="noopener">GitHub</a> under BUSL-1.1. Automatic capture is the active build. Launch prices are on the <a href="/pricing">pricing page</a>, but billing is not live yet, so there is nothing to buy today.</p></div></div>
 </div>
 </div>
 </section>

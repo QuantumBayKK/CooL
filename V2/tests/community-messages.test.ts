@@ -32,8 +32,10 @@ test("the team list is public, hides emails, and says who has joined", async () 
 test("anyone can message the team; members are private by default; replies are allowed", async () => {
   const t = await setup();
   assert.equal((await t.as(ADA, "select public.can_message_handle('kai') ok")).rows[0]!.ok, true, "members can message the team");
-  assert.equal((await t.as(ADA, "select public.can_message_handle('bob') ok")).rows[0]!.ok, false, "but not other members by default");
-  assert.ok((await t.as(ADA, "select public.send_message('bob', 'hi')")).error);
+  assert.equal((await t.as(ADA, "select public.can_message_handle('bob') ok")).rows[0]!.ok, true, "members can message each other by default");
+  await t.as(BO, "update public.profile_privacy set dm_policy = 'shared_project' where user_id = $1", [BO]);
+  assert.equal((await t.as(ADA, "select public.can_message_handle('bob') ok")).rows[0]!.ok, false, "unless they restrict it");
+  assert.ok((await t.as(ADA, "select public.send_message('bob', 'hi')")).error, "restricted members can't be messaged");
   assert.equal((await t.as(KAI, "select public.can_message_handle('ada') ok")).rows[0]!.ok, true, "the team can reach members");
   await t.as(BO, "update public.profile_privacy set dm_policy = 'anyone' where user_id = $1", [BO]);
   assert.equal((await t.as(ADA, "select public.can_message_handle('bob') ok")).rows[0]!.ok, true, "unless they choose anyone");

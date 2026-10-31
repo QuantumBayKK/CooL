@@ -45,7 +45,7 @@ export const ROOMS: Room[] = [
     ],
   },
   {
-    id: "hq.commons", name: "The Commons", type: "commons", capacity: 50, flag: "commons",
+    id: "hq.commons", name: "The Commons", type: "commons", capacity: 50, flag: null,
     summary: "Propose open-source projects, discuss them, vote, and recruit a team.",
     interactables: [
       { id: "commons.ideas", label: "Idea wall", href: "/community/proposals" },
@@ -58,12 +58,12 @@ export const ROOMS: Room[] = [
     interactables: [{ id: "meeting.terminal", label: "Meeting terminal", href: "/community/calendar" }],
   },
   {
-    id: "hq.assembly", name: "Assembly hall", type: "assembly", capacity: 50, flag: "commons",
+    id: "hq.assembly", name: "Assembly hall", type: "assembly", capacity: 50, flag: null,
     summary: "Community-wide discussions, votes and scheduled gatherings.",
     interactables: [{ id: "assembly.polls", label: "Open votes", href: "/community/commons#polls" }],
   },
   {
-    id: "hq.showcase", name: "Showcase gallery", type: "showcase", capacity: 50, flag: "commons",
+    id: "hq.showcase", name: "Showcase gallery", type: "showcase", capacity: 50, flag: null,
     summary: "Shipped projects, releases, demos and contributor stories.",
     interactables: [{ id: "showcase.wall", label: "Showcase", href: "/community/commons#showcase" }],
   },

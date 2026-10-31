@@ -135,3 +135,12 @@
   background: linear-gradient(100deg, #b8862f 0%, #f3dc94 45%, #c99a3f 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
   filter: none; }
 @media (max-width: 860px) { .fdr__name { letter-spacing: .05em; } .fdr__name span { letter-spacing: .1em; } }
+
+/* FAQ: a one-line answer first, then the detail. */
+.faq__a .faq__short { margin-bottom: 10px; color: #fff; font-weight: 600; font-size: 17px; line-height: 1.5; }
+
+/* Solid colours for all display type. Gradient-clipped text rendered washed out or invisible on
+   some machines, so every heading and name is a plain, dependable fill. */
+.c .ch2, .lumen__h1 { background: none !important; -webkit-text-fill-color: currentColor; color: #fff; }
+.fdr__name { background: none !important; -webkit-text-fill-color: currentColor; color: #d9ae55; animation: none; filter: drop-shadow(0 0 12px rgba(217,174,85,.25)); }
+.fdr__name span { background: none !important; -webkit-text-fill-color: currentColor; color: #ecd08a; }

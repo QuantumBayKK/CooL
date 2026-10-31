@@ -10,9 +10,8 @@ export const metadata: Metadata = { title: "People" };
 type Row = { handle: string; name: string; avatar_url: string | null; role: string; joined_at: string };
 
 const TEAM = [
-  { name: "Pranauv Shrinaath", role: "System design", href: "https://www.linkedin.com/in/pranauvshrinaath/" },
+  { name: "Pranauv Shrinaath (Keni)", role: "System design", href: "https://www.linkedin.com/in/pranauvshrinaath/" },
   { name: "Kailosh Kalimuthu", role: "System architecture and development", href: "https://www.linkedin.com/in/kailoshkalimuthu/" },
-  { name: "Rehan Shaik", role: "Founding Engineer", href: "https://www.linkedin.com/in/shaik-mohammad-rehan-01b6b1329/" },
 ];
 
 export default async function PeoplePage() {

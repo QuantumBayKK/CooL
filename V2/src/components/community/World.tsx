@@ -65,7 +65,8 @@ export function World({ me, flags, team, desks }: Props) {
     else if (el.requestFullscreen && document.fullscreenEnabled) void el.requestFullscreen().catch(() => setFull((f) => !f));
     else setFull((f) => !f);
   };
-  const live = flags["world.multiplayer"] === true;
+  // The live office is always on: members see each other unless they choose to be invisible.
+  const live = true;
   const key = JSON.stringify({ me, flags, team, visible, desks });
 
   useEffect(() => {
